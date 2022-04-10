@@ -1,0 +1,67 @@
+
+#:include register_client.kv
+
+<Manager>:
+    HomePage:
+        name:'homepage'
+    Register:
+        name:'register'
+    CreatBill:
+        name:'creatbill'
+    ViewSchedule:
+        name:'viewshedule'
+
+
+<HomePage>:
+    MDBoxLayout:
+        FloatLayout:
+
+
+
+
+<Table_shedule>:
+    hours:''
+    client:''
+    size_hint_y:None
+    height:'70dp'
+    MDBoxLayout:
+        MDLabel:
+            size_hint_x:None
+            width:'5dp'
+            text:root.hours
+            color:0,0,0,1
+        MDLabel:
+            text:'07:30'
+        MDCard:
+            ripple_behavior:True
+            MDLabel:
+                text:root.client
+                color:0,0,0,1
+
+<ViewSchedule>:
+    MDBoxLayout:
+        orientation:'vertical'
+        MDToolbar:
+            title:'Agenda cliete'
+            elevation:10
+            right_action_items:[['refresh',lambda x: root.actualizar()]]
+#            left_action_items:[['arrow-left-bold-outline', lambda x: root.return_homepage()]]
+
+    #    Button:
+    #        size_hint:None,None
+    #        width:'100dp'
+    #        height:'40dp'
+    #        text:'insert'
+    #        on_release:root.actualizar()
+        MDBoxLayout:
+            size_hint:1,.7
+            md_bg_color:0,1,1,1
+            pos_hint:{'center_x':.5}
+            ScrollView:
+                MDBoxLayout:
+                    orientation:'vertical'
+                    size_hint_y:None
+                    height:self.minimum_height
+                    spacing:'5dp'
+                    padding:'5dp'
+                    id:grid_shedule

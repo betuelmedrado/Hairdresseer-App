@@ -1,0 +1,102 @@
+
+<LoginManager>:
+    FloatLayout:
+        TextInput:
+            size_hint:.8,None
+            height:'30dp'
+            pos_hint:{'center_x':.5, 'center_y':.6}
+            hint_text:'Email'
+            id:email
+        TextInput:
+            size_hint:.8,None
+            height:'30dp'
+            pos_hint:{'center_x':.5, 'center_y':.5}
+            hint_text:'Senha'
+            id:senha
+        Label:
+            text:'Faça o seu cadastro'
+            pos_hint:{'center_x':.5,'center_y':.4}
+            color:1,1,1,1
+            id:warning
+        MDCard:
+            orientation:'vertical'
+            size_hint:.8,None
+            height:'40dp'
+            pos_hint:{'center_x':.5,'center_y':.32}
+            md_bg_color:0.13, 0.59, 0.95,1
+            radius:20,5,20,5
+            Label:
+                size_hint_y:None
+                height:'10dp'
+                text:'Faser'
+            Label:
+                size_hint_y:None
+                height:'25dp'
+                bold:True
+                font_size:'20dp'
+                text:'Login'
+        MDCard:
+            orientation:'vertical'
+            size_hint:.8,None
+            height:'40dp'
+            pos_hint:{'center_x':.5,'center_y':.2}
+            ripple_behavior:True
+            md_bg_color:0.16, 0.50, 0.73,1
+            radius:20,5,20,5
+            on_release:app.root.current = 'creatprofile'
+            Label:
+                bold:True
+                font_size:'25dp'
+                text:'Criar'
+            Label:
+                size_hint_y:None
+                height:'10dp'
+                font_size:'10dp'
+                text:'Conta'
+
+<CreatProfile>:
+    FloatLayout:
+        MDBoxLayout:
+            size_hint:.8,None
+            height:'130dp'
+            orientation:'vertical'
+            spacing:'10dp'
+            pos_hint:{'center_x':.5, 'center_y':.6}
+            TextInput:
+                hint_text:'Nome'
+                id:nome
+            TextInput:
+                hint_text:'Email'
+                id:email
+            TextInput:
+                hint_text:'Senha'
+                id:senha
+            TextInput:
+                hint_text:'Repetir senha'
+                id:rep_senha
+
+        Label:
+            text:'Faça o seu cadastro'
+            markup:True
+            pos_hint:{'center_x':.5,'center_y':.4}
+            color:0,0,0,1
+            id:warning
+        MDCard:
+            orientation:'vertical'
+            size_hint:.8,None
+            height:'40dp'
+            pos_hint:{'center_x':.5,'center_y':.2}
+            ripple_behavior:True
+            md_bg_color:0.16, 0.50, 0.73,1
+            radius:20,5,20,5
+            on_release:root.creat_bill()
+            Label:
+                bold:True
+                font_size:'25dp'
+                text:'Criar'
+            Label:
+                size_hint_y:None
+                height:'10dp'
+                font_size:'10dp'
+                text:'Conta'
+

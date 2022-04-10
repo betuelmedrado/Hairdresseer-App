@@ -1,0 +1,108 @@
+
+#:include file_kv/login_manager.kv
+#:include file_kv/manager_profile.kv
+
+<Manager>:
+    LoginManager:
+        name:'loginmanager'
+    CreatProfile
+        name:'creatprofile'
+    HomePage:
+        name:'homepage'
+    ManagerProfile:
+        name:'managerprofile'
+    ViewSchedule:
+        name:'viewshedule'
+
+<HomePage>:
+    MDBoxLayout:
+        orientation:'vertical'
+        MDToolbar:
+            title:'Home Page'
+        FloatLayout:
+            MDBoxLayout:
+                size_hint:None,None
+                width:'250dp'
+                height:'150dp'
+                spacing:'5dp'
+                pos_hint:{'center_x':.5,'center_y':.5}
+                MDCard:
+                    orientation:'vertical'
+                    md_bg_color:0.78, 0.80, 0.83,1
+                    radius:8,8,8,8
+                    elevation:'7dp'
+                    ripple_behavior:True
+                    on_release:app.root.current = 'managerprofile'
+                    Image:
+                        source:'images/profile.jpg'
+                    Label:
+                        color:0,0,0,1
+                        markup:True
+                        text:'[size=17][b]gerenciar[/b][/size]\n[color=#D40A00][size=40][b]Perfil[/b][/size][/color]'
+                MDCard:
+                    orientation:'vertical'
+                    md_bg_color:0.78, 0.80, 0.83,1
+                    radius:8,8,8,8
+                    elevation:'7dp'
+                    ripple_behavior:True
+                    on_release:app.root.current = 'viewshedule'
+                    Image:
+                        source:'images/agenda.png'
+                    Label:
+                        color:0,0,0,1
+                        markup:True
+                        text:'[size=20][b]Ver[/b][/size]\n[color=#D40A00][size=40][b]Agenda[/b][/size][/color]'
+
+
+<Table_shedule>:
+    entrada:''
+    tempo:''
+    client:''
+    size_hint_y:None
+    height:'80dp'
+    MDBoxLayout:
+        md_bg_color:1,1,1,1
+        MDBoxLayout:
+            orientation:'vertical'
+            size_hint_x:None
+            width:'40dp'
+            Label:
+                text:root.entrada
+                color:0,0,0,1
+            Label:
+                text:root.tempo
+                color:0,0,0,1
+
+        MDCard:
+            ripple_behavior:True
+            MDLabel:
+                text:root.client
+                color:0,0,0,1
+
+
+<ViewSchedule>:
+    MDBoxLayout:
+        orientation:'vertical'
+        MDToolbar:
+            title:'Agenda'
+            elevation:10
+            right_action_items:[['refresh',lambda x: root.actualizar()]]
+            left_action_items:[['arrow-left-bold-outline', lambda x: root.return_homepage()]]
+    #    Button:
+    #        size_hint:None,None
+    #        width:'100dp'
+    #        height:'40dp'
+    #        text:'insert'
+    #        on_release:root.actualizar()
+        MDBoxLayout:
+            size_hint:1,.7
+            md_bg_color:0,1,1,1
+            pos_hint:{'center_x':.5}
+            ScrollView:
+                MDBoxLayout:
+                    orientation:'vertical'
+                    size_hint_y:None
+                    height:self.minimum_height
+                    spacing:'5dp'
+                    padding:'5dp'
+                    id:grid_shedule
