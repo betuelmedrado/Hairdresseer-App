@@ -223,53 +223,6 @@
                     pos_hint:{'center_x':.5}
                     hint_text:'Nome/Socio'
                     id:text_socio
-#                MDBoxLayout:
-#                    size_hint:.9,None
-#                    height:'60dp'
-#                    spacing:'11dp'
-#                    pos_hint:{'center_x':.5,'center_y':.67}
-#                    MDBoxLayout:
-#                        orientation:'vertical'
-#                        MDLabel:
-#                            font_size:'9dp'
-#                            text:'Entrada do serviço'
-#                        MDTextFieldRect:
-#                            size_hint_x:None
-#                            width:'60dp'
-#                            pos_hint:{'center_x':.5}
-#                            hint_text:'00:00'
-#                            on_focus:root.validate('entry')
-#                            id:entry_socio
-#                    MDBoxLayout:
-#                        orientation:'vertical'
-#                        MDLabel:
-#                            font_size:'9dp'
-#                            text:'Horas'
-#                            halign:'center'
-#                        MDBoxLayout:
-#                            size_hint_x:None
-#                            width:'60dp'
-#                            pos_hint:{'center_x':.5}
-#                            ScrollView:
-#                                MDBoxLayout:
-#                                    orientation:'vertical'
-#                                    size_hint_y:None
-#                                    height:self.minimum_height
-#                                    id:hours_socio
-#
-#                    MDBoxLayout:
-#                        orientation:'vertical'
-#                        MDLabel:
-#                            font_size:'9dp'
-#                            halign:'right'
-#                            text:'saida do serviço'
-#                        MDTextFieldRect:
-#                            size_hint_x:None
-#                            width:'60dp'
-#                            pos_hint:{'center_x':.5}
-#                            hint_text:'00:00'
-#                            on_focus:root.validate('exit')
-#                            id:exit_socio
                 MDBoxLayout:
                     size_hint:.7,None
                     height:'30dp'
@@ -300,24 +253,15 @@
                             size_hint_x:.40
                             font_size:'10dp'
                             bold:True
-                            text:'Serviços'
-                        MDLabel:
-                            size_hint_x:.40
-                            font_size:'10dp'
-                            bold:True
-                            text:'Tempo'
-                        MDLabel:
-                            size_hint_x:.20
-                            font_size:'10dp'
-                            bold:True
-                            text:'ValorR$'
+                            color:1,0,0,1
+                            text:'Nome'
                     MDBoxLayout:
                         ScrollView:
                             MDBoxLayout:
                                 orientation:'vertical'
                                 size_hint_y:None
                                 height:self.minimum_height
-#                                    id:categorie
+                                id:box_socio
 
 
 

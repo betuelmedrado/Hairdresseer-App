@@ -1,51 +1,45 @@
 
 #:include register_client.kv
 
+
 <Manager>:
-    HomePage:
-        name:'homepage'
+#    HoursSchedule:
+#        name:'hoursschedule'
     Register:
         name:'register'
     CreatBill:
         name:'creatbill'
+    HomePage:
+        name:'homepage'
     ViewSchedule:
         name:'viewshedule'
+    HoursSchedule:
+        name:'hoursschedule'
 
 
 <HomePage>:
     MDBoxLayout:
-        FloatLayout:
-
-
-
-
-<Table_shedule>:
-    hours:''
-    client:''
-    size_hint_y:None
-    height:'70dp'
-    MDBoxLayout:
-        MDLabel:
-            size_hint_x:None
-            width:'5dp'
-            text:root.hours
-            color:0,0,0,1
-        MDLabel:
-            text:'07:30'
-        MDCard:
-            ripple_behavior:True
-            MDLabel:
-                text:root.client
-                color:0,0,0,1
+        orientation:'vertical'
+        MDToolbar:
+            left_action_items:[['account-arrow-left-outline', lambda x: root.return_login()]]
+        ScrollView:
+            FloatLayout:
+                MDBoxLayout:
+                    pos_hint:{'center_x':.5,'center_y':.5}
+                    spacing:'15dp'
+                    orientation:'vertical'
+                    size_hint_y:None
+                    height:self.minimum_height
+                    id:my_card_button
 
 <ViewSchedule>:
     MDBoxLayout:
         orientation:'vertical'
         MDToolbar:
-            title:'Agenda cliete'
             elevation:10
+            id:title_toobar
             right_action_items:[['refresh',lambda x: root.actualizar()]]
-#            left_action_items:[['arrow-left-bold-outline', lambda x: root.return_homepage()]]
+            left_action_items:[['arrow-left-bold-outline', lambda x: root.return_homepage()]]
 
     #    Button:
     #        size_hint:None,None
@@ -55,13 +49,209 @@
     #        on_release:root.actualizar()
         MDBoxLayout:
             size_hint:1,.7
-            md_bg_color:0,1,1,1
+            md_bg_color:0,0,0,.4
             pos_hint:{'center_x':.5}
             ScrollView:
                 MDBoxLayout:
                     orientation:'vertical'
                     size_hint_y:None
                     height:self.minimum_height
-                    spacing:'5dp'
-                    padding:'5dp'
+                    spacing:'11dp'
+                    padding:'11dp'
                     id:grid_shedule
+#<spim>:
+#    size_hint: None, None
+#    size: '46dp', '46dp'
+#    pos_hint: {'center_x': .5}
+
+<HoursSchedule>:
+    ScrollView
+        MDBoxLayout:
+            size_hint_y:None
+            height:self.minimum_height
+            spacing:'20dp'
+            orientation:'vertical'
+            MDCard:
+                size_hint_y:None
+                height:'60dp'
+                md_bg_color:0,1,1,1
+                MDIconButton:
+                    icon:'arrow-left-top-bold'
+                    theme_icon_color: "Custom"
+                    color:1,0,0,1
+                    on_release:app.root.current = 'viewshedule'
+                MDLabel:
+                    font_size:'30dp'
+                    halign:'center'
+                    color:0,0,0,1
+                    bold:True
+                    id:hours
+            MDBoxLayout:
+                size_hint:.7,None
+                height:'20dp'
+                pos_hint:{'center_x':.5}
+                MDLabel:
+                    markup:True
+                    text:'Escolha\nOs tipos de serviços'
+                    bold:True
+                    color:1,1,1,1
+
+#                font_size:'30dp'
+            MDSeparator:
+
+            MDCard:
+                size_hint:.7,None
+                height:'100dp'
+                md_bg_color:0.78, 0.80, 0.83,1
+                radius:8,8,8,8
+                pos_hint:{'center_x':.5}
+                MDCard:
+                    orientation:'vertical'
+                    size_hint:None,None
+                    width:self.parent.width - 10
+                    height:self.parent.height - 10
+                    radius:8,8,8,8
+                    halign:'center'
+                    pos_hint:{'center_x':.5,'center_y':.5}
+                    MDBoxLayout:
+                        size_hint_y:None
+                        height:'10dp'
+                        MDLabel:
+                            size_hint_x:.40
+                            font_size:'10dp'
+                            bold:True
+                            color:1,0,0,1
+                            text:'Serviços'
+                        MDLabel:
+                            size_hint_x:.40
+                            font_size:'10dp'
+                            bold:True
+                            text:'Tempo'
+                            color:1,0,0,1
+                        MDLabel:
+                            size_hint_x:.20
+                            font_size:'10dp'
+                            bold:True
+                            text:'ValorR$'
+                            color:1,0,0,1
+                    MDBoxLayout:
+                        ScrollView:
+                    # Receive my_box_categorie ######################
+                            MDBoxLayout:
+                                orientation:'vertical'
+                                size_hint_y:None
+                                height:self.minimum_height
+                                spacing:'5dp'
+                                padding:'3dp'
+                                id:categorie
+#                                MDSpinner:
+#                                    size_hint: None, None
+#                                    size: '46dp', '46dp'
+#                                    pos_hint: {'center_x': .5}
+            MDBoxLayout:
+                orientation:'vertical'
+                size_hint:.7,None
+                height:'130dp'
+                pos_hint:{'center_x':.5}
+                MDLabel:
+                    size_hint_y:None
+                    height:'20dp'
+                    text:'Serviços escolhidos!'
+                MDCard:
+                    md_bg_color:0.78, 0.80, 0.83,1
+                    radius:8,8,8,8
+                    pos_hint:{'center_x':.5}
+                    MDCard:
+                        orientation:'vertical'
+                        size_hint:None,None
+                        width:self.parent.width - 10
+                        height:self.parent.height - 10
+                        radius:8,8,8,8
+                        halign:'center'
+                        pos_hint:{'center_x':.5,'center_y':.5}
+                        MDBoxLayout:
+                            size_hint_y:None
+                            height:'10dp'
+                            md_bg_color:1,1,1,.3
+                            MDLabel:
+                                size_hint_x:.40
+                                font_size:'10dp'
+                                bold:True
+                                color:0,0,0,1
+                                text:'Serviços'
+                            MDLabel:
+                                size_hint_x:.40
+                                font_size:'10dp'
+                                bold:True
+                                text:'Tempo'
+                                color:0,0,0,1
+                            MDLabel:
+                                size_hint_x:.20
+                                font_size:'10dp'
+                                bold:True
+                                text:'ValorR$'
+                                color:0,0,0,1
+                        MDBoxLayout:
+                            md_bg_color:1,1,1,.3
+                            ScrollView:
+                                MDBoxLayout:
+                                    orientation:'vertical'
+                                    size_hint_y:None
+                                    height:self.minimum_height
+                                    spacing:'5dp'
+                                    padding:'3dp'
+                                    id:work_select
+            MDBoxLayout:
+                orientation:'vertical'
+                size_hint:.7,None
+                height:'85dp'
+                padding:'10dp',0,0,0
+                pos_hint:{'center_x':.5}
+                spacing:'5dp'
+                radius:8,8,8,8
+                MDCard:
+                    orientation:'vertical'
+                    padding:'10dp',0,0,0
+                    pos_hint:{'center_x':.5}
+                    radius:8,8,8,8
+                    MDBoxLayout:
+                        MDLabel:
+                            text:'tempo'
+                            font_size:'11dp'
+                            color:1,1,1,.3
+                        MDLabel:
+                            text:'Valor R$'
+                            font_size:'11dp'
+                            color:1,1,1,.3
+                    MDBoxLayout:
+                        MDLabel:
+                            color:1,1,1,1
+                            id:time
+                        MDLabel:
+                            color:1,1,1,1
+                            id:valor
+                MDCard:
+                    orientation:'vertical'
+                    size_hint_y:None
+                    height:'30dp'
+                    radius:8,8,8,8
+                    md_bg_color:0.13, 0.53, 0.95,1
+                    ripple_behavior:True
+                    id:card_save
+#                    on_release:root.save_scheduleing()
+#                    on_release:
+                    MDLabel:
+                        text:'Salvar'
+                        color:0,0,0,.7
+                        font_size:'9dp'
+                        bold:True
+                        halign:'center'
+                    MDLabel:
+                        text:'Agendamento'
+                        bold:True
+                        halign:'center'
+            MDSeparator:
+
+            MDBoxLayout:
+                size_hint_y:None
+                height:'70dp'

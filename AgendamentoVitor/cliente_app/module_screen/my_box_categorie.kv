@@ -1,0 +1,51 @@
+
+
+<MyBoxCategorie>:
+    size_hint_y:None
+    height:'30dp'
+    servico:''
+    tempo:''
+    valor:''
+    radius:3,3,3,3
+    md_bg_color:0,1,1,.1
+    ripple_behavior:True
+    on_release:app.root.get_screen('hoursschedule').changer_color(self,root.servico)
+
+    MDLabel:
+        size_hint_x:.40
+        font_size:'10dp'
+        bold:True
+        text:root.servico
+    MDLabel:
+        size_hint_x:.40
+        font_size:'10dp'
+        bold:True
+        text:root.tempo
+    MDLabel:
+        size_hint_x:.20
+        font_size:'10dp'
+        bold:True
+        text:root.valor
+
+<MyBoxCategorieLabel>:
+    size_hint_y:None
+    height:'30dp'
+    servico:''
+    tempo:''
+    valor:''
+    md_bg_color:0,0,0,0
+    MDLabel:
+        size_hint_x:.40
+        font_size:'10dp'
+        bold:True
+        text:root.servico
+    MDLabel:
+        size_hint_x:.40
+        font_size:'10dp'
+        bold:True
+        text:root.tempo
+    MDLabel:
+        size_hint_x:.20
+        font_size:'10dp'
+        bold:True
+        text:root.valor

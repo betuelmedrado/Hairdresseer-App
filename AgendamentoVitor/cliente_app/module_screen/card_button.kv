@@ -1,6 +1,20 @@
 
-
-MDCard:
+# The class of Manager hairdresser
+<MyCardButton>:
     size_hint:None,None
-    width:'500dp'
-    height:'600dp'
+    width:'250dp'
+    height:'100dp'
+    pos_hint:{'center_x':.5,'center_y':.5}
+    md_bg_color:0,1,1,1
+    ripple_behavior:True
+    radius:5,5,5,5
+    id_user:''
+    nome:''
+    on_release:root.send_info(self.id_user)
+    Image:
+        source:'images/person.png'
+    MDLabel:
+        color:0,0,0,1
+        bold:True
+        font_size:'30dp'
+        text:root.nome

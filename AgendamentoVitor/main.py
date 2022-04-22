@@ -84,6 +84,7 @@ class CreatProfile(Screen):
         else:
             return True
 
+#  Here I will change to change the id
     def creat_profile(self,localid, *args):
         LINK_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{localid}.json'
 
@@ -146,7 +147,8 @@ class ManagerProfile(Screen):
     def on_pre_enter(self, *args):
         self.creat_profile()
         self.insert_hours()
-        Clock.schedule_once(self.infill,2)
+        Clock.schedule_once(self.get_socios,2)
+        Clock.schedule_once(self.infill,3)
 
     # Here only return the id of user
     def get_id_whith_refreshtoken(self, *args):
@@ -184,6 +186,12 @@ class ManagerProfile(Screen):
 
 
     def insert_hours(self, *args, **kwargs):
+        """
+        function that receiv the hours
+        :param args:
+        :param kwargs:
+        :return:
+        """
         for hours, min in enumerate(range(24)):
             h = f'{str(hours).zfill(2)}:00'
             bt = MDTextButton(text=str(h), md_bg_color=(0.13, 0.53, 0.95,.1))
@@ -223,11 +231,13 @@ class ManagerProfile(Screen):
         try:
             LINK_BASE_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.user_id}.json'
 
-            entrada = self.ids.entry.text
-            saida = self.ids.exit.text
+            self.entrada = self.ids.entry.text
+            self.saida = self.ids.exit.text
 
-            info = f'{{"entrada":"{entrada}",\
-                     "saida": "{saida}"}}'
+            info = f'{{"entrada":"{self.entrada}",\
+                     "saida": "{self.saida}", \
+                     "agenda":" "}}'
+
             requisica = requests.patch(LINK_BASE_SALAO, info)
             toast('Tabela de horas salva com sucesso!', duration=4)
         except:
@@ -242,7 +252,8 @@ class ManagerProfile(Screen):
 
         info = f'{{"nome_servico":"{nome_servico}",' \
                f'"tempo":"{tempo}",' \
-               f'"valor":"{valor}"}}'
+               f'"valor":"{valor}",' \
+               f'"servicos":""}}'
 
         requisicao = requests.post(LINK_BASE_SALAO, info)
         toast('Categoria criada', duration=4)
@@ -250,7 +261,7 @@ class ManagerProfile(Screen):
         self.infill()
 
     def infill(self, *args):
-        LINK_CATEGORIA = 'https://shedule-vitor-default-rtdb.firebaseio.com/salao/3pYGyBmzqoZN548BO7hDrtgoToz2/servicos.json'
+        LINK_CATEGORIA = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.user_id}/servicos.json'
 
         requisicao_get = requests.get(LINK_CATEGORIA)
         requisicao_get_dic = requisicao_get.json()
@@ -258,7 +269,7 @@ class ManagerProfile(Screen):
         self.ids.categorie.clear_widgets()
 
         for id in requisicao_get_dic:
-            LINK_ID = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/3pYGyBmzqoZN548BO7hDrtgoToz2/servicos/{id}.json'
+            LINK_ID = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.user_id}/servicos/{id}.json'
 
             requisicao_get_categoria = requests.get(LINK_ID)
             requisicao_get_categoria_dic = requisicao_get_categoria.json()
@@ -272,17 +283,50 @@ class ManagerProfile(Screen):
             # print(requisicao_get_categoria_div['nome_servico'])
 
     def save_socio(self,*args):
+        LINK_ETRADA_SAIDA =f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.user_id}.json'
+        requisicao_entrada_saida = requests.get(LINK_ETRADA_SAIDA)
+        entrada_saida = requisicao_entrada_saida.json()
+
+        entrada = entrada_saida['entrada']
+        saida = entrada_saida['saida']
+
         LINK_SOCIO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.user_id}/socios.json'
+
 
         nome_socio = self.ids.text_socio.text
 
-        info = f'{{"nome":"{nome_socio}",' \
-               f'"id":1}}'
+        if nome_socio == '':
+            toast('Nenhum nome informado!')
+        else:
+            info = f'{{"nome":"{nome_socio}",' \
+                   f'"id":1,' \
+                   f'"agenda":"",' \
+                   f'"entrada":"{entrada}",' \
+                   f'"saida":"{saida}",' \
+                   f'"servicos":""}}'
 
-        requisicao = requests.post(LINK_SOCIO, data=info)
+            requisicao = requests.post(LINK_SOCIO, data=info)
+            toast('Socio criado com sucesso!')
+            self.ids.box_socio.add_widget(MyBoxSocio(nome_socio))
 
-        toast('Socio criado com sucesso!')
+    def get_socios(self,*args):
 
+        self.ids.box_socio.clear_widgets()
+
+        lista = []
+
+        LINK_SOCIO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.user_id}/socios.json'
+        socio = requests.get(LINK_SOCIO)
+        socio_dic = socio.json()
+
+        try:
+            for id_socio in socio_dic:
+                LINK_ID_SOCIO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.user_id}/socios/{id_socio}.json'
+                nome = requests.get(LINK_ID_SOCIO)
+                nome_dic = nome.json()
+                self.ids.box_socio.add_widget(MyBoxSocio(str(nome_dic['nome'])))
+        except:
+            pass
 
 class MyButtonCard(MDCard):
     pass
@@ -295,14 +339,19 @@ class MyBoxCategorie(MDCard):
         self.tempo = str(tempo)
         self.valor = str(valor)
 
+class MyBoxSocio(MDCard):
+    def __init__(self,name, **kwargs):
+        super().__init__(**kwargs)
+        self.nome = name
+
 
 class Table_shedule(MDBoxLayout):
 
-    def __init__(self,entrada='',tempo='',client='',**kwargs):
+    def __init__(self,id_schedulr='',hours='',client='',**kwargs):
         super().__init__(**kwargs)
-        self.entrada = str(entrada)
+        self.id_schedule = id_schedulr
+        self.hours = str(hours)
         self.client = str(client)
-        self.tempo = tempo
 
 
 class ViewSchedule(Screen):
@@ -310,29 +359,36 @@ class ViewSchedule(Screen):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
 
-        self.entrada = 7
-        self.saida = 20
-        self.tempo = 30
-
-
-        # link = requests.get(f'https://shedule-vitor-default-rtdb.firebaseio.com/.json')
-        link = requests.get(f'https://shedule-vitor-default-rtdb.firebaseio.com/salao.json')
-        self.dados = link.json()
+        LINK = requests.get(f'https://shedule-vitor-default-rtdb.firebaseio.com/salao.json')
+        self.dados = LINK.json()
 
     def actualizar(self, *args):
-        self.ids.grid_shedule.clear_widgets()
 
-        # for informacao in self.dados[1:]:
+        for id in self.dados:
+            self.id_dados = id
+
+        self.ids.grid_shedule.clear_widgets()
+        LINK_AGENDA = requests.get(f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_dados}.json')
+        link_agenda = LINK_AGENDA.json()
+
+        self.entrada = int(link_agenda['entrada'][:2])
+        self.minuto_entrada = int(link_agenda['entrada'][3:])
+        self.saida = int(link_agenda['saida'][:2])
+        self.minuto_saida = int(link_agenda['saida'][3:])
+
+
         for enum,informacao in enumerate(range(self.entrada,self.saida + self.entrada + 1)):
             # self.ids.grid_shedule.add_widget(Table_shedule(informacao['proficional'], informacao['agendados'][1]['cliente']))
 
             if enum >= self.entrada:
-                self.ids.grid_shedule.add_widget(Table_shedule(f'{str(enum).zfill(2)}:00', f'{enum}:{self.tempo}' ))
+                self.ids.grid_shedule.add_widget(
+                    Table_shedule(str(enum), f'{str(enum).zfill(2)}:{str(self.minuto_entrada).zfill(2)}'))
             else:
                 pass
 
     def on_pre_enter(self, *args):
         self.actualizar()
+        pass
 
     def return_homepage(self):
         MDApp.get_running_app().root.current = 'homepage'
@@ -342,6 +398,7 @@ class ViewSchedule(Screen):
 class AgendamentoApp(MDApp):
 
     Builder.load_string(open('agendamento_vitor.kv', encoding='utf-8').read())
+    Builder.load_string(open('module_screen/my_box_socio.kv', encoding='utf-8').read())
 
     def build(self):
 

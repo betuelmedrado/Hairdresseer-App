@@ -1,0 +1,12 @@
+[
+  {
+    "servico": "corte",
+    "tempo": "00:30",
+    "valor": "30.00"
+  },
+  {
+    "servico": "pintura",
+    "tempo": "01:30",
+    "valor": "50.00"
+  }
+]

@@ -55,29 +55,28 @@
 
 
 <Table_shedule>:
-    entrada:''
-    tempo:''
+    id_schedule:''
+    hours:''
+    hours_2:''
     client:''
     size_hint_y:None
-    height:'80dp'
-    MDBoxLayout:
+    height:'100dp'
+    MDCard:
+        ripple_behavior:True
         md_bg_color:1,1,1,1
+        radius:5,5,5,5
+        on_release:print(root.id_schedule)
         MDBoxLayout:
             orientation:'vertical'
-            size_hint_x:None
-            width:'40dp'
-            Label:
-                text:root.entrada
-                color:0,0,0,1
-            Label:
-                text:root.tempo
-                color:0,0,0,1
-
-        MDCard:
-            ripple_behavior:True
             MDLabel:
-                text:root.client
+                text:root.hours
                 color:0,0,0,1
+            MDLabel:
+                color:0,0,0,1
+                text:root.hours_2
+        MDLabel:
+            text:root.client
+            color:0,0,0,1
 
 
 <ViewSchedule>:
