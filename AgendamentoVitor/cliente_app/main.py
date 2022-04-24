@@ -310,6 +310,7 @@ class ViewSchedule(Screen):
             id_informing = json.load(arquivo)
         return id_informing
 
+    # Get id user ########################################################
     def log_aut(self,*args):
         LINK = f'https://securetoken.googleapis.com/v1/token?key={self.API_KEY}'
         try:
@@ -331,41 +332,27 @@ class ViewSchedule(Screen):
         except:
             pass
 
-    def actualizar(self, *args):
-        """
-        funciont what receiv the actualization of screen
-        :param args:
-        :return:
-        """
-        info = None
-        lista_info = ''
-        lista_content = []
-        soma_horas = ''
-
-        # this variable is to see which field I will insert
-        # esta variavel  é para ver qual campo e vou inserir
-        if_insert_fild_empyt = False
-
-        self.ids.grid_shedule.clear_widgets()
-
+    def info_proficional_schedule(self, *args):
         id_manager = self.get_id_proficional()
-
         try:
+            # Here to geting the id of manager to get schedule #######################################
             LINK_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{id_manager}.json'
             requisicao = requests.get(LINK_SALAO)
             requisicao_dic = requisicao.json()
 
             nome = requisicao_dic['nome']
 
-            self.entrada = int(requisicao_dic['entrada'][:2])
+            self.entrada = requisicao_dic['entrada']
             self.minuto_entrada = int(requisicao_dic['entrada'][3:])
 
-            self.saida = int(requisicao_dic['saida'][:2])
+            self.saida = requisicao_dic['saida']
             self.minuto_saida = int(requisicao_dic['saida'][3:])
 
             self.ids.title_toobar.title = f'Agenda {str(nome)}'
 
         except TypeError:
+
+            # Here if not manager then get the socio #########################################################################
             LINK_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{id_manager}.json'
             requisicao = requests.get(LINK_SALAO)
             requisicao_dic = requisicao.json()
@@ -380,99 +367,185 @@ class ViewSchedule(Screen):
 
             self.ids.title_toobar.title = f'Agenda {str(nome)}'
 
-        # ID to know the profissional in the area ###############################################
-        id_informing = self.get_id_proficional()
 
-        LINK_DATA = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{id_informing}/agenda.json'
-        requisicao = requests.get(LINK_DATA)
-        requisicao_dic = requisicao.json()
+    def actualizar(self, *args):
 
-        # formating the table of hours ##########################################################
-        # for enum,informacao in enumerate(range(self.entrada,self.saida + self.entrada + 1)):
-        print('entrada', self.entrada)
-        print('saida', self.saida)
+        self.info_proficional_schedule()
 
-        enum = 0
-        while enum <= self.saida :
-            if_insert_fild_empyt = False
+        entrada = self.entrada
+        saida = self.saida
+        tempo = '00:30'
 
-            # hours formated ###################################################################
-            # horas = f'{str(enum).zfill(2)}:{str(self.minuto_entrada).zfill(2)}'
-            horas = f'{self.entrada}'
+        lista = ['']
 
-            entrada = datetime.strptime(horas, '%H:%M')
+        self.ids.grid_shedule.add_widget(Table_shedule('', '', entrada, '', ''))
+        while entrada[:2] < saida[:2]:
+
+            inicio = datetime.strptime(entrada,'%H:%M')
+
+            horas, minutos = map(int,tempo.split(':'))
+            delta = timedelta(hours=horas, minutes=minutos)
+
+            final = inicio + delta
+
+            entrada = final.strftime('%H:%M')
+            print(entrada)
+
+            table = Table_shedule('', '', entrada, '', '')
+            self.ids.grid_shedule.add_widget(table)
 
 
-            if enum < self.entrada:
 
-            # just to get list position  inside of schedule position###############################
-            # apenas para obter a posição da lista dentro da posição da agenda ####################
-                lista_content.append('')
 
-            # here only go intry if the hours go bigger or equal
-            # aqui só entra se o horário for maior ou igual
-            if enum >= self.entrada:
 
-                try:
-            # percorrendo alista para saber a posicao que o agendamento vai entrar ################
-                    for agenda in requisicao_dic.values():
-                        lista_info = (agenda)
 
-                        if enum == int(lista_info['id_posicao']):
-
-                            hour_table = horas # geting the hours
-                            inicio = datetime.strptime(hour_table,'%H:%M') # formating the hours ############
-                            tempo = lista_info['tempo'] # get work time #####################################
-                            hours, minutos = map(int,tempo.split(':')) # formating hours
-
-                            termino = timedelta(hours=hours, minutes=minutos)
-
-                            soma = inicio + termino
-                            soma_horas = soma.strftime('%H:%M')
-
-                            # print(soma_horas[:2])
-                            # print(soma_horas[3:])
-
-                            self.minuto_entrada = int(soma_horas[3:])
-
-                            # comparing the id of user ######################################################
-                            block = self.log_aut()
-
-                            print('soma horas ',soma_horas)
-                            if block == lista_info['id_user']:
-                                table = Table_shedule(str(enum), str(enum), horas,'Você agendou esse horário',str(soma_horas))
-                                lista_content.append(lista_info['id_horas'])
-                                self.ids.grid_shedule.add_widget(table)
-                                horas = soma_horas
-                                enum = int(soma_horas[:2])
-                            else:
-                                libera = Table_block(str(enum), str(enum), lista_info['id_horas'], 'Agendado!',str(soma_horas))
-                                self.ids.grid_shedule.add_widget(libera)
-                                lista_content.append(lista_info['id_horas'])
-                                horas = soma_horas
-                                enum = int(soma_horas[:2])
-
-                            # To insert empty field ##########################################################
-                            if_insert_fild_empyt = True
-                except AttributeError:
-                    pass
-
-            if enum >= self.entrada and if_insert_fild_empyt == False:
-                print('last soma ', soma_horas)
-                horas = f'{str(enum-1).zfill(2)}:{str(soma_horas[3:]).zfill(2)}'
-                if soma_horas[3:] != '00':
-                    self.ids.grid_shedule.add_widget(Table_shedule(str(enum), str(enum), horas,'',f'{str(enum).zfill(2)}:00'))
-                else:
-                    self.ids.grid_shedule.add_widget(Table_shedule(str(enum), str(enum), horas,'',str()))
-                lista_content.append('')
-            horas = soma_horas
-
-            with open('list_content.json','w') as lista:
-                json.dump(lista_content, lista)
-            enum += 1
-        print(lista_content)
+    def _actualizar(self, *args):
+        pass
+    #     """
+    #     funciont what receiv the actualization of screen
+    #     :param args:
+    #     :return:
+    #     """
+    #     info = None
+    #     lista_info = ''
+    #     lista_content = []
+    #     soma_horas = ''
+    #
+    #     # this variable is to see which field I will insert
+    #     # esta variavel  é para ver qual campo e vou inserir
+    #     if_insert_fild_empyt = False
+    #
+    #     self.ids.grid_shedule.clear_widgets()
+    #
+    #     id_manager = self.get_id_proficional()
+    #
+    #     try:
+    #         # Here to geting the id of manager to get schedule #######################################
+    #         LINK_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{id_manager}.json'
+    #         requisicao = requests.get(LINK_SALAO)
+    #         requisicao_dic = requisicao.json()
+    #
+    #         nome = requisicao_dic['nome']
+    #
+    #         self.entrada = int(requisicao_dic['entrada'][:2])
+    #         self.minuto_entrada = int(requisicao_dic['entrada'][3:])
+    #
+    #         self.saida = int(requisicao_dic['saida'][:2])
+    #         self.minuto_saida = int(requisicao_dic['saida'][3:])
+    #
+    #         self.ids.title_toobar.title = f'Agenda {str(nome)}'
+    #
+    #     except TypeError:
+    #
+    #         # Here if not manager then get the socio #########################################################################
+    #         LINK_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{id_manager}.json'
+    #         requisicao = requests.get(LINK_SALAO)
+    #         requisicao_dic = requisicao.json()
+    #
+    #         nome = requisicao_dic['nome']
+    #
+    #         self.entrada = int(requisicao_dic['entrada'][:2])
+    #         self.minuto_entrada = int(requisicao_dic['entrada'][3:])
+    #
+    #         self.saida = int(requisicao_dic['saida'][:2])
+    #         self.minuto_saida = int(requisicao_dic['saida'][3:])
+    #
+    #         self.ids.title_toobar.title = f'Agenda {str(nome)}'
+    #
+    #     # ID to know the profissional in the area ###############################################
+    #     id_informing = self.get_id_proficional()
+    #
+    #     LINK_DATA = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{id_informing}/agenda.json'
+    #     requisicao = requests.get(LINK_DATA)
+    #     requisicao_dic = requisicao.json()
+    #
+    #     # formating the table of hours ##########################################################
+    #     # for enum,informacao in enumerate(range(self.entrada,self.saida + self.entrada + 1)):
+    #     print('entrada', self.entrada)
+    #     print('saida', self.saida)
+    #
+    #     enum = 0
+    #     while enum <= self.saida :
+    #         if_insert_fild_empyt = False
+    #
+    #         # hours formated ###################################################################
+    #         horas = f'{str(enum).zfill(2)}:{str(self.minuto_entrada).zfill(2)}'
+    #         # horas = f'{self.entrada}'
+    #
+    #         # entrada = datetime.strptime(horas, '%H:%M')
+    #
+    #
+    #         if enum < self.entrada:
+    #
+    #         # just to get list position  inside of schedule position###############################
+    #         # apenas para obter a posição da lista dentro da posição da agenda ####################
+    #             lista_content.append('')
+    #
+    #         # here only go intry if the hours go bigger or equal
+    #         # aqui só entra se o horário for maior ou igual
+    #         if enum >= self.entrada:
+    #
+    #             try:
+    #         # percorrendo alista para saber a posicao que o agendamento vai entrar ################
+    #                 for agenda in requisicao_dic.values():
+    #                     lista_info = (agenda)
+    #
+    #                     if enum == int(lista_info['id_posicao']):
+    #
+    #                         hour_table = horas # geting the hours
+    #                         inicio = datetime.strptime(hour_table,'%H:%M') # formating the hours ############
+    #                         tempo = lista_info['tempo'] # get work time #####################################
+    #                         hours, minutos = map(int,tempo.split(':')) # formating hours
+    #
+    #                         termino = timedelta(hours=hours, minutes=minutos)
+    #
+    #                         soma = inicio + termino
+    #                         soma_horas = soma.strftime('%H:%M')
+    #
+    #                         # print(soma_horas[:2])
+    #                         # print(soma_horas[3:])
+    #
+    #                         self.minuto_entrada = int(soma_horas[3:])
+    #
+    #                         # comparing the id of user ######################################################
+    #                         block = self.log_aut()
+    #
+    #                         print('soma horas ',soma_horas)
+    #                         if block == lista_info['id_user']:
+    #                             table = Table_shedule(str(enum), str(enum), horas,'Você agendou esse horário',str(soma_horas))
+    #                             lista_content.append(lista_info['id_horas'])
+    #                             self.ids.grid_shedule.add_widget(table)
+    #                             horas = soma_horas
+    #                             enum = int(soma_horas[:2])
+    #                         else:
+    #                             libera = Table_block(str(enum), str(enum), lista_info['id_horas'], 'Agendado!',str(soma_horas))
+    #                             self.ids.grid_shedule.add_widget(libera)
+    #                             lista_content.append(lista_info['id_horas'])
+    #                             horas = soma_horas
+    #                             enum = int(soma_horas[:2])
+    #
+    #                         # To insert empty field ##########################################################
+    #                         if_insert_fild_empyt = True
+    #             except AttributeError:
+    #                 pass
+    #
+    #         if enum >= self.entrada and if_insert_fild_empyt == False:
+    #             print('last soma ', soma_horas)
+    #             horas = f'{str(enum-1).zfill(2)}:{str(soma_horas[3:]).zfill(2)}'
+    #             if soma_horas[3:] != '00':
+    #                 self.ids.grid_shedule.add_widget(Table_shedule(str(enum), str(enum), horas,'',f'{str(enum).zfill(2)}:00'))
+    #             else:
+    #                 self.ids.grid_shedule.add_widget(Table_shedule(str(enum), str(enum), horas,'',str()))
+    #             lista_content.append('')
+    #         horas = soma_horas
+    #
+    #         with open('list_content.json','w') as lista:
+    #             json.dump(lista_content, lista)
+    #         enum += 1
+    #     print(lista_content)
 
     # Open and inserting the hours in class HoursSchedule #######################################
+
     def get_hours(self,id_button, hours):
         hours_dic = {}
 
