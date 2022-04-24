@@ -23,7 +23,7 @@ from datetime import datetime, timedelta
 
 # from datetime import datetime
 
-Window.size = 590,900
+Window.size = 590,800
 
 class Manager(ScreenManager):
     pass
@@ -312,26 +312,24 @@ class ViewSchedule(Screen):
 
     def log_aut(self,*args):
         LINK = f'https://securetoken.googleapis.com/v1/token?key={self.API_KEY}'
-        # try:
-        with open('refreshtoken.json', 'r') as arquivo:
-            refresh = json.load(arquivo)
-        info = {"grant_type":"refresh_token",
-                "refresh_token":refresh}
+        try:
+            with open('refreshtoken.json', 'r') as arquivo:
+                refresh = json.load(arquivo)
+            info = {"grant_type":"refresh_token",
+                    "refresh_token":refresh}
 
-        requisicao = requests.post(LINK, data=info)
-        requisicao_dic = requisicao.json()
+            requisicao = requests.post(LINK, data=info)
+            requisicao_dic = requisicao.json()
 
-        idtoken = requisicao_dic["id_token"]
-        user_id = requisicao_dic["user_id"]
-        return user_id
+            idtoken = requisicao_dic["id_token"]
+            user_id = requisicao_dic["user_id"]
 
-        # if requisicao.ok:
-        #     return user_id
-        # else:
-        #     pass
-        # except:
-        #     pass
-
+            if requisicao.ok:
+                return user_id
+            else:
+                pass
+        except:
+            pass
 
     def actualizar(self, *args):
         """
@@ -399,12 +397,16 @@ class ViewSchedule(Screen):
             if_insert_fild_empyt = False
 
             # hours formated ###################################################################
-            horas = f'{str(enum).zfill(2)}:{str(self.minuto_entrada).zfill(2)}'
+            # horas = f'{str(enum).zfill(2)}:{str(self.minuto_entrada).zfill(2)}'
+            horas = f'{self.entrada}'
+
+            entrada = datetime.strptime(horas, '%H:%M')
+
 
             if enum < self.entrada:
 
-                # just to get list position  inside of schedule position###############################
-                # apenas para obter a posição da lista dentro da posição da agenda ####################
+            # just to get list position  inside of schedule position###############################
+            # apenas para obter a posição da lista dentro da posição da agenda ####################
                 lista_content.append('')
 
             # here only go intry if the hours go bigger or equal
@@ -412,7 +414,7 @@ class ViewSchedule(Screen):
             if enum >= self.entrada:
 
                 try:
-                    # percorrendo alista para saber a posicao que o agendamento vai entrar
+            # percorrendo alista para saber a posicao que o agendamento vai entrar ################
                     for agenda in requisicao_dic.values():
                         lista_info = (agenda)
 
@@ -441,11 +443,13 @@ class ViewSchedule(Screen):
                                 table = Table_shedule(str(enum), str(enum), horas,'Você agendou esse horário',str(soma_horas))
                                 lista_content.append(lista_info['id_horas'])
                                 self.ids.grid_shedule.add_widget(table)
+                                horas = soma_horas
                                 enum = int(soma_horas[:2])
                             else:
-                                libera = Table_block(str(enum), str(enum), horas, 'Agendado!',str(soma_horas))
+                                libera = Table_block(str(enum), str(enum), lista_info['id_horas'], 'Agendado!',str(soma_horas))
                                 self.ids.grid_shedule.add_widget(libera)
                                 lista_content.append(lista_info['id_horas'])
+                                horas = soma_horas
                                 enum = int(soma_horas[:2])
 
                             # To insert empty field ##########################################################
@@ -454,8 +458,12 @@ class ViewSchedule(Screen):
                     pass
 
             if enum >= self.entrada and if_insert_fild_empyt == False:
-                horas = f'{str(enum).zfill(2)}:{str(self.minuto_entrada).zfill(2)}'
-                self.ids.grid_shedule.add_widget(Table_shedule(str(enum), str(enum), horas,'',str()))
+                print('last soma ', soma_horas)
+                horas = f'{str(enum-1).zfill(2)}:{str(soma_horas[3:]).zfill(2)}'
+                if soma_horas[3:] != '00':
+                    self.ids.grid_shedule.add_widget(Table_shedule(str(enum), str(enum), horas,'',f'{str(enum).zfill(2)}:00'))
+                else:
+                    self.ids.grid_shedule.add_widget(Table_shedule(str(enum), str(enum), horas,'',str()))
                 lista_content.append('')
             horas = soma_horas
 
