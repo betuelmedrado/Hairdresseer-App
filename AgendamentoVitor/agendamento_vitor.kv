@@ -1,6 +1,8 @@
 
 #:include file_kv/login_manager.kv
 #:include file_kv/manager_profile.kv
+#:include file_kv/creat_profile.kv
+#:include module_screen/table_schedule_m.kv
 
 <Manager>:
     LoginManager:
@@ -19,6 +21,7 @@
         orientation:'vertical'
         MDToolbar:
             title:'Home Page'
+            left_action_items:[['account-arrow-left-outline',lambda x:root.return_login()]]
         FloatLayout:
             MDBoxLayout:
                 size_hint:None,None
@@ -53,55 +56,28 @@
                         markup:True
                         text:'[size=20][b]Ver[/b][/size]\n[color=#D40A00][size=40][b]Agenda[/b][/size][/color]'
 
-
-<Table_shedule>:
-    id_schedule:''
-    hours:''
-    hours_2:''
-    client:''
-    size_hint_y:None
-    height:'100dp'
-    MDCard:
-        ripple_behavior:True
-        md_bg_color:1,1,1,1
-        radius:5,5,5,5
-        on_release:print(root.id_schedule)
-        MDBoxLayout:
-            orientation:'vertical'
-            MDLabel:
-                text:root.hours
-                color:0,0,0,1
-            MDLabel:
-                color:0,0,0,1
-                text:root.hours_2
-        MDLabel:
-            text:root.client
-            color:0,0,0,1
-
-
 <ViewSchedule>:
+    canvas:
+        Rectangle:
+            size:root.size
+            pos:root.pos
+            source:'images/wallp_schedule.jpg'
     MDBoxLayout:
         orientation:'vertical'
         MDToolbar:
-            title:'Agenda'
             elevation:10
+            id:title_toobar
             right_action_items:[['refresh',lambda x: root.actualizar()]]
             left_action_items:[['arrow-left-bold-outline', lambda x: root.return_homepage()]]
-    #    Button:
-    #        size_hint:None,None
-    #        width:'100dp'
-    #        height:'40dp'
-    #        text:'insert'
-    #        on_release:root.actualizar()
         MDBoxLayout:
             size_hint:1,.7
-            md_bg_color:0,1,1,1
+            md_bg_color:0,0,0,.4
             pos_hint:{'center_x':.5}
             ScrollView:
                 MDBoxLayout:
                     orientation:'vertical'
                     size_hint_y:None
                     height:self.minimum_height
-                    spacing:'5dp'
-                    padding:'5dp'
+                    spacing:'11dp'
+                    padding:'11dp'
                     id:grid_shedule

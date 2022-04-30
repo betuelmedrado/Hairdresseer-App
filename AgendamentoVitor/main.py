@@ -27,12 +27,55 @@ class Manager(ScreenManager):
 class LoginManager(Screen):
     API_KEY = 'AIzaSyAue2_eYU5S5TsUc692vHNlyxIHrlBVZjk'
 
-    def load_refresh(self, *args):
+    def get_id_manager(self, *args):
+        LINK_ID_MANAGER = 'https://shedule-vitor-default-rtdb.firebaseio.com/salao.json'
 
+        id_manager = ''
+
+        requisicao = requests.get(LINK_ID_MANAGER)
+        requisicao_dic = requisicao.json()
+
+        for id in requisicao_dic:
+            print(id)
+            return id
+
+    def login(self, *args):
+
+        id_manager = self.get_id_manager()
+
+        LINK_API = f'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={self.API_KEY}'
+
+        email = self.ids.email.text
+        senha = self.ids.senha.text
+
+        info={"email":email,
+              "password":senha,
+              "returnSecureToken":True}
+
+        requisicao = requests.post(LINK_API, data=info)
+        requisicao_dic = requisicao.json()
+
+        if requisicao.ok:
+            if requisicao_dic['localId'] == id_manager:
+                MDApp.get_running_app().root.current = 'homepage'
+            else:
+                self.ids.warning.text = 'Email ou senha [color=D40A00]Invalida[/color]'
+        else:
+            erro = str(requisicao_dic['error']['message'])
+
+            if erro == 'INVALID_EMAIL':
+                self.ids.warning.text = 'Email [color=D40A00]Invalido[/color]'
+            elif erro == 'MISSING_PASSWORD':
+                self.ids.warning.text = 'Sem informação de [color=D40A00]Senha[/color]'
+            elif erro == 'INVALID_PASSWORD':
+                self.ids.warning.text = 'Senha [color=D40A00]Invalido[/color]'
+            elif erro == 'EMAIL_NOT_FOUND':
+                self.ids.warning.text = 'Email não [color=D40A00]Encontrado[/color]'
+
+    def load_refresh(self, *args):
         try:
             # pegando o locaoid
             LINK_GET_ID = f'https://securetoken.googleapis.com/v1/token?key={self.API_KEY}'
-
 
             with open('refreshtoken.json', 'r') as arquivo:
                 refresh = json.load(arquivo)
@@ -45,9 +88,9 @@ class LoginManager(Screen):
 
             # email = requisicao_dic["email"]
             user_id = requisicao_dic["user_id"]
-            print(user_id)
 
             if requisicao.ok:
+                # LINK_DATA_MANAGER = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{user_id}.json'
                 LINK_DATA_MANAGER = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{user_id}.json'
 
                 requisicao_data_manager = requests.get(LINK_DATA_MANAGER)
@@ -85,7 +128,7 @@ class CreatProfile(Screen):
             return True
 
 #  Here I will change to change the id
-    def creat_profile(self,localid, *args):
+    def creat_profile(self,id_token, localid, refreshtoken, *args):
         LINK_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{localid}.json'
 
         nome = self.ids.nome.text
@@ -95,48 +138,69 @@ class CreatProfile(Screen):
         requisicao = requests.patch(LINK_SALAO, data=info)
         self.ids.warning.text = 'Perfil creado com sucesso!'
 
+        with open('refreshtoken.json','w') as file:
+            json.dump(refreshtoken, file)
 
     def creat_bill(self, *args):
         if self.valid_field():
             try:
-                nome = self.ids.nome.text
+                LINK = f"https://identitytoolkit.googleapis.com/v1/accounts:signUp?key={self.API_KEY}"
+
                 email = self.ids.email.text
                 senha = self.ids.senha.text
 
-                LINK = f'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key={self.API_KEY}'
+                info = {"email": email,
+                        "password": senha,
+                        "returnSecureToken": True}
 
-                info_bill = {"email":email,
-                             "password":senha,
-                             "returnSecureToken":True}
-
-            # creat account of manager of app
-                requisicao = requests.post(LINK, data=info_bill)
+                requisicao = requests.post(LINK, data=info)
                 requisicao_dic = requisicao.json()
 
-            # geting information of account of manager
-                id_token = requisicao_dic["idToken"]
-                local_id = requisicao_dic["localId"]
-                refreshe_token = requisicao_dic["refreshToken"]
+                idtoken = requisicao_dic['idToken']
+                localid = requisicao_dic['localId']
+                refreshtoken = requisicao_dic['refreshToken']
 
-            # if the requisition this right
                 if requisicao.ok:
-                    with open('refreshtoken.json', 'w') as arquivo:
-                        json.dump(refreshe_token, arquivo)
-
-                 # creat profile
-                    self.creat_profile(local_id)
-                    self.ids.warning.text = 'Perfil creado com sucesso!'
+                    self.creat_profile(idtoken, localid, refreshtoken)
+                    self.ids.warning.text = '[b][color=D40A00]Conta criada[/color] com sucesso![/b]'
+                    MDApp.get_running_app().root.current = 'homepage'
                 else:
-                    pass
+                    erro = str(requisicao_dic['error']['message'])
 
-                print(requisicao.json())
-            except:
-                self.ids.warning.text = requisicao_dic["error"]["message"]
+                    if erro == 'INVALID_EMAIL':
+                        self.ids.warning.text = 'Email [color=D40A00]Invalido[/color]'
+                    elif erro == 'MISSING_PASSWORD':
+                        self.ids.warning.text = 'Sem informação de [color=D40A00]Senha[/color]'
+                    elif erro == 'INVALID_PASSWORD':
+                        self.ids.warning.text = 'Senha [color=D40A00]Invalido[/color] digite pelominos 6 digitos'
+                    elif erro == 'EMAIL_NOT_FOUND':
+                        self.ids.warning.text = 'Email não [color=D40A00]Encontrado[/color]'
+            except KeyError:
+                erro = str(requisicao_dic['error']['message'])
+
+                if erro == 'INVALID_EMAIL':
+                    self.ids.warning.text = 'Email [color=D40A00]Invalido[/color]'
+                elif erro == 'MISSING_PASSWORD':
+                    self.ids.warning.text = 'Sem informação de [color=D40A00]Senha[/color]'
+                elif erro == 'INVALID_PASSWORD':
+                    self.ids.warning.text = 'Senha [color=D40A00]Invalido[/color] digite pelominos 6 digitos'
+                elif erro == 'EMAIL_NOT_FOUND':
+                    self.ids.warning.text = 'Email não [color=D40A00]Encontrado[/color]'
+                elif erro == 'EMAIL_EXISTS':
+                    self.ids.warning.text = 'Esse [color=D40A00]Email[/color] já possue uma conta'
+                elif erro == 'WEAK_PASSWORD : Password should be at least 6 characters':
+                    self.ids.warning.text = 'A [color=D40A00]senha[/color] deve ter pelo menos\n6 caracteres'
+                print(erro)
         else:
-            pass
+            print('last')
 
 class HomePage(Screen):
-    pass
+
+    def return_login(self):
+        with open('refreshtoken.json','w') as file:
+            json.dump('',file)
+
+        MDApp.get_running_app().root.current = 'loginmanager'
 
 class ManagerProfile(Screen):
     API_KEY = 'AIzaSyAue2_eYU5S5TsUc692vHNlyxIHrlBVZjk'
@@ -181,6 +245,7 @@ class ManagerProfile(Screen):
         try:
             self.ids.entry.text = requisicao_salao_dic['entrada']
             self.ids.exit.text = requisicao_salao_dic['saida']
+            self.ids.space_temp.text = requisicao_salao_dic['space_temp']
         except:
             pass
 
@@ -194,12 +259,12 @@ class ManagerProfile(Screen):
         """
         for hours, min in enumerate(range(24)):
             h = f'{str(hours).zfill(2)}:00'
-            bt = MDTextButton(text=str(h), md_bg_color=(0.13, 0.53, 0.95,.1))
+            bt = MDTextButton(text=str(h),pos_hint=({'center_x':.5}), md_bg_color=(0.13, 0.53, 0.95,.1))
             self.ids.hours.add_widget(bt)
             bt.bind(on_release=self.insert)
 
             h2 = f'{str(hours).zfill(2)}:30'
-            bt = MDTextButton(text=str(h2),md_bg_color=(0.13, 0.53, 0.95,.3))
+            bt = MDTextButton(text=str(h2),pos_hint=({'center_x':.5}),md_bg_color=(0.13, 0.53, 0.95,.3))
             self.ids.hours.add_widget(bt)
 
             bt.bind(on_release=self.insert)
@@ -233,10 +298,11 @@ class ManagerProfile(Screen):
 
             self.entrada = self.ids.entry.text
             self.saida = self.ids.exit.text
+            self.space_tempo = self.ids.space_temp.text
 
             info = f'{{"entrada":"{self.entrada}",\
-                     "saida": "{self.saida}", \
-                     "agenda":" "}}'
+                     "saida": "{self.saida}",\
+                     "space_temp":"{self.space_tempo}"}}'
 
             requisica = requests.patch(LINK_BASE_SALAO, info)
             toast('Tabela de horas salva com sucesso!', duration=4)
@@ -260,6 +326,10 @@ class ManagerProfile(Screen):
 
         self.infill()
 
+        self.ids.nome_servico.text = ''
+        self.ids.tempo.text = ''
+        self.ids.valor.text = ''
+
     def infill(self, *args):
         LINK_CATEGORIA = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.user_id}/servicos.json'
 
@@ -268,17 +338,20 @@ class ManagerProfile(Screen):
 
         self.ids.categorie.clear_widgets()
 
-        for id in requisicao_get_dic:
-            LINK_ID = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.user_id}/servicos/{id}.json'
+        try:
+            for id in requisicao_get_dic:
+                LINK_ID = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.user_id}/servicos/{id}.json'
 
-            requisicao_get_categoria = requests.get(LINK_ID)
-            requisicao_get_categoria_dic = requisicao_get_categoria.json()
+                requisicao_get_categoria = requests.get(LINK_ID)
+                requisicao_get_categoria_dic = requisicao_get_categoria.json()
 
-            nome_servico = requisicao_get_categoria_dic['nome_servico']
-            tempo = requisicao_get_categoria_dic['tempo']
-            valor = requisicao_get_categoria_dic['valor']
+                nome_servico = requisicao_get_categoria_dic['nome_servico']
+                tempo = requisicao_get_categoria_dic['tempo']
+                valor = requisicao_get_categoria_dic['valor']
 
-            self.ids.categorie.add_widget(MyBoxCategorie(nome_servico,tempo,valor))
+                self.ids.categorie.add_widget(MyBoxCategorie(nome_servico,tempo,valor))
+        except TypeError:
+            pass
 
             # print(requisicao_get_categoria_div['nome_servico'])
 
@@ -388,7 +461,7 @@ class ViewSchedule(Screen):
 
     def on_pre_enter(self, *args):
         self.actualizar()
-        pass
+
 
     def return_homepage(self):
         MDApp.get_running_app().root.current = 'homepage'

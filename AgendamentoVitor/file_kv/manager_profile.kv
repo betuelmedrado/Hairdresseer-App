@@ -23,78 +23,100 @@
                     bold:True
                     halign:'center'
                     text:'Crie seu perfil'
-            MDBoxLayout:
+            Widget:
+                size_hint_y:None
+                height:'10dp'
+            MDCard:
                 orientation:'vertical'
-                size_hint:.9,None
-                pos_hint:{'center_x':.5,'center_y':.8}
-                spacing:'4dp'
-                height:'60dp'
-                MDTextFieldRect:
+                size_hint:.8,None
+                height:'200dp'
+                radius:12,12,12,12
+                pos_hint:{'center_x':.5}
+                MDBoxLayout:
+                    orientation:'vertical'
+                    size_hint_y:None
+                    height:'60dp'
+                    pos_hint:{'center_x':.5,'center_y':.8}
+                    spacing:'4dp'
+                    MDTextFieldRect:
+                        size_hint_y:None
+                        height:'30dp'
+                        pos_hint:{'center_x':.5}
+                        hint_text:'Nome'
+                        readonly:True
+                        id:text_name
+                MDBoxLayout:
+                    orientation:'vertical'
+                    size_hint_y:None
+                    height:'60dp'
+                    spacing:'11dp'
+                    pos_hint:{'center_x':.5,'center_y':.67}
+                    MDBoxLayout:
+                        MDLabel:
+                            font_size:'9dp'
+                            text:'Entrada do serviço'
+                        MDLabel:
+                            font_size:'9dp'
+                            text:'Horas'
+                            halign:'center'
+                        MDLabel:
+                            font_size:'9dp'
+                            halign:'right'
+                            text:'saida do serviço'
+                    MDBoxLayout:
+                        MDTextFieldRect:
+                            size_hint_x:None
+                            width:'50dp'
+                            hint_text:'00:00'
+                            on_focus:root.validate('entry')
+                            id:entry
+                        MDBoxLayout:
+                            size_hint_y:None
+                            height:'50dp'
+                            pos_hint:{'center_y':.5}
+                            ScrollView:
+                                MDBoxLayout:
+                                    orientation:'vertical'
+                                    size_hint_y:None
+                                    height:self.minimum_height
+                                    id:hours
+                        MDTextFieldRect:
+                            size_hint_x:None
+                            width:'50dp'
+    #                        pos_hint:{'center_x':.9}
+                            hint_text:'00:00'
+                            on_focus:root.validate('exit')
+                            id:exit
+                Widget:
+                    size_hint_y:None
+                    height:'10dp'
+
+                MDBoxLayout:
+                    orientation:'vertical'
+                    size_hint_y:None
+                    height:'50dp'
+                    Label:
+                        font_size:'9dp'
+                        text:'Informe o tempo entre cada agenda'
+                        color:0,0,0,1
+                    MDTextFieldRect:
+                        size_hint_x:None
+                        width:'50dp'
+                        pos_hint:{'center_x':.5}
+                        hint_text:'00:00'
+                        id:space_temp
+                Widget:
+                    size_hint_y:None
+                    height:'10dp'
+
+                MDBoxLayout:
                     size_hint_y:None
                     height:'30dp'
                     pos_hint:{'center_x':.5}
-                    hint_text:'Nome'
-                    readonly:True
-                    id:text_name
-            MDBoxLayout:
-                size_hint:.9,None
-                height:'60dp'
-                spacing:'11dp'
-                pos_hint:{'center_x':.5,'center_y':.67}
-                MDBoxLayout:
-                    orientation:'vertical'
-                    MDLabel:
-                        font_size:'9dp'
-                        text:'Entrada do serviço'
-                    MDTextFieldRect:
-                        size_hint_x:None
-                        width:'60dp'
-                        pos_hint:{'center_x':.5}
-                        hint_text:'00:00'
-                        on_focus:root.validate('entry')
-                        id:entry
-                MDBoxLayout:
-                    orientation:'vertical'
-                    MDLabel:
-                        font_size:'9dp'
-                        text:'Horas'
-                        halign:'center'
-                    MDBoxLayout:
-                        size_hint_x:None
-                        width:'60dp'
-                        pos_hint:{'center_x':.5}
-                        ScrollView:
-                            MDBoxLayout:
-                                orientation:'vertical'
-                                size_hint_y:None
-                                height:self.minimum_height
-                                id:hours
-
-                MDBoxLayout:
-                    orientation:'vertical'
-                    MDLabel:
-                        font_size:'9dp'
-                        halign:'right'
-                        text:'saida do serviço'
-                    MDTextFieldRect:
-                        size_hint_x:None
-                        width:'60dp'
-                        pos_hint:{'center_x':.5}
-                        hint_text:'00:00'
-                        on_focus:root.validate('exit')
-                        id:exit
-            Widget:
-                size_hint_y:None
-                height:'30dp'
-
-            MDBoxLayout:
-                size_hint:.7,None
-                height:'30dp'
-                pos_hint:{'center_x':.5}
-                MyButtonCard:
-                    first_text:'Salvar'
-                    secound_text:'Horas'
-                    on_release:app.root.get_screen('managerprofile').save_data()
+                    MyButtonCard:
+                        first_text:'Salvar'
+                        secound_text:'Horas'
+                        on_release:app.root.get_screen('managerprofile').save_data()
 
             Widget:
                 size_hint_y:None
@@ -173,16 +195,19 @@
                                 size_hint_x:.40
                                 font_size:'10dp'
                                 bold:True
+                                color:0,0,0,.5
                                 text:'Serviços'
                             MDLabel:
                                 size_hint_x:.40
                                 font_size:'10dp'
                                 bold:True
+                                color:0,0,0,.5
                                 text:'Tempo'
                             MDLabel:
                                 size_hint_x:.20
                                 font_size:'10dp'
                                 bold:True
+                                color:0,0,0,.5
                                 text:'ValorR$'
                         MDBoxLayout:
                             ScrollView:

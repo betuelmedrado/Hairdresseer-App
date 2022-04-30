@@ -18,9 +18,17 @@
 
 
 <HomePage>:
+    canvas:
+        Rectangle:
+            size:root.size
+            pos:root.pos
+            source:'images/wallpaper.png'
     MDBoxLayout:
         orientation:'vertical'
         MDToolbar:
+            markup:True
+            title:'Seja ben vindo'
+            specific_text_color:0,0,0,1
             left_action_items:[['account-arrow-left-outline', lambda x: root.return_login()]]
         ScrollView:
             FloatLayout:
@@ -33,6 +41,11 @@
                     id:my_card_button
 
 <ViewSchedule>:
+    canvas:
+        Rectangle:
+            size:root.size
+            pos:root.pos
+            source:'images/wallp_schedule.jpg'
     MDBoxLayout:
         orientation:'vertical'
         MDToolbar:
@@ -95,14 +108,14 @@
                     text:'Escolha\nOs tipos de serviços'
                     bold:True
                     color:1,1,1,1
-
 #                font_size:'30dp'
             MDSeparator:
 
             MDCard:
-                size_hint:.7,None
+                size_hint:.8,None
                 height:'100dp'
-                md_bg_color:0.78, 0.80, 0.83,1
+#                md_bg_color:0.78, 0.80, 0.83,1
+                md_bg_color:1,1,1,1
                 radius:8,8,8,8
                 pos_hint:{'center_x':.5}
                 MDCard:
@@ -111,6 +124,7 @@
                     width:self.parent.width - 10
                     height:self.parent.height - 10
                     radius:8,8,8,8
+                    md_bg_color:1,1,1,1
                     halign:'center'
                     pos_hint:{'center_x':.5,'center_y':.5}
                     MDBoxLayout:
@@ -144,13 +158,10 @@
                                 spacing:'5dp'
                                 padding:'3dp'
                                 id:categorie
-#                                MDSpinner:
-#                                    size_hint: None, None
-#                                    size: '46dp', '46dp'
-#                                    pos_hint: {'center_x': .5}
+
             MDBoxLayout:
                 orientation:'vertical'
-                size_hint:.7,None
+                size_hint:.8,None
                 height:'130dp'
                 pos_hint:{'center_x':.5}
                 MDLabel:
@@ -237,9 +248,9 @@
                     radius:8,8,8,8
                     md_bg_color:0.13, 0.53, 0.95,1
                     ripple_behavior:True
+#                    disabled:True
                     id:card_save
 #                    on_release:root.save_scheduleing()
-#                    on_release:
                     MDLabel:
                         text:'Salvar'
                         color:0,0,0,.7

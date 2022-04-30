@@ -1,79 +1,6 @@
 
-<Register>:
-    canvas:
-        Color:
-            rgba:1,1,1,.7
-        Rectangle:
-            pos:root.pos
-            size:root.size
-            source:'images/degrade.jpg'
-    FloatLayout:
-        MDBoxLayout:
-            orientation:'vertical'
-            size_hint:.8, None
-            height:'150dp'
-            pos_hint:{'center_x':.5, 'center_y':.6}
-            spacing:'20dp'
-            MDLabel:
-                text:'Email'
-                color:1,1,1,.4
-            TextInput:
-                size_hint_y:None
-                height:'30dp'
-                hint_text:'Email'
-                id:email
-            MDLabel:
-                text:'Senha'
-                color:1,1,1,.4
-            TextInput:
-                size_hint_y:None
-                height:'30dp'
-                hint_text:'Senha'
-                id:senha
-            Label:
-                text:'Faça o seu cadastro'
-                markup:True
-                color:1,1,1,1
-                id:warning
-        MDCard:
-            orientation:'vertical'
-            size_hint:.8,None
-            height:'40dp'
-            pos_hint:{'center_x':.5,'center_y':.32}
-            md_bg_color:0.13, 0.59, 0.95,1
-            radius:20,5,20,5
-            ripple_behavior:True
-            on_release:root.logar()
-            Label:
-                size_hint_y:None
-                height:'10dp'
-                text:'Faser'
-            Label:
-                size_hint_y:None
-                height:'25dp'
-                bold:True
-                font_size:'20dp'
-                text:'Login'
-        MDCard:
-            orientation:'vertical'
-            size_hint:.8,None
-            height:'40dp'
-            pos_hint:{'center_x':.5,'center_y':.2}
-            ripple_behavior:True
-            md_bg_color:0.16, 0.50, 0.73,1
-            radius:20,5,20,5
-            on_release:app.root.current = 'creatbill'
-            Label:
-                bold:True
-                font_size:'25dp'
-                text:'Criar'
-            Label:
-                size_hint_y:None
-                height:'10dp'
-                font_size:'10dp'
-                text:'Conta'
 
-<CreatBill>:
+<CreatProfile>:
     canvas:
         Color:
             rgba:1,1,1,.4
@@ -151,4 +78,4 @@
                 text:'Conta'
         MDIconButton:
             icon:'arrow-left-top'
-            on_release:app.root.current = 'register'
+            on_release:app.root.current = 'loginmanager'

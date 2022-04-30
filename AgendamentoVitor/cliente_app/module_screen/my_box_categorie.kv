@@ -7,7 +7,7 @@
     tempo:''
     valor:''
     radius:3,3,3,3
-    md_bg_color:0,1,1,.1
+    md_bg_color:0.61, 0.60, 0.58,.7
     ripple_behavior:True
     on_release:app.root.get_screen('hoursschedule').changer_color(self,root.servico)
 
@@ -15,16 +15,19 @@
         size_hint_x:.40
         font_size:'10dp'
         bold:True
+        color:0,0,0,1
         text:root.servico
     MDLabel:
         size_hint_x:.40
         font_size:'10dp'
         bold:True
+        color:0,0,0,1
         text:root.tempo
     MDLabel:
         size_hint_x:.20
         font_size:'10dp'
         bold:True
+        color:0,0,0,1
         text:root.valor
 
 <MyBoxCategorieLabel>:
