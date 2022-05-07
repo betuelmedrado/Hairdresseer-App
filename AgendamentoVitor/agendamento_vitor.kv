@@ -3,6 +3,7 @@
 #:include file_kv/manager_profile.kv
 #:include file_kv/creat_profile.kv
 #:include module_screen/table_schedule_m.kv
+#:include module_screen/card_button_proficional.kv
 
 <Manager>:
     LoginManager:
@@ -13,6 +14,8 @@
         name:'homepage'
     ManagerProfile:
         name:'managerprofile'
+    ScreenChoiceSchedule:
+        name:'screenchoiceschedule'
     ViewSchedule:
         name:'viewshedule'
 
@@ -48,7 +51,7 @@
                     radius:8,8,8,8
                     elevation:'7dp'
                     ripple_behavior:True
-                    on_release:app.root.current = 'viewshedule'
+                    on_release:app.root.current = 'screenchoiceschedule'
                     Image:
                         source:'images/agenda.png'
                     Label:

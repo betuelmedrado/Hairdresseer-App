@@ -1,6 +1,5 @@
 
-# The class of Manager hairdresser
-<MyCardButton>:
+<CardButtonProficional>:
     size_hint:None,None
     width:'250dp'
     height:'100dp'
@@ -8,10 +7,9 @@
     md_bg_color:0,1,1,1
     ripple_behavior:True
     radius:5,5,5,5
-    socio_or_manager:''
     id_user:''
     nome:''
-    on_release:root.send_info(self.socio_or_manager, self.id_user)
+    on_release:root.send_info(self.id_user)
     Image:
         source:'images/person.png'
     MDLabel:
@@ -24,6 +22,3 @@
         width:'30dp'
         pos_hint:{'center_y':.9}
         id:image_check
-#        Image:
-#            background_image:0,0,0,0
-#            source:''

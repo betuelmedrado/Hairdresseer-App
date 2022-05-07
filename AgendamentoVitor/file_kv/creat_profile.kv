@@ -9,12 +9,20 @@
             size:root.size
             source:'images/degrade.jpg'
     FloatLayout:
+        Label:
+            size_hint_y:None
+            height:'5dp'
+            bold:True
+            font_size:'20dp'
+            color:1,0,0,1
+            pos_hint:{'center_x':.5,'center_y':.9}
+            id:enter_as_socio
         MDBoxLayout:
             size_hint:.8,None
             height:'220dp'
             orientation:'vertical'
             spacing:'10dp'
-            pos_hint:{'center_x':.5, 'center_y':.7}
+            pos_hint:{'center_x':.5, 'center_y':.6}
             MDLabel:
                 size_hint_y:None
                 height:'12dp'
@@ -23,6 +31,7 @@
                 text:'Nome'
             TextInput:
                 hint_text:'Nome'
+                multiline:False
                 id:nome
             MDLabel:
                 size_hint_y:None
@@ -32,6 +41,7 @@
                 text:'Email'
             TextInput:
                 hint_text:'Email'
+                multiline:False
                 id:email
             MDLabel:
                 size_hint_y:None
@@ -41,21 +51,23 @@
                 text:'Senha'
             TextInput:
                 hint_text:'Senha'
+                multiline:False
                 id:senha
             MDLabel:
                 size_hint_y:None
                 height:'12dp'
                 font_size:'12dp'
                 color:1,1,1,.5
-                text:'Repitir senha'
+                text:'Confirmar senha'
             TextInput:
-                hint_text:'Repetir senha'
+                hint_text:'Confirmar senha'
+                multiline:False
                 id:rep_senha
 
         Label:
             text:'Faça o seu cadastro'
             markup:True
-            pos_hint:{'center_x':.5,'center_y':.34}
+            pos_hint:{'center_x':.5,'center_y':.3}
             color:1,1,1,1
             id:warning
         MDCard:
