@@ -123,8 +123,6 @@ class LoginManager(Screen):
         self.creat_files()
 
 
-
-
 class CreatProfile(Screen):
 
     API_KEY = 'AIzaSyAue2_eYU5S5TsUc692vHNlyxIHrlBVZjk'
@@ -158,8 +156,7 @@ class CreatProfile(Screen):
         else:
             return True
 
-############################# creat one file to get if is manager or socio ################################
-
+    # creat one file to get if is manager or socio ################################
     def verification_if_manger(self, *args):
 
         requisicao = requests.get(self.LINK_DATABASE_SALAO + '.json')
@@ -175,7 +172,7 @@ class CreatProfile(Screen):
                     json.dump('socio', file)
                 return False
 
-#  Here I will change to change the id
+    #  Here I will change to change the id
     def creat_profile(self,id_token, localid, refreshtoken, *args):
         LINK_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{localid}.json'
 
@@ -260,9 +257,9 @@ class CreatProfile(Screen):
                     self.ids.warning.text = 'Esse [color=D40A00]Email[/color] já possue uma conta'
                 elif erro == 'WEAK_PASSWORD : Password should be at least 6 characters':
                     self.ids.warning.text = 'A [color=D40A00]senha[/color] deve ter pelo menos\n6 caracteres'
-                print(erro)
         else:
-            print('last')
+            pass
+
 
 class HomePage(Screen):
 
@@ -271,6 +268,7 @@ class HomePage(Screen):
             json.dump('',file)
 
         MDApp.get_running_app().root.current = 'loginmanager'
+
 
 class ManagerProfile(Screen):
     API_KEY = 'AIzaSyAue2_eYU5S5TsUc692vHNlyxIHrlBVZjk'
@@ -348,6 +346,7 @@ class ManagerProfile(Screen):
         :param kwargs:
         :return:
         """
+        self.ids.hours.clear_widgets()
         for hours, min in enumerate(range(24)):
             h = f'{str(hours).zfill(2)}:00'
             bt = MDTextButton(text=str(h),pos_hint=({'center_x':.5}), md_bg_color=(0.13, 0.53, 0.95,.1))
@@ -367,7 +366,7 @@ class ManagerProfile(Screen):
     # Receiv the hours and insert in field
     def insert(self,texto,**kwargs):
         """
-        Here choice the field for will be insert hours
+        Here choice the field of entry or exit for will be insert hours
         :param texto: receiv the hours
         :param kwargs:
         :return:
@@ -396,15 +395,13 @@ class ManagerProfile(Screen):
 
             info = f'{{"entrada":"{self.entrada}",\
                      "saida": "{self.saida}",\
-                     "space_temp":"{self.space_tempo}"}}'
+                     "space_temp":"{self.space_tempo}",\
+                     "agenda":"" }}'
 
             requisica = requests.patch(LINK_BASE_SALAO, info)
             toast('Tabela de horas salva com sucesso!', duration=4)
 
-            print('socio')
-
         except:
-            print('manager')
 
             LINK_BASE_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.user_id}.json'
 
@@ -433,7 +430,8 @@ class ManagerProfile(Screen):
             info = f'{{"nome_servico":"{nome_servico}",' \
                    f'"tempo":"{tempo}",' \
                    f'"valor":"{valor}",' \
-                   f'"servicos":""}}'
+                   f'"servicos":"",' \
+                   f'"agenda":""}}'
 
             requisicao = requests.post(LINK_BASE_SALAO, info)
             toast('Categoria criada', duration=4)
@@ -550,6 +548,7 @@ class ManagerProfile(Screen):
         except:
             pass
 
+
 class MyButtonCard(MDCard):
     pass
 
@@ -561,10 +560,12 @@ class MyBoxCategorie(MDCard):
         self.tempo = str(tempo)
         self.valor = str(valor)
 
+
 class MyBoxSocio(MDCard):
     def __init__(self,name, **kwargs):
         super().__init__(**kwargs)
         self.nome = name
+
 
 class Table_shedule_m(MDBoxLayout):
 
@@ -573,6 +574,7 @@ class Table_shedule_m(MDBoxLayout):
         self.id_schedule = id_schedulr
         self.hours = str(hours)
         self.client = str(client)
+
 
 class CardButtonProficional(MDCard):
 
@@ -587,6 +589,7 @@ class CardButtonProficional(MDCard):
             json.dump(id_user, arquivo)
 
         MDApp.get_running_app().root.current = 'viewshedule'
+
 
 class ScreenChoiceSchedule(Screen):
     LINK_DATABASE_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao'
@@ -621,7 +624,6 @@ class ScreenChoiceSchedule(Screen):
 
     def on_pre_enter(self, *args):
         self.get_info()
-
 
 
 class ViewSchedule(Screen):

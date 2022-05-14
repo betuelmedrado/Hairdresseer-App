@@ -227,35 +227,35 @@
                     Rectangle:
                         size:self.width,3
                         pos:self.pos
-# ========== Socios =========
-            MDBoxLayout:
-                orientation:'vertical'
-                size_hint:.9,None
-                height:'200dp'
-                pos_hint:{'center_x':.5}
-                Widget:
-                    size_hint_y:
-                    height:'25dp'
-                MDLabel:
-                    size_hint_y:None
-                    height:'30dp'
-                    halign:'center'
-                    bold:True
-                    text:'Adicione Seus Socios'
-                MDTextFieldRect:
-                    size_hint:.7,None
-                    height:'30dp'
-                    pos_hint:{'center_x':.5}
-                    hint_text:'Nome/Socio'
-                    id:text_socio
-                MDBoxLayout:
-                    size_hint:.7,None
-                    height:'30dp'
-                    pos_hint:{'center_x':.5}
-                    MyButtonCard:
-                        first_text:'Adicionar'
-                        secound_text:'Socio'
-                        on_release:app.root.get_screen('managerprofile').save_socio()
+## ========== Socios =========
+#            MDBoxLayout:
+#                orientation:'vertical'
+#                size_hint:.9,None
+#                height:'200dp'
+#                pos_hint:{'center_x':.5}
+#                Widget:
+#                    size_hint_y:
+#                    height:'25dp'
+#                MDLabel:
+#                    size_hint_y:None
+#                    height:'30dp'
+#                    halign:'center'
+#                    bold:True
+#                    text:'Adicione Seus Socios'
+#                MDTextFieldRect:
+#                    size_hint:.7,None
+#                    height:'30dp'
+#                    pos_hint:{'center_x':.5}
+#                    hint_text:'Nome/Socio'
+#                    id:text_socio
+#                MDBoxLayout:
+#                    size_hint:.7,None
+#                    height:'30dp'
+#                    pos_hint:{'center_x':.5}
+#                    MyButtonCard:
+#                        first_text:'Adicionar'
+#                        secound_text:'Socio'
+#                        on_release:app.root.get_screen('managerprofile').save_socio()
                 Widget:
             MDCard:
                 size_hint:.7,None

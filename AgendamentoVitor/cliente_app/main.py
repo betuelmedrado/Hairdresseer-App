@@ -36,15 +36,20 @@ class Manager(ScreenManager):
 
 class HomePage(Screen):
     LINK_SALAO = 'https://shedule-vitor-default-rtdb.firebaseio.com/salao.json'
+    lista_id_user = []
 
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
         self.id_manager = self.get_id_manager()
         self.id_socios = self.get_id_socios()
+        # Clock.schedule_once(self.get_info, 1)
 
     def on_pre_enter(self, *args):
-        self.get_info()
         self.creat_files()
+        toast('Aguarde estamos carregando as informações!...')
+        Clock.schedule_once(self.get_info, 1)
+
+
 
     def get_id_manager(self, *args):
         id = ''
@@ -60,10 +65,13 @@ class HomePage(Screen):
 
         lista = []
 
+        # verification if have schedule in manager ########################################################################
         check_image_manager = self.check_manager_scheduling()
+
+        # verification if have schedule in socio ##########################################################################
         check_socio = self.check_socio_scheduling()
 
-    # geting the id of manager
+        # geting the id of manager
         try:
             LINK_ID = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}.json'
             requisicao_id = requests.get(LINK_ID)
@@ -76,23 +84,31 @@ class HomePage(Screen):
             else:
                 self.ids.my_card_button.add_widget(MyCardButton(requisicao_id_dic['manager'], self.id_manager, requisicao_id_dic['nome']))
 
-            for id_socio in requisicao_id_dic['socios']:
-                lista.append(id_socio)
+            for id_socios in requisicao_id_dic['socios']:
+                lista.append(id_socios)
         except:
             pass
 
-        # geting the id of socio #######################################################################################
-        for id_socio in lista:
-            LINK_ID = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{id_socio}.json'
+        # getting ids of user which is schedule ############################################################################
+        for enum, id in enumerate(lista):
+            # try:
+            # Here getting socio to read of data ##############################################################################
+            LINK_ID = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{id}.json'
             requisicao_to_socio = requests.get(LINK_ID)
             requisicao_to_socio_dic = requisicao_to_socio.json()
 
-            if check_socio:
-                my_card_button = MyCardButton(requisicao_to_socio_dic['manager'], id_socio, requisicao_to_socio_dic['nome'])
-                my_card_button.ids.image_check.add_widget(Image(source='images/check.png'))
-                self.ids.my_card_button.add_widget(my_card_button)
-            else:
-                self.ids.my_card_button.add_widget(MyCardButton(requisicao_to_socio_dic['manager'], id_socio, requisicao_to_socio_dic['nome']))
+            try:
+                if check_socio[enum]:
+                    card_button = MyCardButton(requisicao_to_socio_dic['manager'], id, requisicao_to_socio_dic['nome'])
+                    card_button.ids.image_check.add_widget(Image(source='images/check.png'))
+                    self.ids.my_card_button.add_widget(card_button)
+                else:
+                    self.ids.my_card_button.add_widget(MyCardButton(requisicao_to_socio_dic['manager'], id, requisicao_to_socio_dic['nome']))
+            except IndexError:
+                self.ids.my_card_button.add_widget(
+                    MyCardButton(requisicao_to_socio_dic['manager'], id, requisicao_to_socio_dic['nome']))
+            # except:
+            #     pass
 
     def get_id_socios(self, *args):
 
@@ -177,16 +193,18 @@ class HomePage(Screen):
                 requisicao = requests.get(LINK)
                 requisicao_dic = requisicao.json()
 
+
                 for id in requisicao_dic:
                     # list_of_id.append(id)
-
                     if id_user['id_user'] == id:
-                        return True
+                        list_of_id.append(True)
+                        break
                     else:
-                        return False
-
+                        list_of_id.append(False)
+            return list_of_id
         except:
-            return False
+            list_of_id.append(False)
+            return list_of_id
 
 class Register(Screen):
 
@@ -307,7 +325,8 @@ class CreatBill(Screen):
         # info_user = '{"avatar":"photos2.png", "equipe":"", "total_vendas":"0","vendas":""}'
         info_user = f'{{"nome":"{nome}",' \
                     f' "quant_cancelado":"0",' \
-                    f' "bloqueado":"False"}}'
+                    f' "bloqueado":"False",' \
+                    f'"ids_agendado":}}'
         creat_user = requests.patch(LINK_FIREBASE, data=info_user)
 
     def creat_bill(self, *args, **kwargs):
@@ -507,16 +526,21 @@ class ViewSchedule(Screen):
         user_id = self.log_aut()
         lista_info = self.info_entrace_salao()
         list_content = []
-
         entrada = self.entrada
         saida = self.saida
         tempo = self.space_temp
+
+        # variable to show the first schedule if it is scheduled, is implemented in "for range", I do this to display the correct schedule table
+        # variável para mostrar o primeiro agendamento se for agendado, está implementado no "for range", Eu faço isso para exibir a tabela de agendamento correta
+        ranger_init = 0
+        ranger_last = tempo[3:]
+
         # lista = ['']
         block = False
         permition_to_sum = True
 
         # To conting the position of schedule to verification of next schedule
-        cont = 0
+        cont = 00
 
         self.ids.grid_shedule.clear_widgets()
 
@@ -525,10 +549,14 @@ class ViewSchedule(Screen):
             for num, agenda in enumerate(lista_info):
                 try:
                     if entrada[:2] == lista_info[num]['id_horas'][:2]:
-                        for mim in range(0,60):
-                            if entrada[3:] == lista_info[num]['id_horas'][3:]:
+                        for mim in range(ranger_init, ranger_last):
+
+                            # conparing the minutes ###################################################################################
+                            if str(mim).zfill(2) == lista_info[num]['id_horas'][3:] :
                                 # id_hours = lista_info[num]['id_horas']
                                 # entry = datetime.strptime(entrada,'%H:%M')
+                                ent = int(str(entrada[:2]).zfill(2))
+                                entrada = f'{str(ent).zfill(2)}:{str(mim).zfill(2)}'
 
                                 entry = datetime.strptime(entrada,'%H:%M')
                                 temp = lista_info[num]['tempo']
@@ -543,6 +571,8 @@ class ViewSchedule(Screen):
                                     entrada = soma_horas.strftime('%H:%M')
                                     block = True
                                     permition_to_sum = False
+                                    del(lista_info[num])
+                                    print(lista_info)
                                     break
                                 else:
                                     table = Table_block(str(cont), '', entrada, 'Agendado!', f'{soma_horas.strftime("%H:%M")}')
@@ -551,7 +581,17 @@ class ViewSchedule(Screen):
                                     entrada = soma_horas.strftime('%H:%M')
                                     block = True
                                     permition_to_sum = False
+                                    del(lista_info[num])
                                     break
+
+                            # para não dá erro, de sumir o agendamento anterior
+                            elif str(mim).zfill(2) == tempo[3:]:
+                                table = Table_shedule(str(cont), '', entrada, f'', '')
+                                self.ids.grid_shedule.add_widget(table)
+                                list_content.append('')
+                                block = True
+                                permition_to_sum = True
+
                 except:
                     print('Deu algum erro na função actualizar da class "ViewSchedule"')
         # except:
@@ -559,6 +599,10 @@ class ViewSchedule(Screen):
 
             # Here block to not have repetition ########################################################################
             # Aqui bloqueia para não ter repetições
+
+            ranger_init = 30
+            ranger_last = 60
+
             if block == False:
                 table = Table_shedule(str(cont), '', entrada, f'', '')
                 self.ids.grid_shedule.add_widget(table)
@@ -933,12 +977,12 @@ class HoursSchedule(Screen):
         print('nadaa')
 
     def disable_release(self,*args):
-        print('disablad')
+        toast('O gendamento excede o horario do proximo agendamento escolha outro horario ou outro cabeleleiro!')
 
     def save_scheduleing(self, *args):
-
         horas_hoje = self.time_now()
-        list_work = []
+        list_works = []
+        list_ids_schedule = []
         link = ''
 
         # geting the id of Manager ##############################
@@ -980,9 +1024,31 @@ class HoursSchedule(Screen):
 
         requisicao = requests.patch(link, data=info)
 
-        toast('Agendamento feito! Você tem Uma(1) Hora para cancelar\n "3" cancelamento abaixo disso você tera que pagar uma taxa', duration=10)
+        toast('Agendamento Marcado! Você tem Uma(1) Hora para cancelar\n "3" cancelamento abaixo disso você tera que pagar uma taxa', duration=10)
 
-        # Clearing file "select_work" after of save #################
+        if if_manager['manager'] == "False":
+            # getting ids that are already scheduled ###########################################################################
+                link_cliente = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_user}/ids_agendado.json'
+                requisicao_client_get = requests.get(link_cliente)
+                requisicao_client_get_dic = requisicao_client_get.json()
+
+            # list_ids_schedule receiver the ids what is in cloud ##############################################################
+                if requisicao_client_get_dic != '':
+                    list_ids_schedule.append(requisicao_client_get_dic)
+
+            # list_ids_schedule receiver the id what go be schedule ############################################################
+                list_ids_schedule.append(if_manager['id_user'])
+
+            # Insert ids of schedule in user ###################################################################################
+                link_cliente = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_user}/ids_agendado.json'
+
+                info = f'{{"ids_agendado":"{list_ids_schedule}" }}'
+
+                requisicao_client = requests.patch(link_cliente, data=info)
+        else:
+            pass
+
+    # Clearing file "select_work" after of save ########################################################################
         with open('select_works.json','w') as file:
             json.dump([], file)
 
