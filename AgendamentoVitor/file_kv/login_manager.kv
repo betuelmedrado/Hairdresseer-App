@@ -8,26 +8,34 @@
             size:root.size
             source:'images/degrade.jpg'
     FloatLayout:
-        TextInput:
-            size_hint:.8,None
-            height:'30dp'
+        MDBoxLayout:
+            orientation:'vertical'
+            size_hint:.8, None
+            height:'150dp'
             pos_hint:{'center_x':.5, 'center_y':.6}
-            hint_text:'Email'
-            multiline:False
-            id:email
-        TextInput:
-            size_hint:.8,None
-            height:'30dp'
-            pos_hint:{'center_x':.5, 'center_y':.5}
-            hint_text:'Senha'
-            multiline:False
-            id:senha
-        Label:
-            text:'Faça o seu cadastro'
-            pos_hint:{'center_x':.5,'center_y':.4}
-            color:0,0,0,1
-            markup:True
-            id:warning
+            spacing:'20dp'
+            MDLabel:
+                text:'Email'
+                color:1,1,1,.4
+            TextInput:
+                size_hint_y:None
+                height:'30dp'
+                hint_text:'Email'
+                id:email
+            MDLabel:
+                text:'Senha'
+                color:1,1,1,.4
+            TextInput:
+                size_hint_y:None
+                height:'30dp'
+                hint_text:'Senha'
+                password:True
+                id:senha
+            Label:
+                text:'Faça o seu cadastro'
+                markup:True
+                color:1,1,1,1
+                id:warning
         MDCard:
             orientation:'vertical'
             size_hint:.8,None

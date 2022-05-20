@@ -23,6 +23,10 @@
                     bold:True
                     halign:'center'
                     text:'Crie seu perfil'
+                MDIconButton:
+                    icon:'refresh'
+                    on_release:root.infill()
+
             Widget:
                 size_hint_y:None
                 height:'10dp'
@@ -38,12 +42,13 @@
                     height:'60dp'
                     pos_hint:{'center_x':.5,'center_y':.8}
                     spacing:'4dp'
-                    MDTextFieldRect:
+                    MDLabel:
                         size_hint_y:None
                         height:'30dp'
                         pos_hint:{'center_x':.5}
-                        hint_text:'Nome'
-                        readonly:True
+                        bold:True
+                        color:1,.5,.5,1
+                        font_size:'30dp'
                         id:text_name
                 MDBoxLayout:
                     orientation:'vertical'
@@ -288,51 +293,63 @@
                                 height:self.minimum_height
                                 id:box_socio
 
-<MyButtonCard>:
+<Popup_widgets>:
     orientation:'vertical'
-    size_hint_y:None
-    height:'30dp'
-    md_bg_color:0.13, 0.53, 0.95,1
-    radius:3,3,3,3
-    ripple_behavior:True
-    elevation:'7dp'
-    first_text:''
-    secound_text:''
-    MDLabel:
-        size_hint_y:None
-        height:'13dp'
-        color:1,1,1,1
-        bold:True
-        text:root.first_text
-        halign:'center'
-    MDLabel:
-        size_hint_y:None
-        height:'13dp'
-        bold:True
-        font_size:'12dp'
-        text:root.secound_text
-        halign:'center'
-
-
-<MyBoxCategorie>:
-    size_hint_y:None
-    height:'13dp'
+    id_work:''
     servico:''
     tempo:''
     valor:''
-    ripple_behavior:True
-    MDLabel:
-        size_hint_x:.40
-        font_size:'10dp'
-        bold:True
-        text:root.servico
-    MDLabel:
-        size_hint_x:.40
-        font_size:'10dp'
-        bold:True
-        text:root.tempo
-    MDLabel:
-        size_hint_x:.20
-        font_size:'10dp'
-        bold:True
-        text:root.valor
+    spacing:'10dp'
+    padding:'10dp'
+    MDBoxLayout:
+        orientation:'vertical'
+        MDLabel:
+            size_hint_y:None
+            height:'15dp'
+            text:'Serviço'
+            bold:True
+            color:0.39, 0.40, 0.42,1
+        TextInput:
+            size_hint_y:None
+            height:'30dp'
+            text:root.servico
+    MDBoxLayout:
+        orientation:'vertical'
+        MDLabel:
+            size_hint_y:None
+            height:'15dp'
+            text:'Tempo'
+            bold:True
+            color:0.39, 0.40, 0.42,1
+        TextInput:
+            size_hint_y:None
+            height:'30dp'
+            text:root.tempo
+            id:id_tempo
+    MDBoxLayout:
+        orientation:'vertical'
+        MDLabel:
+            size_hint_y:None
+            height:'15dp'
+            text:'Valor: R$'
+            bold:True
+            color:0.39, 0.40, 0.42,1
+        TextInput:
+            size_hint_y:None
+            height:'30dp'
+            text:root.valor
+            id:id_valor
+    MDBoxLayout:
+        spacing:'15dp'
+        id:box_button
+        MDRaisedButton:
+            text:'Editar'
+            on_release:root.pop_edit(root.id_work)
+
+        MDRaisedButton:
+            text:'Excluir'
+            on_release:root.pop_delet_work(root.id_work)
+
+        MDTextButton:
+            text:'Sair'
+            on_release:app.root.get_screen('managerprofile').dismiss_popup()

@@ -1,0 +1,25 @@
+
+<MyBoxCategorie>:
+    size_hint_y:None
+    height:'13dp'
+    id_work:''
+    servico:''
+    tempo:''
+    valor:''
+    ripple_behavior:True
+    on_release:app.root.get_screen('managerprofile').pop_alteration(self.id_work,self.servico, self.tempo, self.valor)
+    MDLabel:
+        size_hint_x:.40
+        font_size:'10dp'
+        bold:True
+        text:root.servico
+    MDLabel:
+        size_hint_x:.40
+        font_size:'10dp'
+        bold:True
+        text:root.tempo
+    MDLabel:
+        size_hint_x:.20
+        font_size:'10dp'
+        bold:True
+        text:root.valor

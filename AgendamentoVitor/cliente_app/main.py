@@ -29,7 +29,7 @@ from datetime import datetime, timedelta
 
 # from datetime import datetime
 
-Window.size = 590,800
+# Window.size = 590,800
 
 class Manager(ScreenManager):
     pass
@@ -463,65 +463,70 @@ class ViewSchedule(Screen):
         id_manager = self.get_id_proficional()
         lista_info = []
 
-        # information socio ############################################################################################
-        if id_manager["manager"] == 'False':
-            # Here if not manager then get the socio #########################################################################
-            LINK_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{id_manager["id_user"]}.json'
-            requisicao = requests.get(LINK_SALAO)
-            requisicao_dic = requisicao.json()
+        try:
+            # information socio ############################################################################################
+            if id_manager["manager"] == 'False':
+                # Here if not manager then get the socio #########################################################################
+                LINK_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{id_manager["id_user"]}.json'
+                requisicao = requests.get(LINK_SALAO)
+                requisicao_dic = requisicao.json()
 
-            nome = requisicao_dic['nome']
+                nome = requisicao_dic['nome']
 
-            self.entrada = requisicao_dic['entrada']
+                self.entrada = requisicao_dic['entrada']
 
-            self.saida = requisicao_dic['saida']
+                self.saida = requisicao_dic['saida']
 
-            self.space_temp = requisicao_dic['space_temp']
+                self.space_temp = requisicao_dic['space_temp']
 
-            self.ids.title_toobar.title = f'Agenda {str(nome)}'
-            try:
-                for id_agenda in requisicao_dic['agenda']:
-                    LINK_SCHEDULE = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{id_manager["id_user"]}/agenda/{id_agenda}.json'
-                    requisicao_schedule = requests.get(LINK_SCHEDULE)
-                    requisicao_schedule_dic = requisicao_schedule.json()
-                    lista_info.append(requisicao_schedule_dic)
-                return lista_info
-            except:
-                return lista_info
+                self.ids.title_toobar.title = f'Agenda {str(nome)}'
+                try:
+                    for id_agenda in requisicao_dic['agenda']:
+                        LINK_SCHEDULE = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{id_manager["id_user"]}/agenda/{id_agenda}.json'
+                        requisicao_schedule = requests.get(LINK_SCHEDULE)
+                        requisicao_schedule_dic = requisicao_schedule.json()
+                        lista_info.append(requisicao_schedule_dic)
+                    return lista_info
+                except:
+                    return lista_info
 
-        elif id_manager["manager"] == 'True':
-            # Here to geting the id of manager to get schedule #######################################
-            requisicao = requests.get(self.LINK_SALAO + '.json')
-            requisicao_dic = requisicao.json()
+            elif id_manager["manager"] == 'True':
+                # Here to geting the id of manager to get schedule #######################################
+                requisicao = requests.get(self.LINK_SALAO + '.json')
+                requisicao_dic = requisicao.json()
 
-            nome = requisicao_dic['nome']
+                nome = requisicao_dic['nome']
 
-            self.entrada = requisicao_dic['entrada']
+                self.entrada = requisicao_dic['entrada']
 
-            self.saida = requisicao_dic['saida']
+                self.saida = requisicao_dic['saida']
 
-            self.space_temp = requisicao_dic['space_temp']
+                self.space_temp = requisicao_dic['space_temp']
 
-            self.ids.title_toobar.title = f'Agenda {str(nome)}'
+                self.ids.title_toobar.title = f'Agenda {str(nome)}'
 
-            try:
-                for id_agenda in requisicao_dic['agenda']:
-                    LINK_SCHEDULE = self.LINK_SALAO + '/' + 'agenda' + '/' + f'{id_agenda}' + '.json'
-                    requisicao_schedule = requests.get(LINK_SCHEDULE)
-                    requisicao_schedule_dic = requisicao_schedule.json()
-                    lista_info.append(requisicao_schedule_dic)
-                return lista_info
-            except:
-                return lista_info
-        # else:
-        #     self.entrada = '00:00'
-        #     self.saida = '00:00'
-        #     self.space_temp = '00:00'
-        #     self.ids.title_toobar.title = f' Agenda {str(nome)}'
-        #     return lista_info
+                try:
+                    for id_agenda in requisicao_dic['agenda']:
+                        LINK_SCHEDULE = self.LINK_SALAO + '/agenda/' + f'{id_agenda}.json'
+                        requisicao_schedule = requests.get(LINK_SCHEDULE)
+                        requisicao_schedule_dic = requisicao_schedule.json()
+                        lista_info.append(requisicao_schedule_dic)
+                    return lista_info
+
+                except:
+                    return lista_info
+            # else:
+            #     self.entrada = '00:00'
+            #     self.saida = '00:00'
+            #     self.space_temp = '00:00'
+            #     self.ids.title_toobar.title = f' Agenda {str(nome)}'
+            #     return lista_info
+        except:
+            pass
 
     def actualizar(self, *args):
 
+        # try:
         # get user id ##################################################################################################
         user_id = self.log_aut()
         lista_info = self.info_entrace_salao()
@@ -533,7 +538,7 @@ class ViewSchedule(Screen):
         # variable to show the first schedule if it is scheduled, is implemented in "for range", I do this to display the correct schedule table
         # variável para mostrar o primeiro agendamento se for agendado, está implementado no "for range", Eu faço isso para exibir a tabela de agendamento correta
         ranger_init = 0
-        ranger_last = tempo[3:]
+        ranger_last = int(tempo[3:])
 
         # lista = ['']
         block = False
@@ -547,67 +552,101 @@ class ViewSchedule(Screen):
         # try:
         while entrada[:2] < saida[:2]:
             for num, agenda in enumerate(lista_info):
-                try:
-                    if entrada[:2] == lista_info[num]['id_horas'][:2]:
-                        for mim in range(ranger_init, ranger_last):
+                # try:
+                if entrada[:2] == lista_info[num]['id_horas'][:2]:
+                    for mim in range(ranger_init, ranger_last):
+                        # conparing the minutes ###################################################################################
+                        if str(mim).zfill(2) == lista_info[num]['id_horas'][3:] :
 
-                            # conparing the minutes ###################################################################################
-                            if str(mim).zfill(2) == lista_info[num]['id_horas'][3:] :
-                                # id_hours = lista_info[num]['id_horas']
-                                # entry = datetime.strptime(entrada,'%H:%M')
-                                ent = int(str(entrada[:2]).zfill(2))
-                                entrada = f'{str(ent).zfill(2)}:{str(mim).zfill(2)}'
+                            # id_hours = lista_info[num]['id_horas']
+                            # entry = datetime.strptime(entrada,'%H:%M')
+                            ent = int(str(entrada[:2]).zfill(2))
+                            entrada = f'{str(ent).zfill(2)}:{str(mim).zfill(2)}'
 
-                                entry = datetime.strptime(entrada,'%H:%M')
-                                temp = lista_info[num]['tempo']
-                                hours, minute = map(int,temp.split(':'))
-                                delta_temp = timedelta(hours=hours, minutes=minute)
-                                soma_horas = entry + delta_temp
+                            entry = datetime.strptime(entrada,'%H:%M')
+                            temp = lista_info[num]['tempo']
+                            hours, minute = map(int,temp.split(':'))
+                            delta_temp = timedelta(hours=hours, minutes=minute)
+                            soma_horas = entry + delta_temp
 
-                                if user_id == lista_info[num]['id_user']:
-                                    # Insert table #####################################################################################
-                                    table = TableInfo(str(cont), '', entrada, 'Você agendou esse horarion', f'{soma_horas.strftime("%H:%M")}')
-                                    self.ids.grid_shedule.add_widget(table)
-                                    entrada = soma_horas.strftime('%H:%M')
-                                    block = True
-                                    permition_to_sum = False
-                                    del(lista_info[num])
-                                    print(lista_info)
-                                    break
-                                else:
-                                    table = Table_block(str(cont), '', entrada, 'Agendado!', f'{soma_horas.strftime("%H:%M")}')
-                                    self.ids.grid_shedule.add_widget(table)
-                                    list_content.append(entrada)
-                                    entrada = soma_horas.strftime('%H:%M')
-                                    block = True
-                                    permition_to_sum = False
-                                    del(lista_info[num])
-                                    break
-
-                            # para não dá erro, de sumir o agendamento anterior
-                            elif str(mim).zfill(2) == tempo[3:]:
-                                table = Table_shedule(str(cont), '', entrada, f'', '')
+                            if user_id == lista_info[num]['id_user']:
+                                # Insert table #####################################################################################
+                                table = TableInfo(str(cont), '', entrada, 'Você agendou esse horarion', f'{soma_horas.strftime("%H:%M")}')
                                 self.ids.grid_shedule.add_widget(table)
-                                list_content.append('')
+                                entrada = soma_horas.strftime('%H:%M')
                                 block = True
-                                permition_to_sum = True
+                                permition_to_sum = False
+                                del(lista_info[num])
 
-                except:
-                    print('Deu algum erro na função actualizar da class "ViewSchedule"')
+                                # Exemplo: conta por exemplo 07:30  e depois 08:00  para saber si já tem agenda marcada nesse horário para não ocultar agenda ############
+                                if ranger_init == 0:
+                                    ranger_init = int(tempo[3:])
+                                    ranger_last = 60
+                                elif ranger_init == int(tempo[3:]):
+                                    ranger_init = 0
+                                    ranger_last = int(tempo[3:])
+
+                                break
+                            else:
+                                table = Table_block(str(cont), '', entrada, 'Agendado!', f'{soma_horas.strftime("%H:%M")}')
+                                self.ids.grid_shedule.add_widget(table)
+                                list_content.append(entrada)
+                                entrada = soma_horas.strftime('%H:%M')
+                                block = True
+                                permition_to_sum = False
+                                del(lista_info[num])
+
+                                # Exemplo: conta por exemplo 07:30  e depois 08:00  para saber si já tem agenda marcada nesse horário para não ocultar agenda ############
+                                if ranger_init == 0:
+                                    ranger_init = int(tempo[3:])
+                                    ranger_last = 60
+                                elif ranger_init == int(tempo[3:]):
+                                    ranger_init = 0
+                                    ranger_last = int(tempo[3:])
+                                break
+
+                        # para não dá erro, de sumir o agendamento anterior
+                        elif str(mim).zfill(2) == tempo[3:]:
+                            table = Table_shedule(str(cont), '', entrada, f'', '')
+                            self.ids.grid_shedule.add_widget(table)
+                            list_content.append('')
+                            block = True
+                            permition_to_sum = True
+
+                            # Exemplo: conta por exemplo 07:30  e depois 08:00  para saber si já tem agenda marcada nesse horário para não ocultar agenda ############
+                            if ranger_init == 0:
+                                ranger_init = int(tempo[3:])
+                                ranger_last = 60
+                            elif ranger_init == int(tempo[3:]):
+                                ranger_init = 0
+                                ranger_last = int(tempo[3:])
+
+
+                # except:
+                #     print('Deu algum erro na função actualizar da class "ViewSchedule"')
+
         # except:
         #     print('Deu algum erro na função actualizar da class "ViewSchedule"')
 
             # Here block to not have repetition ########################################################################
             # Aqui bloqueia para não ter repetições
 
-            ranger_init = 30
-            ranger_last = 60
+            # ranger_init = 30
+            # ranger_last = 60
 
             if block == False:
                 table = Table_shedule(str(cont), '', entrada, f'', '')
                 self.ids.grid_shedule.add_widget(table)
                 list_content.append('')
                 permition_to_sum = True
+
+                # Exemplo: conta por exemplo 07:30  e depois 08:00  para saber si já tem agenda marcada nesse horário para não ocultar agenda ############
+                if ranger_init == 0:
+                    ranger_init = int(tempo[3:])
+                    ranger_last = 60
+                elif ranger_init == int(tempo[3:]):
+                    ranger_init = 0
+                    ranger_last = int(tempo[3:])
             block = False
 
             if permition_to_sum == True:
@@ -625,6 +664,8 @@ class ViewSchedule(Screen):
         # using in class "HoursSchedule" function "hours_limit" ###########
         with open('list_content.json','w') as file:
             json.dump(list_content, file)
+        # except:
+        #     pass
 
     # Open and inserting the hours in class HoursSchedule #######################################
 

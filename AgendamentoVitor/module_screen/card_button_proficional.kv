@@ -1,15 +1,16 @@
 
 <CardButtonProficional>:
     size_hint:None,None
-    width:'250dp'
-    height:'100dp'
+    width:'200dp'
+    height:'80dp'
     pos_hint:{'center_x':.5,'center_y':.5}
     md_bg_color:0,1,1,1
     ripple_behavior:True
     radius:5,5,5,5
+    socio_ro_manager:''
     id_user:''
     nome:''
-    on_release:root.send_info(self.id_user)
+    on_release:root.send_info(self.socio_or_manager, self.id_user)
     Image:
         source:'images/person.png'
     MDLabel:

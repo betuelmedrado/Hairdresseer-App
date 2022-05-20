@@ -4,6 +4,9 @@
 #:include file_kv/creat_profile.kv
 #:include module_screen/table_schedule_m.kv
 #:include module_screen/card_button_proficional.kv
+#:include module_screen/my_box_categorie.kv
+#:include module_screen/my_button_card.kv
+#:include module_screen/table_schedule_m.kv
 
 <Manager>:
     LoginManager:
@@ -71,7 +74,7 @@
             elevation:10
             id:title_toobar
             right_action_items:[['refresh',lambda x: root.actualizar()]]
-            left_action_items:[['arrow-left-bold-outline', lambda x: root.return_homepage()]]
+            left_action_items:[['arrow-left-bold-outline', lambda x: root.return_schoice_schedule()]]
         MDBoxLayout:
             size_hint:1,.7
             md_bg_color:0,0,0,.4
