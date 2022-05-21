@@ -20,6 +20,7 @@
             TextInput:
                 size_hint_y:None
                 height:'30dp'
+                multiline:False
                 hint_text:'Email'
                 id:email
             MDLabel:
@@ -28,7 +29,11 @@
             TextInput:
                 size_hint_y:None
                 height:'30dp'
-                hint_text:'Senha'
+                font_size:'30dp'
+                multiline:False
+                bold:True
+                hint_text:'******'
+                foreground_color:0,1,1,1
                 password:True
                 id:senha
             Label:

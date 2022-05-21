@@ -20,6 +20,7 @@
             TextInput:
                 size_hint_y:None
                 height:'30dp'
+                multiline:False
                 hint_text:'Email'
                 id:email
             MDLabel:
@@ -28,8 +29,12 @@
             TextInput:
                 size_hint_y:None
                 height:'30dp'
-                hint_text:'Senha'
+                hint_text:'******'
+                bold:True
+                font_size:'30dp'
+                multiline:False
                 password:True
+                foreground_color:0,1,1,1
                 id:senha
             Label:
                 text:'Faça o seu cadastro'
@@ -98,6 +103,7 @@
             TextInput:
                 hint_text:'Nome'
                 id:nome
+                multiline:False
             MDLabel:
                 size_hint_y:None
                 height:'12dp'
@@ -106,6 +112,7 @@
                 text:'Email'
             TextInput:
                 hint_text:'Email'
+                multiline:False
                 id:email
             MDLabel:
                 size_hint_y:None
@@ -114,7 +121,11 @@
                 color:1,1,1,.5
                 text:'Senha'
             TextInput:
-                hint_text:'Senha'
+                font_size:'30dp'
+                bold:True
+                hint_text:'******'
+                foreground_color:0,1,1,1
+                multiline:False
                 password:True
                 id:senha
             MDLabel:
@@ -124,7 +135,11 @@
                 color:1,1,1,.5
                 text:'Confirmar Senha'
             TextInput:
-                hint_text:'Repetir senha'
+                font_size:'30dp'
+                bold:True
+                hint_text:'******'
+                multiline:False
+                foreground_color:0,1,1,1
                 password:True
                 id:rep_senha
 

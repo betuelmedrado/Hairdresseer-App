@@ -676,10 +676,13 @@ class ViewSchedule(Screen):
 
     def popup_mark_off(self,id_button,hours, *args, **kwargs):
         id_user = ''
-        info_schedule = self.info_entrace_salao()
-        for id in info_schedule:
-            if id['id_user'] == self.user_id:
-                id_user = id['id_user']
+        # info_schedule = self.info_entrace_salao()
+        # for id in info_schedule:
+        #     if id['id_user'] == self.user_id:
+        #         id_user = id['id_user']
+
+        with open('info_user.json', 'r') as file:
+            id_user = json.load(file)
 
 
         box = MDBoxLayout(orientation='vertical')
@@ -701,7 +704,7 @@ class ViewSchedule(Screen):
         self.popup  = Popup(title='Deseja cancelar o agendamento?',
                        size_hint=(.8,.5),content=box)
 
-        bt_sim.bind(on_release = partial(self.cancel_schedule, id_user))
+        bt_sim.bind(on_release = partial(self.cancel_schedule, id_user["id_user"]))
         bt_nao.bind(on_release = self.popup.dismiss)
 
         self.popup.open()
@@ -710,10 +713,14 @@ class ViewSchedule(Screen):
         id_proficional = self.get_id_proficional()
         link = ''
 
+        print('iddd ',id_user)
+
         if id_proficional['manager'] == "False":
-            link = self.LINK_SALAO + '/socios/' + f'{id_proficional["id_user"]}/agenda/{id_user}.json'
+            link = self.LINK_SALAO + f'/socios/{id_proficional["id_user"]}/agenda/{id_user}.json'
+            print('exclud socio')
         elif id_proficional['manager'] == "True":
-            link = self.LINK_SALAO +'/'+'agenda/' + f'{id_user}.json'
+            link = self.LINK_SALAO + f'/agenda/{id_user}.json'
+            print('exclud manager')
 
         requisicao = requests.delete(link)
         self.actualizar()

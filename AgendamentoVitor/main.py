@@ -173,10 +173,11 @@ class CreatProfile(Screen):
     def on_pre_enter(self, *args):
 
         verification = self.verification_if_manger()
+
         if verification:
-            self.ids.enter_as_socio.text = 'Cadastro de Sócio'
-        else:
             pass
+        else:
+            self.ids.enter_as_socio.text = 'Cadastro de Sócio'
 
     def valid_field(self):
         if self.ids.nome.text == '':
@@ -428,7 +429,11 @@ class ManagerProfile(Screen):
             toast('escolha o campo a ser preenchido! Entrada ou Saida', duration=5)
 
     def save_data(self,*args):
-        try:
+
+        with open('is_manager_or_socio.json','r') as file:
+            if_manager = json.load(file)
+
+        if if_manager == 'socio':
             LINK_BASE_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{self.user_id}.json'
 
             self.entrada = self.ids.entry.text
@@ -446,7 +451,7 @@ class ManagerProfile(Screen):
             requisica = requests.patch(LINK_BASE_SALAO, info)
             toast('Tabela de horas salva com sucesso!', duration=4)
 
-        except:
+        elif if_manager == 'manager':
 
             LINK_BASE_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.user_id}.json'
 
@@ -1088,7 +1093,7 @@ class ViewSchedule(Screen):
 
                             # para não dá erro, de sumir o agendamento anterior
                             elif str(mim).zfill(2) == tempo[3:]:
-                                table = Table_shedule(str(cont), '', entrada, f'', '')
+                                table = TableEnpty(str(cont), '', entrada, f'', '')
                                 self.ids.grid_shedule.add_widget(table)
                                 list_content.append('')
                                 block = True
