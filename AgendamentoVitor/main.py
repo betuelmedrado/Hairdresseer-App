@@ -358,7 +358,7 @@ class ManagerProfile(Screen):
             requisicao_salao_dic = requisicao_base_salao.json()
 
             name = requisicao_salao_dic['nome']
-            self.ids.text_name.text = str(name)
+            self.ids.text_name.text = str(name).title()
 
             # saving infomation if is manager or socio #################################################################
             with open('is_manager_or_socio.json','w', encoding='utf-8') as file:
@@ -372,7 +372,7 @@ class ManagerProfile(Screen):
             requisicao_salao_dic = requisicao_base_salao.json()
 
             name = requisicao_salao_dic['nome']
-            self.ids.text_name.text = str(name)
+            self.ids.text_name.text = str(name).title()
 
             # saving infomation is manager or socio
             with open('is_manager_or_socio.json','w', encoding='utf-8') as file:
@@ -693,7 +693,7 @@ class ManagerProfile(Screen):
         box_widgets.add_widget(Popup_widgets(self.id_manager, self.user_id, id_work, servico, tempo, valor))
 
         box_main.add_widget(box_widgets)
-        box_main.add_widget(box_buttons)
+        # box_main.add_widget(box_buttons)
 
         self.popup.open()
 

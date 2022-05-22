@@ -1,0 +1,71 @@
+
+<Popup_widgets>:
+    orientation:'vertical'
+    id_work:''
+    servico:''
+    tempo:''
+    valor:''
+    spacing:'10dp'
+    padding:'10dp'
+    MDBoxLayout:
+        orientation:'vertical'
+        MDLabel:
+            size_hint_y:None
+            height:'15dp'
+            text:'Serviço'
+            bold:True
+            color:0.39, 0.40, 0.42,1
+        TextInput:
+            size_hint_y:None
+            height:'30dp'
+            text_bold:True
+            text:root.servico
+    MDBoxLayout:
+        orientation:'vertical'
+        MDLabel:
+            size_hint_y:None
+            height:'15dp'
+            text:'Tempo'
+            bold:True
+            color:0.39, 0.40, 0.42,1
+        TextInput:
+            size_hint_y:None
+            height:'30dp'
+            text:root.tempo
+            id:id_tempo
+    MDBoxLayout:
+        orientation:'vertical'
+        MDLabel:
+            size_hint_y:None
+            height:'15dp'
+            text:'Valor: R$'
+            bold:True
+            color:0.39, 0.40, 0.42,1
+        TextInput:
+            size_hint_y:None
+            height:'30dp'
+            text:root.valor
+            id:id_valor
+    Widget:
+        size_hint_y:None
+        height:'10dp'
+    MDBoxLayout:
+        size_hint_y:None
+        height:'30dp'
+        spacing:'15dp'
+        id:box_button
+        MDRaisedButton:
+            text:'Editar'
+            bold:True
+            on_release:root.pop_edit(root.id_work)
+
+        MDRaisedButton:
+            text:'Excluir'
+            bold:True
+            text_color:1,0,0,1
+            on_release:root.pop_delet_work(root.id_work)
+
+        MDTextButton:
+            text:'Sair'
+            pos_hint:{'center_y':.5}
+            on_release:app.root.get_screen('managerprofile').dismiss_popup()

@@ -33,9 +33,10 @@
             MDCard:
                 orientation:'vertical'
                 size_hint:.8,None
-                height:'200dp'
+                height:'240dp'
                 radius:12,12,12,12
                 pos_hint:{'center_x':.5}
+                spacing:'10dp'
                 MDBoxLayout:
                     orientation:'vertical'
                     size_hint_y:None
@@ -99,21 +100,53 @@
                 MDBoxLayout:
                     orientation:'vertical'
                     size_hint_y:None
-                    height:'50dp'
+                    height:'70dp'
+                    spacing:'10dp'
                     Label:
                         font_size:'9dp'
                         text:'Informe o tempo entre cada agenda'
                         color:0,0,0,1
-                    MDTextFieldRect:
-                        size_hint_x:None
+                    MDCard:
+                        size_hint_y:None
+                        height:'30dp'
+                        spacing:'10dp'
+                        padding:['20dp','5dp']
+                        MDTextFieldRect:
+                            size_hint_y:None
+                            height:'25dp'
+                            readonly:True
+                            pos_hint:{'center_x':.5}
+                            text:'00:30'
+                            on_focus:space_temp.text = self.text
+                        MDTextFieldRect:
+                            size_hint_y:None
+                            height:'25dp'
+                            readonly:True
+                            pos_hint:{'center_x':.5}
+                            text:'00:40'
+                            on_focus:space_temp.text = self.text
+                        MDTextFieldRect:
+                            size_hint_y:None
+                            height:'25dp'
+                            readonly:True
+                            pos_hint:{'center_x':.5}
+                            text:'00:50'
+                            on_focus:space_temp.text = self.text
+                        MDTextFieldRect:
+                            size_hint_y:None
+                            height:'25dp'
+                            readonly:True
+                            pos_hint:{'center_x':.5}
+                            text:'00:60'
+                            on_focus:space_temp.text = self.text
+                    MDTextButton:
+                        size_hint:None,None
                         width:'50dp'
+                        height:'25dp'
+                        readonly:True
                         pos_hint:{'center_x':.5}
-                        hint_text:'00:00'
+#                        hint_text:'00:00'
                         id:space_temp
-                Widget:
-                    size_hint_y:None
-                    height:'10dp'
-
                 MDBoxLayout:
                     size_hint_y:None
                     height:'30dp'
@@ -283,8 +316,8 @@
                             size_hint_x:.40
                             font_size:'10dp'
                             bold:True
-                            color:1,0,0,1
-                            text:'Nome'
+                            color:1,0,0,.7
+                            text:'Nomes dos socios!'
                     MDBoxLayout:
                         ScrollView:
                             MDBoxLayout:
@@ -292,64 +325,3 @@
                                 size_hint_y:None
                                 height:self.minimum_height
                                 id:box_socio
-
-<Popup_widgets>:
-    orientation:'vertical'
-    id_work:''
-    servico:''
-    tempo:''
-    valor:''
-    spacing:'10dp'
-    padding:'10dp'
-    MDBoxLayout:
-        orientation:'vertical'
-        MDLabel:
-            size_hint_y:None
-            height:'15dp'
-            text:'Serviço'
-            bold:True
-            color:0.39, 0.40, 0.42,1
-        TextInput:
-            size_hint_y:None
-            height:'30dp'
-            text:root.servico
-    MDBoxLayout:
-        orientation:'vertical'
-        MDLabel:
-            size_hint_y:None
-            height:'15dp'
-            text:'Tempo'
-            bold:True
-            color:0.39, 0.40, 0.42,1
-        TextInput:
-            size_hint_y:None
-            height:'30dp'
-            text:root.tempo
-            id:id_tempo
-    MDBoxLayout:
-        orientation:'vertical'
-        MDLabel:
-            size_hint_y:None
-            height:'15dp'
-            text:'Valor: R$'
-            bold:True
-            color:0.39, 0.40, 0.42,1
-        TextInput:
-            size_hint_y:None
-            height:'30dp'
-            text:root.valor
-            id:id_valor
-    MDBoxLayout:
-        spacing:'15dp'
-        id:box_button
-        MDRaisedButton:
-            text:'Editar'
-            on_release:root.pop_edit(root.id_work)
-
-        MDRaisedButton:
-            text:'Excluir'
-            on_release:root.pop_delet_work(root.id_work)
-
-        MDTextButton:
-            text:'Sair'
-            on_release:app.root.get_screen('managerprofile').dismiss_popup()

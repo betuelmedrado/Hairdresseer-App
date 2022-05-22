@@ -63,7 +63,10 @@ class HomePage(Screen):
 
         self.ids.my_card_button.clear_widgets()
 
-        lista = []
+        with open('info_user.json', 'r') as file:
+            id_user = json.load(file)
+
+        # lista = []
 
         # verification if have schedule in manager ########################################################################
         check_image_manager = self.check_manager_scheduling()
@@ -84,31 +87,32 @@ class HomePage(Screen):
             else:
                 self.ids.my_card_button.add_widget(MyCardButton(requisicao_id_dic['manager'], self.id_manager, requisicao_id_dic['nome']))
 
-            for id_socios in requisicao_id_dic['socios']:
-                lista.append(id_socios)
+            # for id_socios in requisicao_id_dic['socios']:
+            #     lista.append(id_socios)
         except:
             pass
 
         # getting ids of user which is schedule ############################################################################
-        for enum, id in enumerate(lista):
-            # try:
-            # Here getting socio to read of data ##############################################################################
-            LINK_ID = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{id}.json'
-            requisicao_to_socio = requests.get(LINK_ID)
-            requisicao_to_socio_dic = requisicao_to_socio.json()
-
+        # for enum, id in enumerate(lista):
+        for enum, id in enumerate(self.id_socios):
             try:
-                if check_socio[enum]:
-                    card_button = MyCardButton(requisicao_to_socio_dic['manager'], id, requisicao_to_socio_dic['nome'])
-                    card_button.ids.image_check.add_widget(Image(source='images/check.png'))
-                    self.ids.my_card_button.add_widget(card_button)
-                else:
-                    self.ids.my_card_button.add_widget(MyCardButton(requisicao_to_socio_dic['manager'], id, requisicao_to_socio_dic['nome']))
-            except IndexError:
-                self.ids.my_card_button.add_widget(
-                    MyCardButton(requisicao_to_socio_dic['manager'], id, requisicao_to_socio_dic['nome']))
-            # except:
-            #     pass
+                # Here getting socio to read of data ##############################################################################
+                LINK_ID = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{id}.json'
+                requisicao_to_socio = requests.get(LINK_ID)
+                requisicao_to_socio_dic = requisicao_to_socio.json()
+
+                try:
+                    if check_socio[enum]:
+                        card_button = MyCardButton(requisicao_to_socio_dic['manager'], id, requisicao_to_socio_dic['nome'])
+                        card_button.ids.image_check.add_widget(Image(source='images/check.png'))
+                        self.ids.my_card_button.add_widget(card_button)
+                    else:
+                        self.ids.my_card_button.add_widget(MyCardButton(requisicao_to_socio_dic['manager'], id, requisicao_to_socio_dic['nome']))
+                except:
+                    self.ids.my_card_button.add_widget(
+                        MyCardButton(requisicao_to_socio_dic['manager'], id, requisicao_to_socio_dic['nome']))
+            except:
+                pass
 
     def get_id_socios(self, *args):
 
@@ -187,13 +191,13 @@ class HomePage(Screen):
         with open('info_user.json', 'r') as file:
             id_user = json.load(file)
 
-        try:
-            for idsocio in self.id_socios:
-                LINK = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{idsocio}/agenda.json'
-                requisicao = requests.get(LINK)
-                requisicao_dic = requisicao.json()
+        # try:
+        for idsocio in self.id_socios:
+            LINK = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{idsocio}/agenda.json'
+            requisicao = requests.get(LINK)
+            requisicao_dic = requisicao.json()
 
-
+            try:
                 for id in requisicao_dic:
                     # list_of_id.append(id)
                     if id_user['id_user'] == id:
@@ -201,10 +205,13 @@ class HomePage(Screen):
                         break
                     else:
                         list_of_id.append(False)
-            return list_of_id
-        except:
-            list_of_id.append(False)
-            return list_of_id
+            except:
+                list_of_id.append(False)
+
+        return list_of_id
+        # except:
+        #     list_of_id.append(False)
+        #     return list_of_id
 
 class Register(Screen):
 
