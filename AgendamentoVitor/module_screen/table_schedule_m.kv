@@ -16,7 +16,7 @@
         md_bg_color:1,1,1,.3
         radius:7,7,7,7
         id:card
-        on_release: app.root.get_screen('viewshedule').get_hours(root.id_button, root.hours)
+        on_release: app.root.get_screen('viewshedule').inf_schedule_client(root.id_button, root.id_schedule, root.hours, root.hours_second, root.time, root.client)
         MDBoxLayout:
             MDBoxLayout:
                 orientation:'vertical'

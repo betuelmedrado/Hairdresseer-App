@@ -1,5 +1,5 @@
 
-#requere python 3.8
+#requere python 3.9
 
 # kivymd ###
 from kivymd.app import MDApp
@@ -250,7 +250,34 @@ class Register(Screen):
         with open('info_user.json','w') as arquivo:
             json.dump(info, arquivo, indent=2)
 
+    def not_can_client(self):
+        lista_info_ids = []
+        ID_MANAGER = ''
+
+        # Geting id of manager #########################################################################################
+        LINK_MANAGER = 'https://shedule-vitor-default-rtdb.firebaseio.com/salao.json'
+        requisicao_manager = requests.get(LINK_MANAGER)
+        requisicao_manager_dic = requisicao_manager.json()
+
+        for id in requisicao_manager_dic:
+            ID_MANAGER = id
+
+        # Geting ids of socios #########################################################################################
+
+        LINK_SOCIOS = f'https://shedule-vitor-default-rtdb.firebaseio.com/client.json'
+        requisicao_socio = requests.get(LINK_SOCIOS)
+        requisicao_socio_dic = requisicao_socio.json()
+
+        for id_socio in requisicao_socio_dic:
+            lista_info_ids.append(id_socio)
+
+        return lista_info_ids
+
     def logar(self,*args):
+
+        lista_info_ids = self.not_can_client()
+        print('listaaa ',lista_info_ids)
+
         LINK = f'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={self.API_KEY}'
 
         email = self.ids.email.text
@@ -281,8 +308,11 @@ class Register(Screen):
             pass
 
         if requisicao.ok:
-            self.save_refreshtoken(refresh_token)
-            MDApp.get_running_app().root.current = 'homepage'
+            if requisicao_dic['localId'] in lista_info_ids:
+                self.save_refreshtoken(refresh_token)
+                MDApp.get_running_app().root.current = 'homepage'
+            else:
+                self.ids.warning.text = 'Email ou senha [color=D40A00]Invalida[/color]'
         else:
             erro = str(requisicao_dic['error']['message'])
 
@@ -424,6 +454,8 @@ class ViewSchedule(Screen):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
 
+        self.dia_atual = datetime.today().isoweekday()
+
         # agendados = self.dados[1]
         # print(agendados)
 
@@ -480,11 +512,11 @@ class ViewSchedule(Screen):
 
                 nome = requisicao_dic['nome']
 
-                self.entrada = requisicao_dic['entrada']
+                self.entrada = requisicao_dic[f'{self.dia_atual}']['entrada']
 
-                self.saida = requisicao_dic['saida']
+                self.saida = requisicao_dic[f'{self.dia_atual}']['saida']
 
-                self.space_temp = requisicao_dic['space_temp']
+                self.space_temp = requisicao_dic[f'{self.dia_atual}']['space_temp']
 
                 self.ids.title_toobar.title = f'Agenda {str(nome)}'
                 try:
@@ -504,11 +536,11 @@ class ViewSchedule(Screen):
 
                 nome = requisicao_dic['nome']
 
-                self.entrada = requisicao_dic['entrada']
+                self.entrada = requisicao_dic[f'{self.dia_atual}']['entrada']
 
-                self.saida = requisicao_dic['saida']
+                self.saida = requisicao_dic[f'{self.dia_atual}']['saida']
 
-                self.space_temp = requisicao_dic['space_temp']
+                self.space_temp = requisicao_dic[f'{self.dia_atual}']['space_temp']
 
                 self.ids.title_toobar.title = f'Agenda {str(nome)}'
 
