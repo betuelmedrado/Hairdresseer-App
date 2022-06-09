@@ -43,22 +43,39 @@
                             bold:True
                             markup:True
                             id:nome
-                        MDCard:
-                            orientation:'vertical'
-                            size_hint:None,None
-                            width:'100dp'
+                        MDBoxLayout:
+                            size_hint_y:None
                             height:'45dp'
-                            pos_hint:{'x':.6}
-                            radius:7,7,7,7
-                            md_bg_color:0.78, 0.80, 0.83,1
-                            Label:
-                                font_size:'8dp'
-                                color:0,0,0,1
-                                text:'Quantidade cancelada!'
-                            MDLabel:
-                                bold:True
-                                halign:'center'
-                                id:quant_cancelada
+                            MDCard:
+                                orientation:'vertical'
+                                elevation:0
+                                on_release:root.popup_leave()
+                                Image:
+                                    source:''
+                                    id:img_block
+                                MDLabel:
+                                    size_hint_y:None
+                                    height:'5dp'
+                                    font_size:'7dp'
+                                    halign:'center'
+                                    id:label_block
+                            MDCard:
+                                orientation:'vertical'
+                                size_hint:None,None
+                                width:'100dp'
+                                height:'45dp'
+                                pos_hint:{'x':.6}
+                                radius:7,7,7,7
+                                md_bg_color:0.78, 0.80, 0.83,1
+                                Label:
+                                    font_size:'8dp'
+                                    color:0,0,0,1
+                                    text:'Quantidade cancelada!'
+                                MDLabel:
+                                    bold:True
+                                    halign:'center'
+                                    font_size:'20dp'
+                                    id:quant_cancelada
 
                         MDBoxLayout:
                             orientation:'vertical'
@@ -171,6 +188,7 @@
                 radius:7,7,7,7
                 md_bg_color:app.theme_cls.primary_color
                 ripple_behavior:True
+                on_release:root.client_missed()
                 Image:
                     size_hint_x:None
                     width:'30dp'
@@ -182,6 +200,7 @@
                 radius:7,7,7,7
                 md_bg_color:app.theme_cls.primary_color
                 ripple_behavior:True
+                on_release:root.block_client()
                 Image:
                     size_hint_x:None
                     width:'28dp'

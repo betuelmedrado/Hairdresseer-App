@@ -16,6 +16,8 @@ from kivy.lang import Builder
 from kivy.clock import Clock
 from kivy.uix.popup import Popup
 from kivy.uix.widget import Widget
+from kivy.uix.button import Button
+from kivy.uix.image import Image
 
 # importando firebase
 import requests
@@ -1171,6 +1173,11 @@ class ViewSchedule(Screen):
         except:
             print('actualizar ViewSchedule erro!')
 
+    def blocked(self,id_button, hours):
+        print(id_button)
+        print(hours)
+
+
     def inf_schedule_client(self,id_button, id_schedule, hours, hours_second, time, client):
         dic_info = {}
         # print('idbutton ', id_button)
@@ -1207,8 +1214,27 @@ class InfoScheduleClient(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
+        self.manager_main = self.id_manager()
+
     def on_pre_enter(self):
+
         self.inf_schedule_client()
+
+    def on_leave(self):
+        self.ids.img_block.source = ''
+        self.ids.label_block.text = ''
+
+    def id_manager(self):
+
+        manager = ''
+
+        link_work = self.LINK_DATA_BASE + '.json'
+        requisicao = requests.get(link_work)
+        requisicao_dic = requisicao.json()
+
+        for id in requisicao_dic:
+            manager = id
+        return manager
 
     def inf_schedule_client(self):
         dic_inf = {}
@@ -1233,13 +1259,108 @@ class InfoScheduleClient(Screen):
 
         self.ids.quant_cancelada.text = str(requisicao_dic['quant_cancelado'])
 
+        # Here change the color and the number of quant cancel #########################################################
         if int(requisicao_dic['quant_cancelado']) == 0:
-            print('verde')
             self.ids.color_quant.md_bg_color = [0,1,0,1]
+            self.ids.quant_cancelada.color = [0,1,0,1]
         elif int(requisicao_dic['quant_cancelado']) == 1:
             self.ids.color_quant.md_bg_color = 1.00, 0.65, 0.16,1
-        elif int(requisicao_dic['quant_cancelado']) >= 2:
+            self.ids.quant_cancelada.color = 1.00, 0.65, 0.16,1
+        elif int(requisicao_dic['quant_cancelado']) == 2:
+            self.ids.color_quant.md_bg_color = 1.00, 0.33, 0.03,1
+            self.ids.quant_cancelada.color = 1.00, 0.33, 0.03,1
+        elif int(requisicao_dic['quant_cancelado']) >= 3:
             self.ids.color_quant.md_bg_color = 1,0,0,1
+            self.ids.quant_cancelada.color = 1,0,0,1
+
+        # Get if go cancel or not ######################################################################################
+        if requisicao_dic['bloqueado'] == 'True':
+            self.ids.img_block.source = 'images/bloqueado.png'
+            self.ids.label_block.text = 'Cliente bloqueado!'
+        else:
+            self.ids.img_block.source = ''
+            self.ids.label_block.text = ''
+
+    def client_missed(self):
+
+        cancelada = int(self.ids.quant_cancelada.text)
+        cancelada += 1
+
+        with open('infoscheduleclient.json', 'r') as file:
+            info_schedule = json.load(file)
+        id_client = info_schedule['id_schedule']
+
+
+        link = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_client}.json'
+
+        info = f'{{"quant_cancelado":"{cancelada}"}}'
+        requisicao = requests.patch(link, data=info)
+
+        self.ids.quant_cancelada.text = str(cancelada)
+
+        if cancelada == 1:
+            self.ids.color_quant.md_bg_color = 1.00, 0.65, 0.16,1
+            self.ids.quant_cancelada.color = 1.00, 0.65, 0.16,1
+        elif cancelada == 2:
+            self.ids.color_quant.md_bg_color = 1.00, 0.33, 0.03,1
+            self.ids.quant_cancelada.color = 1.00, 0.33, 0.03,1
+        elif cancelada >= 3:
+            self.ids.color_quant.md_bg_color = 1,0,0,1
+            self.ids.quant_cancelada.color = 1,0,0,1
+
+    def block_client(self):
+        with open('infoscheduleclient.json', 'r') as file:
+            info_schedule = json.load(file)
+        id_client = info_schedule['id_schedule']
+
+
+        link = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_client}.json'
+
+        info = f'{{"bloqueado":"True"}}'
+        requisicao = requests.patch(link, data=info)
+
+        self.ids.img_block.source = 'images/bloqueado.png'
+        self.ids.label_block.text = 'Cliente bloqueado!'
+
+    def popup_leave(self, *args, **kwargs):
+
+        if self.ids.img_block.source != '':
+            box_content = MDBoxLayout(orientation='vertical',spacing='5')
+            box_bt = MDBoxLayout(spacing='10dp', padding='5dp')
+
+            pop = Popup(title='Liberar cliente?', size_hint=(None, None),
+                        size=(450, 300), content=box_content)
+
+            bt_sim = Button(text='Liberar',on_release=pop.dismiss)
+            bt_nao = Button(text='Não', on_release=pop.dismiss)
+
+            box_bt.add_widget(bt_sim)
+            box_bt.add_widget(bt_nao)
+
+            image = Image(source='images/atencao.png')
+
+            box_content.add_widget(image)
+            box_content.add_widget(box_bt)
+
+            bt_sim.bind(on_press=self.leave_client)
+
+            pop.open()
+        else:
+            pass
+
+    def leave_client(self, *args):
+
+        with open('infoscheduleclient.json', 'r') as file:
+            info_schedule = json.load(file)
+        id_client = info_schedule['id_schedule']
+
+        link = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_client}.json'
+
+        info = f'{{"bloqueado":"False"}}'
+        requisicao = requests.patch(link, data=info)
+
+        self.ids.img_block.source = ''
+        self.ids.label_block.text = ''
 
 
     def work(self, id_client):
@@ -1260,20 +1381,22 @@ class InfoScheduleClient(Screen):
             list_string = requisicao_dic
 
         elif id_worker['manager'] == 'False':
-            pass
+
+            manager_main = self.manager_main
+
+            link_work = self.LINK_DATA_BASE + f'/{manager_main}/socios/{id_worker["id_user"]}/agenda/{id_client}/servicos.json'
+            requisicao = requests.get(link_work)
+            requisicao_dic = requisicao.json()
+
+            list_string = requisicao_dic
 
         list_work = eval(list_string)
 
         for enum, work in enumerate(list_work):
-            print(work)
             valor += float(work['valor'])
             self.ids.box_work.add_widget(MyBoxCategorie('',work['servico'], work['tempo'], work['valor']))
 
         self.ids.id_valor.text = str(valor)
-
-
-
-
 
 
 
