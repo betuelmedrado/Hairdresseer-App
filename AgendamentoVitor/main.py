@@ -1,5 +1,5 @@
 
-# requeriment python 3.9
+# requeriment python 3.8
 
 from kivymd.app import MDApp
 from kivymd.uix.boxlayout import MDBoxLayout
@@ -7,6 +7,7 @@ from kivymd.uix.button import MDTextButton, MDFlatButton, MDRaisedButton
 from kivymd.toast import toast
 from kivymd.uix.card import MDCard
 from kivymd.uix.label import MDLabel
+from kivymd.uix.spinner import MDSpinner
 
 
 from kivy.uix.screenmanager import ScreenManager, Screen
@@ -158,6 +159,12 @@ class LoginManager(Screen):
             with open('infoscheduleclient.json', 'w') as file:
                 json.dump('', file)
 
+        try:
+            with open('select_works.json', 'r') as file_work:
+                json.load(file_work)
+        except:
+            with open('select_works.json', 'w') as file_work:
+                json.dump([],file_work)
 
     def on_pre_enter(self, *args):
         self.load_refresh()
@@ -340,6 +347,31 @@ class ManagerProfile(Screen):
             self.list_day.append(dia)
         elif state == 'normal':
             self.list_day.remove(dia)
+
+    def on_text_temp(self,*args):
+        text_temp = ''
+
+        # try:
+        text_temp = str(self.ids.tempo.text).zfill(4)
+
+        # text_temp = '00:01'
+
+        print(text_temp)
+
+        hours, minute = map(int, text_temp.split(':'))
+        print(hours)
+        print(minute)
+
+        delta_temp = timedelta(hours=hours, minutes=minute)
+        # entry = datetime.strptime(text_temp, '%H:%M')
+        print(delta_temp)
+
+
+        # soma_horas = entry + delta_temp
+
+
+        # except ValueError:
+        #     self.ids.tempo.text = (text_temp)
 
 
     def on_pre_enter(self, *args):
@@ -830,6 +862,24 @@ class MyBoxCategorie(MDCard):
         self.tempo = str(tempo)
         self.valor = str(valor)
 
+class CategoriesWork(MDCard):
+
+    def __init__(self, servico='', tempo='', valor='', **kwargs):
+        super().__init__(**kwargs)
+
+        self.servico = str(servico)
+        self.tempo = str(tempo)
+        self.valor = str(valor)
+
+
+class MyBoxCategorieLabel(MDCard):
+    def __init__(self, servico='', tempo='', valor='', **kwargs):
+        super().__init__(**kwargs)
+
+        self.servico = str(servico)
+        self.tempo = str(tempo)
+        self.valor = str(valor)
+
 
 class MyBoxSocio(MDCard):
     def __init__(self,name, **kwargs):
@@ -858,6 +908,16 @@ class TableEnpty(MDBoxLayout):
         self.hours_second = hours_second
         self.time = time
         self.client = str(client)
+
+class TableInfo(MDBoxLayout):
+    def __init__(self,id_button='',id_schedule='',hours='',client='',hours2='',**kwargs):
+
+        super().__init__(**kwargs)
+        self.id_button = id_button
+        self.id_schedule = id_schedule
+        self.hours = str(hours)
+        self.client = str(client)
+        self.hours_2 = hours2
 
 class CardButtonProficional(MDCard):
 
@@ -1173,19 +1233,79 @@ class ViewSchedule(Screen):
         except:
             print('actualizar ViewSchedule erro!')
 
-    def blocked(self,id_button, hours):
-        print(id_button)
-        print(hours)
+    def popup_mark_off(self,id_button,hours, *args, **kwargs):
+        id_user = ''
+        # info_schedule = self.info_entrace_salao()
+        # for id in info_schedule:
+        #     if id['id_user'] == self.user_id:
+        #         id_user = id['id_user']
+
+        with open('write_id_manager.json', 'r') as file:
+            id_user = json.load(file)
+
+
+        box = MDBoxLayout(orientation='vertical')
+        box_button = MDBoxLayout(padding=15,spacing=15)
+
+        img = Image(source='images/atencao.png')
+
+        bt_sim = Button(text='Sim',background_color=(0,1,1,1),color=(1,0,0,.8), size_hint=(1,None),width='23dp')
+        bt_nao = Button(text='Não',background_color=(0,1,1,1),color=(0,0,0,1),size_hint=(1,None),width='23dp')
+        bt_view = Button(text='View',background_color=(0,1,1,1),color=(0,0,0,1),size_hint=(1,None),width='23dp')
+
+        box_button.add_widget((bt_sim))
+        box_button.add_widget((bt_nao))
+        box_button.add_widget((bt_view))
+
+        box.add_widget((img))
+        box.add_widget((box_button))
+
+        self.popup  = Popup(title='Deseja cancelar o agendamento?',
+                       size_hint=(.8,.5),content=box)
+
+        bt_sim.bind(on_release = partial(self.cancel_schedule, id_user["id_user"]))
+        bt_nao.bind(on_release = self.popup.dismiss)
+
+        self.popup.open()
+
+    def cancel_schedule(self, id_user, *args, **kwargs):
+        id_proficional = self.get_id_proficional()
+        link = ''
+
+        if id_proficional['manager'] == "False":
+            link = self.LINK_SALAO + f'/socios/{id_proficional["id_user"]}/agenda/{id_user}.json'
+
+        elif id_proficional['manager'] == "True":
+            link = self.LINK_SALAO + f'/agenda/{id_user}.json'
+
+        requisicao = requests.delete(link)
+        self.actualizar()
+        self.popup.dismiss()
+
+    def blocked_schedule(self,id_button, hours):
+        proficional = self.get_id_proficional()
+
+        if proficional['manager'] == 'True':
+            link = f'{self.LINK_SALAO}'
+
+    def get_hours(self,id_button, id_schedule, hours, hours_second, time, client, *args):
+        hours_dic = {}
+
+        hours_dic['proficional'] = 'True'
+        hours_dic['id_button'] = id_button
+        hours_dic['id_schedule'] = id_schedule
+        hours_dic['hours'] = hours
+        hours_dic['hours_second'] = hours_second
+        hours_dic['time'] = time
+        hours_dic['client'] = client
+
+        with open('infoscheduleclient.json','w') as arquivo:
+            json.dump(hours_dic, arquivo, indent=2)
+        MDApp.get_running_app().root.current = 'hoursschedule'
 
 
     def inf_schedule_client(self,id_button, id_schedule, hours, hours_second, time, client):
         dic_info = {}
-        # print('idbutton ', id_button)
-        # print('idshedule ', id_schedule)
-        # print('horas ', hours)
-        # print('segunda horas ', hours_second)
-        # print('tempo ', time)
-        # print('cliente ', client)
 
         dic_info['id_button'] = id_button
         dic_info['id_schedule'] = id_schedule
@@ -1193,7 +1313,6 @@ class ViewSchedule(Screen):
         dic_info['hours_second'] = hours_second
         dic_info['time'] = time
         dic_info['client'] = client
-
 
         with open('infoscheduleclient.json', 'w') as file:
             json.dump(dic_info, file, indent=2)
@@ -1206,6 +1325,389 @@ class ViewSchedule(Screen):
     def return_schoice_schedule(self):
         MDApp.get_running_app().root.current = 'screenchoiceschedule'
 
+
+class HoursSchedule(Screen):
+
+    LINK_SALAO = 'https://shedule-vitor-default-rtdb.firebaseio.com/salao'
+    def __init__(self,hours='', **kwargs):
+        super().__init__(**kwargs)
+        # Clock.schedule_once(self.get_works, 2)
+        self.hours = hours
+        self.id_manager = self.get_manager()
+
+
+    def on_pre_enter(self, *args):
+        try:
+            with open('infoscheduleclient.json', 'r') as arquivo:
+                horas = json.load(arquivo)
+            self.ids.hours.text = horas['hours']
+        except FileNotFoundError:
+            pass
+
+        self.ids.categorie.add_widget(MDSpinner(size_hint=(None,None,), size=('46dp','46dp'),pos_hint={'center_x':.5}))
+        Clock.schedule_once(self.get_works, 2)
+        self.includ_color_select()
+        self.soma_hours_values()
+
+        self.valid_button_save()
+
+    def valid_button_save(self):
+        with open('select_works.json', 'r') as arquivo:
+            my_select = json.load(arquivo)
+
+        if my_select == []:
+            self.ids.card_save.md_bg_color = 1, 0, 0, .1
+            self.ids.card_save.unbind(on_release=self.save_scheduleing)
+            self.ids.card_save.bind(on_release=self.nada)
+        else:
+            pass
+
+    def time_now(self):
+        h = datetime.today().hour
+        mim = datetime.today().minute
+        horas = f'{str(h).zfill(2)}:{str(mim).zfill(2)}'
+
+        return horas
+
+    def on_leave(self, *args):
+        self.ids.categorie.clear_widgets()
+
+    def get_manager(self, *args):
+        requisicao = requests.get(self.LINK_SALAO + '.json')
+        requisicao_dic = requisicao.json()
+        for id in requisicao_dic:
+            return id
+
+    def get_id_diverse(self):
+        if_manager = {}
+
+        with open('write_id_manager.json','r') as arquivo:
+            if_manager = json.load(arquivo)
+        return if_manager
+
+    def get_works(self,*args):
+        self.ids.categorie.clear_widgets()
+
+        lista = []
+        lista_name = []
+        lista_color = []
+        socio_or_manager = False
+        self.id_diverse = self.get_id_diverse()
+        link = ''
+
+        # LINK DATA BASE
+        if self.id_diverse['manager'] == "False":
+            link = self.LINK_SALAO + '/' + self.id_manager + '/socios/' + self.id_diverse["id_user"] + '.json'
+            socio_or_manager = True
+        elif self.id_diverse['manager'] == "True":
+            link = self.LINK_SALAO + '/' + self.id_manager + '.json'
+            socio_or_manager = False
+
+        requisicao = requests.get(link)
+
+        try:
+            requisicao_dic = requisicao.json()
+
+            for get_id_work in requisicao_dic['servicos']:
+                lista.append(get_id_work)
+
+            try:
+                with open('select_works.json','r') as arquivo_color:
+                    lista_color = json.load(arquivo_color)
+            except:
+                pass
+
+        # LINK DATA BASE
+            for num, id_work in enumerate(lista):
+
+                if socio_or_manager:
+                    link_id = self.LINK_SALAO + '/' + self.id_manager + '/socios/' + self.id_diverse["id_user"] + '/servicos/' + id_work + '.json'
+                else:
+                    link_id = self.LINK_SALAO + '/' + self.id_manager + '/' + 'servicos' + '/' + id_work + '.json'
+
+                works = requests.get(link_id)
+                works_dic = works.json()
+
+                servico = works_dic['nome_servico']
+                tempo = works_dic['tempo']
+                valor = works_dic['valor']
+
+
+                for iten in lista_color:
+                    lista_name.append(iten['servico'])
+
+                if servico in lista_name:
+                    self.ids.categorie.add_widget(CategoriesWork(str(servico), str(tempo), str(valor), md_bg_color=[0.13, 0.53, 0.95,.2]))
+                else:
+                    self.ids.categorie.add_widget(CategoriesWork(str(servico), str(tempo), str(valor)))
+        except:
+            try:
+                if socio_or_manager:
+                    work_socio = self.LINK_SALAO + '/' + self.id_manager + '/socios/' + self.id_diverse["id_user"] + '/' + id_work + '.json'
+                else:
+                    work_socio = self.LINK_SALAO + '/' + self.id_manager + '/socios/' + id_work + '.json'
+            except:
+                pass
+
+    def changer_color(self,eu,servico,*args):
+        color = eu.md_bg_color
+        dic = {}
+        lista = []
+
+        dic['servico'] = eu.servico
+        dic['tempo'] = eu.tempo
+        dic['valor'] = eu.valor
+
+        if color == [0.61, 0.60, 0.58,.7]:
+            eu.md_bg_color = 0.13, 0.53, 0.95,.5
+
+            try:
+                with open('select_works.json', 'r') as arquivo:
+                    my_select = json.load(arquivo)
+                    lista = (my_select)
+            except:
+               pass
+
+            lista.append(dic)
+
+            with open('select_works.json','w') as arquivo:
+                my_select = json.dump(lista, arquivo, indent=2)
+
+            self.ids.work_select.clear_widgets()
+            for work in lista:
+                self.ids.work_select.add_widget(MyBoxCategorieLabel(work['servico'].title(), work['tempo'].title(), work['valor'].title()))
+            self.soma_hours_values(eu)
+
+        else:
+            to_delet = []
+            eu.md_bg_color = 0.61, 0.60, 0.58,.7
+
+            # Geting the info in file ###################
+            with open('select_works.json','r') as arquivo:
+                to_delet = json.load(arquivo)
+
+            for num, item in enumerate(to_delet):
+                if servico == item['servico']:
+                    del(to_delet[num])
+
+            # save info in file ##########################
+            with open('select_works.json', 'w') as arquivo:
+                json.dump(to_delet, arquivo, indent=2)
+
+            # includ the color in button #################
+            self.includ_color_select()
+
+            # do the sum of hours and values #############
+            self.soma_hours_values(eu)
+
+        if self.ids.work_select.children == []:
+            self.ids.card_save.md_bg_color = 1, 0, 0, .1
+            self.ids.card_save.unbind(on_release=self.save_scheduleing)
+            self.ids.card_save.bind(on_release=self.nada)
+
+    def includ_color_select(self,*args):
+
+        # mdcard = MDCard(size_hint_y=(None), height=('20dp'))
+
+        lista = []
+        self.ids.work_select.clear_widgets()
+
+        try:
+            with open('select_works.json','r') as arquivo:
+                lista = json.load(arquivo)
+        except:
+            pass
+        for work in lista:
+            self.ids.categorie.children.md_bg_color = 0.13, 0.53, 0.95,1
+            self.ids.work_select.add_widget(MyBoxCategorieLabel(work['servico'].title(), work['tempo'].title(), work['valor'].title()))
+
+    def soma_hours_values(self, eu=''):
+        list_info = []
+        # try:
+        with open('select_works.json','r') as arquivo:
+            list_info = json.load(arquivo)
+
+        tempo = 0
+        hours = 0
+        minute = 0
+        valor = 0
+
+        # Formating and sum the hours #####################
+        for h in list_info:
+            h, m = map(int,h['tempo'].split(':'))
+            hours += h
+            minute += m
+
+        # here is for the minutes not to exceed 59 ########
+            if minute >= 60:
+                minute = minute % 60
+                hours += 1
+
+        # Sum the values ##################################
+        for v in list_info:
+            valor += float(v['valor'])
+
+
+        # Geting the hours
+        tempo = f'{str(hours).zfill(2)}:{str(minute).zfill(2)}'
+
+        self.ids.time.text = str(tempo)
+        self.ids.valor.text = str(valor)
+
+        self.hours_limit(tempo)
+
+
+    def hours_limit(self, tempo, *args):
+
+        lista_pos = ''
+
+        with open('infoscheduleclient.json','r') as file_info:
+            info = json.load(file_info)
+
+        with open('list_content.json','r') as lista:
+            lista_content = json.load(lista)
+
+        # hours of schedule
+        h = datetime.strptime(info['hours'],'%H:%M')
+
+        hora_tempo, minuto_tempo = map(int,tempo.split(':'))
+        delta_time = timedelta(hours=hora_tempo, minutes=minuto_tempo)
+        soma_horas = h + delta_time
+
+        posicao = info['id_button']
+        hora = info['hours']
+        try:
+            lista_pos =lista_content[int(posicao)]
+        except:
+            pass
+
+        #Here return one boolian ##############################
+        boolian = bool(soma_horas.strftime('%H:%M') > lista_pos)
+
+        #if lista_pos is empty  then boolian receive False ####
+        if lista_pos == '':
+
+            for field in lista_content[int(posicao):]:
+                boolian = bool(soma_horas.strftime('%H:%M') > str(field))
+                if field == '':
+                    boolian = False
+                else:
+                    boolian = bool(soma_horas.strftime('%H:%M') > str(field))
+                    # if the schedule is bigger than the next schedule then stop of througn list
+                    if boolian:
+                        break
+
+        if boolian:
+            self.ids.card_save.md_bg_color = 1,0,0,.1
+            self.ids.card_save.unbind(on_release = self.save_scheduleing)
+            self.ids.card_save.bind(on_release = self.disable_release)
+            toast('O gendamento excede o horario do proximo agendamento escolha outro horario ou outro cabeleleiro!', duration=6)
+        elif boolian == False:
+            self.ids.card_save.unbind(on_release = self.disable_release)
+            self.ids.card_save.md_bg_color = 0.13, 0.53, 0.95,1
+            self.ids.card_save.bind(on_release = self.save_scheduleing)
+
+    def check_time(self, *args):
+        pass
+
+    def get_name_user(self, info_user, *args):
+        # LINK_DATA_NAME = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_user}.json'
+        # name = requests.get(LINK_DATA_NAME)
+        # name_dic = name.json()
+
+        info_dic = {}
+
+        if info_user['manager'] == 'True':
+            link = f'{self.LINK_SALAO}/{info_user["id_user"]}.json'
+
+            requisicao = requests.get(link)
+            info_dic = requisicao.json()
+
+        else:
+            pass
+
+        print(info_dic)
+
+        return info_dic['nome']
+
+    def nada(self,*args):
+        toast('Selecione o tipo de serviço!')
+
+    def disable_release(self,*args):
+        toast('O gendamento excede o horario do proximo agendamento escolha outro horario ou outro cabeleleiro!')
+
+    def save_scheduleing(self, *args):
+        horas_hoje = self.time_now()
+        list_works = []
+        list_ids_schedule = []
+        link = ''
+
+        # geting the id of Manager ##############################
+        # name_id = self.get_id_diverse()
+        if_manager = self.get_id_diverse()
+
+        # geting the info of work ###############################
+        with open('select_works.json','r') as select_work:
+            list_works = json.load(select_work)
+
+        with open('write_id_manager.json','r') as arquivo:
+            info_user = json.load(arquivo)
+
+        with open('infoscheduleclient.json', 'r') as file_info:
+            id_pos = json.load(file_info)
+
+
+        id_user = info_user['id_user']
+        nome = self.get_name_user(info_user)
+        horas = self.ids.hours.text
+        tempo = self.ids.time.text
+        valor = self.ids.valor.text
+
+        if if_manager['manager'] == "False":
+            link = self.LINK_SALAO + '/' + self.id_manager + '/socios/' + if_manager["id_user"] + '/agenda/' + id_user + '.json'
+            get_requisicao = requests.get(link)
+        elif if_manager['manager'] == "True":
+            link = self.LINK_SALAO + '/' + self.id_manager + '/' + 'agenda' + '/' + id_user + '.json'
+
+
+        info = f'{{"id_posicao":"{id_pos["id_button"]}",' \
+               f'"id_horas":"{horas}",' \
+               f'"id_user":"{id_user}",' \
+               f'"tempo":"{tempo}",' \
+               f'"valor":"{valor}",' \
+               f'"nome":"{nome}",'\
+               f'"horas_agendamento": "{horas_hoje}",'\
+               f'"servicos":"{list_works}"}}'
+
+        requisicao = requests.patch(link, data=info)
+
+        toast('Agendamento Marcado! Você tem Uma(1) Hora para cancelar\n "3" cancelamento abaixo disso você tera que pagar uma taxa', duration=10)
+
+        if if_manager['manager'] == "False":
+            # getting ids that are already scheduled ###########################################################################
+                link_cliente = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_user}/ids_agendado.json'
+                requisicao_client_get = requests.get(link_cliente)
+                requisicao_client_get_dic = requisicao_client_get.json()
+
+            # list_ids_schedule receiver the ids what is in cloud ##############################################################
+                if requisicao_client_get_dic != '':
+                    list_ids_schedule.append(requisicao_client_get_dic)
+
+            # list_ids_schedule receiver the id what go be schedule ############################################################
+                list_ids_schedule.append(if_manager['id_user'])
+
+            # Insert ids of schedule in user ###################################################################################
+                link_cliente = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_user}/ids_agendado.json'
+
+                info = f'{{"ids_agendado":"{list_ids_schedule}" }}'
+
+                requisicao_client = requests.patch(link_cliente, data=info)
+        else:
+            pass
+
+    # Clearing file "select_work" after of save ########################################################################
+        with open('select_works.json','w') as file:
+            json.dump([], file)
 
 class InfoScheduleClient(Screen):
 

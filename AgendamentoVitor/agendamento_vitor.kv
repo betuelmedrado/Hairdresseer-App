@@ -3,12 +3,16 @@
 #:include file_kv/manager_profile.kv
 #:include file_kv/creat_profile.kv
 #:include file_kv/info_schedule_client.kv
+#:include file_kv/hours_schedule.kv
+
 #:include module_screen/table_schedule_m.kv
 #:include module_screen/card_button_proficional.kv
 #:include module_screen/my_box_categorie.kv
 #:include module_screen/my_button_card.kv
 #:include module_screen/table_schedule_m.kv
 #:include module_screen/popup_widget.kv
+#:include module_screen/categories_work.kv
+
 
 <Manager>:
     LoginManager:
@@ -23,6 +27,8 @@
         name:'screenchoiceschedule'
     ViewSchedule:
         name:'viewshedule'
+    HoursSchedule:
+        name:'hoursschedule'
     InfoScheduleClient:
         name:'infoscheduleclient'
 

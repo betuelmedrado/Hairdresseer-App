@@ -1,5 +1,5 @@
 
-#requere python 3.9
+#requere python 3.8
 
 # kivymd ###
 from kivymd.app import MDApp
@@ -752,14 +752,11 @@ class ViewSchedule(Screen):
         id_proficional = self.get_id_proficional()
         link = ''
 
-        print('iddd ',id_user)
-
         if id_proficional['manager'] == "False":
             link = self.LINK_SALAO + f'/socios/{id_proficional["id_user"]}/agenda/{id_user}.json'
-            print('exclud socio')
+
         elif id_proficional['manager'] == "True":
             link = self.LINK_SALAO + f'/agenda/{id_user}.json'
-            print('exclud manager')
 
         requisicao = requests.delete(link)
         self.actualizar()
@@ -808,6 +805,19 @@ class HoursSchedule(Screen):
         Clock.schedule_once(self.get_works, 2)
         self.includ_color_select()
         self.soma_hours_values()
+
+        self.valid_button_save()
+
+    def valid_button_save(self):
+        with open('select_works.json', 'r') as arquivo:
+            my_select = json.load(arquivo)
+
+        if my_select == []:
+            self.ids.card_save.md_bg_color = 1, 0, 0, .1
+            self.ids.card_save.unbind(on_release=self.save_scheduleing)
+            self.ids.card_save.bind(on_release=self.nada)
+        else:
+            pass
 
     def time_now(self):
         h = datetime.today().hour
@@ -947,7 +957,10 @@ class HoursSchedule(Screen):
             # do the sum of hours and values #############
             self.soma_hours_values(eu)
 
-            # print(servico)
+        if self.ids.work_select.children == []:
+            self.ids.card_save.md_bg_color = 1, 0, 0, .1
+            self.ids.card_save.unbind(on_release=self.save_scheduleing)
+            self.ids.card_save.bind(on_release=self.nada)
 
     def includ_color_select(self,*args):
 
@@ -963,7 +976,6 @@ class HoursSchedule(Screen):
             pass
         for work in lista:
             self.ids.categorie.children.md_bg_color = 0.13, 0.53, 0.95,1
-
             self.ids.work_select.add_widget(MyBoxCategorieLabel(work['servico'].title(), work['tempo'].title(), work['valor'].title()))
 
     def soma_hours_values(self, eu=''):
@@ -1040,6 +1052,7 @@ class HoursSchedule(Screen):
                     # if the schedule is bigger than the next schedule then stop of througn list
                     if boolian:
                         break
+
         if boolian:
             self.ids.card_save.md_bg_color = 1,0,0,.1
             self.ids.card_save.unbind(on_release = self.save_scheduleing)
@@ -1061,7 +1074,7 @@ class HoursSchedule(Screen):
         return name_dic['nome']
 
     def nada(self,*args):
-        print('nadaa')
+        toast('Selecione o tipo de serviço!')
 
     def disable_release(self,*args):
         toast('O gendamento excede o horario do proximo agendamento escolha outro horario ou outro cabeleleiro!')

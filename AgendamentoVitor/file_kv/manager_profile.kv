@@ -7,6 +7,7 @@
             size_hint_y:None
             height:self.minimum_height
             orientation:'vertical'
+            md_bg_color:0.53, 0.54, 0.56, .4
             MDBoxLayout:
                 size_hint_y:None
                 height:'60dp'
@@ -231,7 +232,13 @@
                         on_release:app.root.get_screen('managerprofile').save_data()
             Widget:
                 size_hint_y:None
-                height:'30dp'
+                height:'15dp'
+            MDSeparator:
+                size_hint_x:.9
+                pos_hint:{'center_x':.5}
+            Widget:
+                size_hint_y:None
+                height:'15dp'
             MDBoxLayout:
                 orientation:'vertical'
                 size_hint:.7,None
@@ -271,6 +278,8 @@
                                 size_hint_y:None
                                 height:'30dp'
                                 hint_text:'00:00'
+                                multiline:False
+                                on_text:root.on_text_temp()
                                 id:tempo
                         MDBoxLayout:
                             orientation:'vertical'
@@ -283,6 +292,7 @@
                                 size_hint_y:None
                                 height:'30dp'
                                 hint_text:'R$:'
+                                multiline:False
                                 id:valor
                 MyButtonCard:
                     first_text:'Adicionar'
@@ -328,17 +338,15 @@
                                     size_hint_y:None
                                     height:self.minimum_height
                                     id:categorie
-
-            MDBoxLayout:
-                size_hint:.8,None
-                height:'30dp'
+            Widget:
+                size_hint_y:None
+                height:'15dp'
+            MDSeparator:
+                size_hint_x:.9
                 pos_hint:{'center_x':.5}
-                canvas:
-                    Color:
-                        rgba:0,1,1,1
-                    Rectangle:
-                        size:self.width,3
-                        pos:self.pos
+            Widget:
+                size_hint_y:None
+                height:'15dp'
 ## ========== Socios =========
 #            MDBoxLayout:
 #                orientation:'vertical'
@@ -391,7 +399,7 @@
                             font_size:'10dp'
                             bold:True
                             color:1,0,0,.7
-                            text:'Nomes dos socios!'
+                            text:' Socios!'
                     MDBoxLayout:
                         ScrollView:
                             MDBoxLayout:
@@ -399,3 +407,6 @@
                                 size_hint_y:None
                                 height:self.minimum_height
                                 id:box_socio
+            Widget:
+                size_hint_y:None
+                height:'15dp'
