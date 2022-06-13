@@ -1,0 +1,14 @@
+
+
+
+
+
+
+
+
+# MDLabel ================================= MDLabel =========================
+
+MdLabel:
+    text:'Testo'
+    # "custon" para mudar a color com rgb para poder usar "text_color"
+    theme_text_color:'Custon'

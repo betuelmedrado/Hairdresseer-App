@@ -24,6 +24,7 @@
                     bold:True
                     halign:'center'
                     text:'Crie seu perfil'
+                Widget:
                 MDIconButton:
                     icon:'refresh'
                     on_release:root.infill()
@@ -70,7 +71,7 @@
                         pos_hint:{'center_x':.5}
                         ToggleButton:
                             text:'D'
-                            dia:'0'
+                            dia:'7'
                             bold:True
                             color:1,0,0,1
                             background_color:0.35, 0.42, 0.49, .5
@@ -280,6 +281,7 @@
                                 hint_text:'00:00'
                                 multiline:False
                                 on_text:root.on_text_temp()
+                                on_focus:root.un_focus()
                                 id:tempo
                         MDBoxLayout:
                             orientation:'vertical'
@@ -293,6 +295,7 @@
                                 height:'30dp'
                                 hint_text:'R$:'
                                 multiline:False
+                                on_focus:root.on_valor()
                                 id:valor
                 MyButtonCard:
                     first_text:'Adicionar'

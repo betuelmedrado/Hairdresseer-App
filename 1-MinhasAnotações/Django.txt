@@ -1,0 +1,51 @@
+
+
+- Istalando Django
+    - pip install django
+
+    # Sempre que for construir um novo projeto Django tenque rodar esse codio a baixo
+    - django-admin startproject betoflix . <= # betoflix é o nome do meu projeto eo ponto é para não criar outra pasta
+
+    - Rodar site para teste
+        - python manager.py runserver
+
+    - Criar meu App
+        # Here i am  creating my app
+        - django-admin startapp filme
+
+    # migrate to the data base
+        # Tira o erro do admin
+    - python manage.py makemigrations   # Create the structure of migrations
+    - python manage.py migrate
+
+    # creating a superuser
+    - python manage.py createsuperuser
+
+
+# Tradução no arquivo setting ================
+    - Para português
+    # LANGUAGE_CODE = 'pt-br'
+
+    # TIME_ZONE = 'America/Sao_Paulo'
+
+# Registrar o App no arquivo "admin.py" =====================
+    from django.contrib import admin
+    from .models import Filme
+
+    admin.site.register(Filme)
+
+
+# Pegando dados no Banco de dados Django ===================
+
+    from .models import Filme
+
+    context = {}
+    lista = Filme.objects.all()
+
+    return render(request 'arquivo.html', context)
+
+# Relação Chave Estrangeira "Foreignkey" =========================
+    # Para uma tabela ter o id de outra tabela
+
+    EX.:
+        filme = models.Foreignkey('Filme', related_name="episodios", on_delete=models.CASCADE)

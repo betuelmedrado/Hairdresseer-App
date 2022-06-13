@@ -762,6 +762,19 @@ class ViewSchedule(Screen):
         self.actualizar()
         self.popup.dismiss()
 
+    def if_blocked(self,id_button, hours):
+
+        link = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{self.user_id}.json'
+
+        requisicao = requests.get(link)
+        requisicao_dic = requisicao.json()
+
+        if requisicao_dic['bloqueado'] == 'True':
+            toast('Você foi bloqueado! Entre em contato com um proficional ',duration=4)
+        elif requisicao_dic['bloqueado'] == 'False':
+            self.get_hours(id_button, hours)
+
+
     def get_hours(self,id_button, hours):
         hours_dic = {}
 
@@ -1198,7 +1211,7 @@ class AgendamentoApp(MDApp):
     Builder.load_string(open('module_screen/table_schedule.kv', encoding='utf-8').read())
     Builder.load_string(open('module_screen/my_box_categorie.kv', encoding='utf-8').read())
     def build(self):
-        self.theme_cls.theme_style = 'Dark'
+        # self.theme_cls.theme_style = 'Dark'
         return Manager()
 
 AgendamentoApp().run()

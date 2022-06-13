@@ -334,6 +334,8 @@ class ManagerProfile(Screen):
 
         self.dia_atual = datetime.today().isoweekday()
 
+        print('dia ',self.dia_atual)
+
         self.id_manager = self.get_id_manager()
 
     def insert_day(self, state, dia):
@@ -348,30 +350,70 @@ class ManagerProfile(Screen):
         elif state == 'normal':
             self.list_day.remove(dia)
 
+    def on_valor(self):
+        try:
+            valor = float(self.ids.valor.text)
+
+            self.ids.valor.text = str(valor)
+        except ValueError:
+            self.ids.valor.text = ''
+
+        # if self.ids.valor.text >= 'a':
+        #     pass
+        # else:
+        #     self.ids.valor.text = str(valor[0:len(self.ids.valor.text)-1])
+
+    def un_focus(self):
+        first = self.ids.tempo.text[:2]
+        last = self.ids.tempo.text[2:]
+
+        self.ids.tempo.text.split(';')
+
+        if self.ids.tempo.text == '':
+            self.state_focus = False
+        elif len(self.ids.tempo.text) < 5:
+            self.state_focus = True
+            self.ids.tempo.text = f'{str(first).zfill(2)}:{str(last).zfill(2)}'
+
     def on_text_temp(self,*args):
         text_temp = ''
+        tamanho = self.ids.tempo.text
 
-        # try:
-        text_temp = str(self.ids.tempo.text).zfill(4)
+        if self.ids.tempo.text.isnumeric() or self.state_focus == True:
+            if len(self.ids.tempo.text) >= 5:
+                if self.state_focus == True:
+                    self.ids.tempo.text = str(tamanho[0:len(tamanho)])
+                else:
+                    self.ids.tempo.text = str(tamanho[0:len(tamanho) - 1])
+            else:
+                print(len(tamanho))
 
-        # text_temp = '00:01'
+            # self.ids.tempo.text = str( int(tamanho)+1 )
 
-        print(text_temp)
+            # if len(tamanho) <= 2:
+            #     self.ids.tempo.text = f'00:{tamanho}'
+            # else:
+            #     self.ids.tempo.text = f'{tamanho}:00'
 
-        hours, minute = map(int, text_temp.split(':'))
-        print(hours)
-        print(minute)
+            # text_temp = str(self.ids.tempo.text).zfill(4)
 
-        delta_temp = timedelta(hours=hours, minutes=minute)
-        # entry = datetime.strptime(text_temp, '%H:%M')
-        print(delta_temp)
+            # text_temp = '00:01'
+
+            # print(text_temp)
+            #
+            # hours, minute = map(int, text_temp.split(':'))
+            # print(hours)
+            # print(minute)
+            #
+            # delta_temp = timedelta(hours=hours, minutes=minute)
+            # # entry = datetime.strptime(text_temp, '%H:%M')
+            # print(delta_temp)
 
 
-        # soma_horas = entry + delta_temp
+            # soma_horas = entry + delta_temp
 
-
-        # except ValueError:
-        #     self.ids.tempo.text = (text_temp)
+        else:
+            self.ids.tempo.text = str(tamanho[0:len(tamanho)-1])
 
 
     def on_pre_enter(self, *args):
@@ -681,83 +723,6 @@ class ManagerProfile(Screen):
                 self.ids.box_socio.add_widget(MyBoxSocio(str(nome_dic['nome'])))
         except:
             pass
-
-    # def edit(self, id_work='', tempo='', valor='', *args, **kwargs):
-    #
-    #     print(tempo)
-    #     print(valor)
-    #
-    #     requisicao_get = ''
-    #
-    #     with open('is_manager_or_socio.json', 'r') as file:
-    #         is_manager = json.load(file)
-    #
-    #     info = f'{{"tempo":"{tempo}",' \
-    #            f'" valor":"{valor}"}}'
-    #
-    #     # Para saber si quem esta acessando é o socio ou o gerente #####################################################
-    #     # if is_manager == 'socio':
-    #     #     LINK_CATEGORIA = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{self.user_id}/servicos{id_work}.json'
-    #     #     requisicao_get = requests.patch(LINK_CATEGORIA, data=info)
-    #     #
-    #     # elif is_manager == 'manager':
-    #     #     LINK_CATEGORIA = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.user_id}/servicos/{id_work}.json'
-    #     #     requisicao_get = requests.patch(LINK_CATEGORIA, data=info)
-    #     #
-    #     # self.infill()
-
-    # def pop_alteration(self,id_work, servico, tempo, valor, *args, **kwargs):
-    #     box_main = MDBoxLayout(orientation='vertical',md_bg_color=([1,1,1,1]),radius=(5,5,5,5))
-    #     box_widgets = MDBoxLayout(orientation='vertical', padding='15dp',spacing='10')
-    #
-    #     box_work = MDBoxLayout(orientation='vertical')
-    #     box_time = MDBoxLayout(orientation='vertical')
-    #     box_values = MDBoxLayout(orientation='vertical')
-    #     box_buttons = MDBoxLayout(size_hint_y=None,height=('30dp'),spacing=8, padding=8)
-    #
-    #     # Inserting the widget in box of work #########################################################################
-    #     label_work = MDLabel(text='Servico', size_hint_y=None,height='15dp')
-    #     text_work = TextInput(text=servico,size_hint_y=None,height='30dp')
-    #     box_work.add_widget(label_work)
-    #     box_work.add_widget(text_work)
-    #
-    #     # Inserting the widget in box of time #########################################################################
-    #     label_time = MDLabel(text='Tempo',size_hint_y=None,height='15dp')
-    #     text_time = TextInput(text=tempo,size_hint_y=None,height='30dp')
-    #     box_time.add_widget(label_time)
-    #     box_time.add_widget(text_time)
-    #
-    #     # Inserting the widget in box of values #########################################################################
-    #     label_values = MDLabel(text='Valor: R$',size_hint_y=None,height='15dp')
-    #     text_values = TextInput(text=valor,size_hint_y=None,height='30dp')
-    #     box_values.add_widget(label_values)
-    #     box_values.add_widget(text_values)
-    #
-    #
-    #     popup = Popup(title_color=(1, 1, 1, .0), separator_color=([0,1,1,1]), background_color=([1, 1, 1, 0]),
-    #                   size_hint=(None, None), size=('240dp', '400dp'),
-    #                   content=box_main)
-    #
-    #     box_widgets.add_widget(box_work)
-    #     box_widgets.add_widget(box_time)
-    #     box_widgets.add_widget(box_values)
-    #     box_widgets.add_widget(Widget(size_hint_y=None, height='30dp'))
-    #
-    #     tempos = text_time.text
-    #     valors = text_values.text
-    #
-    #     bt_edit = MDRaisedButton(text='Editar', text_color=(0,0,0,1) ,md_bg_color=(0,1,1,1), on_release=partial(self.edit, id_work, tempos, valors))
-    #     bt_exclud = MDRaisedButton(text='Excluir', md_bg_color=(0,1,1,1))
-    #     bt_exit = MDFlatButton(text='sair', on_release=popup.dismiss)
-    #
-    #     box_buttons.add_widget(bt_edit)
-    #     box_buttons.add_widget(bt_exclud)
-    #     box_buttons.add_widget(bt_exit)
-    #
-    #     box_main.add_widget(box_widgets)
-    #     box_main.add_widget(box_buttons)
-    #
-    #     popup.open()
 
     def pop_alteration(self,id_work, servico, tempo, valor, *args, **kwargs):
         box_main = MDBoxLayout(orientation='vertical',md_bg_color=([1,1,1,1]),radius=(5,5,5,5))
@@ -1101,6 +1066,7 @@ class ViewSchedule(Screen):
             lista_info = self.info_entrace_salao()
 
             list_content = []
+
             entrada = self.entrada
             saida = self.saida
             tempo = self.space_temp

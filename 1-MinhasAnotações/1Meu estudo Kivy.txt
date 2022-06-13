@@ -1,0 +1,547 @@
+# pythonlibs => site python bibliotec do python impacotadas
+
+
+from kivy.app import App     =   importando a biblioteca kivy
+from kivy.uix.floatlayout import FloatLayout  = importando FloatLayout sendo um conteiner para widget
+from kivy.core.window import Window   # importando para mensionar o tamanho da nossa janela
+Window.size = 600, 500  # tamanho da janela
+
+# =========================Para forçar o arquivo ".kv" ler em 'utf-8' ================================
+
+EX.:
+class ControleVerbaApp(App):  # A classe "App"
+    def build(self):
+        Builder.load_string(open('verba.kv', encoding='utf-8').read(),rulesonly=True)
+        return Gerenciador()
+
+        # O nome do arquivo ".k" não prescisa estar com o nome da classe Principar
+        # o arquivo .kv esta com o nome acima de verba.kv e não ControleVerba.kv
+
+# buildozer ====LOGCAT============ Criação de app ======== Maquina virtual linux ==== VBox ====
+
+    #Abre a pasta da aplicação na "VM" e o propert de comando nela.
+    -buildozer init =>              # Cria um arquivo ".spec" para ser comfigurado
+    -buildozer android debug =>     # "debug" é a versão para teste
+    -buildozer android release =>   # "release" é a versão pronta do app
+    -buildozer android logcat | grep python =>   # "logcat |" se der algum erro a gente pega as informações do app
+    #para parar é CTR + C
+
+    #Para deixar o teclado em modo portugues
+        -setxkbmap br
+
+    # Servir o app
+        -buildozer serve  =>  # para utilizar em um servidor
+
+    # Para acessar o local no navegador
+        # O meu ip     # a porta disponibilizada (:8000)
+        192.168.0.105:8000
+
+# =========================  Cervir o app na rede =========================
+    -No pronpert de comando => ifconfig   # para visualizar o nosso ip
+
+
+# ===========================  propert de comando   =============================
+instalação:  pip install ....
+abrir pasta: cd
+voltar uma pasta: cd ../
+versõe: python --version
+desinstalação : pip uninstall python
+p/ interface grafica :  windowed   EXE: pyintaller windowed main.py
+listar ambiente: conda env list
+Administrador:  --uac-admin
+Limpar a tela:  cls
+Abrir unidades HD: d:  # É só colocar em minuscula a unidade que deseja
+
+                                # AULA 158 #
+
+    # ======================== CELULAR  Modulo screen "para cimular telas de celular ETC.." com propert de comando =====================
+    Vai no propert de comando e vai até o phet da aplicação que deseja execultar
+    EXEMPLO: activate k35 "ENTER"
+    >cd C:\dev\excript\app_comerciais_kivy\ ea pasta da aplicação
+    >python main.py -m screen "ENTER PARA VER A LISTA DE APARELHOS"
+    >python main.py -m screen:ipad
+
+
+# =========================  CRIANDO AMBIENTE VIRTUAL COM CONDA ======\/===\/==\/==\/==\/==\/==\/==´´
+conda create --name k35 python=3.5
+
+
+# ============================= Mudar a cor background da janela principal ===========
+from kivy.core.window import Window
+window.clearcolor = 1,1,1,1
+
+    #:import C kivy.utils.get_color_from_hex  => # Para pegar a cor hexadecimal no arquivo .kv
+        rgba: C('#ffffff')
+
+# ============================ Criar class em kivy ====================================
+<MinhaClass@Button>:  #Éssa class extende a class Button
+
+# ================ Para importar outro aquivo kivy em outro modulo ===================
+#:include e passa a localização do arquivo
+
+#============================= Widgets ===============================================
+Button = Botão
+TextInput = Uma caixa de entrada de texto
+
+# ============================= para posicionamentos dos widget =======================
+
+size: =   Tamanho do widget
+pos: = 350,50     Posição do widget        EXEMPLO: dp(100), dp(500)
+
+text_size: => Define a largura da coluna do texto
+font_size: = Tamanho da font
+size_hint: = tamanho do widget em porcetagem   EXEPLO:  "1. = 100% " e ".1 = 1%"
+size = (tupla)
+size_hint_x = .1
+size_hint_y = .1
+pos_hint: = {passa um dicionario}  em porcentagem  EXE: pos_hint: {"x":.1, "y":.1}
+right =  Direita
+top  = Topo
+center = (passa uma tupla)
+center_x = centro "x" do widget
+center_y = centro "y" do widget
+orientation => orientação dos widgets
+padding: 20 => Espaçamento da margen dos widgets da janela
+padding:['20dp','8dp'] => Padding X e Y
+spacing: 20 => Espaçamento de um widget para outro
+opacity: 0.5  => Transparencia dos botões
+bind  => liga um evento a uma determinada função  EXEMPLO:  bt.bind(on_press=bt_click) ou bt.bind(on_realese=fim_click)
+unbind => Desligar
+minimum_height => #para ScrollView
+clear_widgets <='s'  => # para limpar uma tela etc...
+
+# ============================= Eventos de classe "on_....." ======================================
+on_press =>     #quando apertar um botao
+on_release =>   #Quando soltar o botão
+on_pre_enter => #Um pouco antes de entrar em uma Tela
+on_enter =>     #Quando entrar em uma tela
+on_pre_leave => #Um pouco antes de sair de uma tela
+on_leave =>     #Quando sair de uma tela
+on_key_board => # Para eventos de teclado
+on_request_close =>  # Evento que fecha uma tela
+
+
+# ======================= Button propriedades =============================================
+-imagen no Button
+Button:
+    background_normal:'icones/Mk3.png'
+
+# ======================= Destruir uma tela e imprementar outra no lugar ==================
+class Exemplo:
+    def fução():
+        janela.root_window.remove_widget(janela.root)
+        janela.root_window.add_widget(Tela2)
+
+#====================================== linguagen Kv e ids, name, get_creen ===========================
+
+#: <= para importação de modulos
+include => para incluir o modulo no arquivo "kv"
+Variaveis em Kivy
+    #:set var 'teste'  => "var" é a variavel e afrente é o valor da variavel
+importar pacote do pytho  AULA- 164
+    #:import alias nome_pacote
+
+self = se refere a si mesmo:
+root = O primeiro widget da ierarquia:
+app = O widget que esta rodando o app
+parent = Mesma coisa do 'root'
+id: uma variavel para ser asseçada de um widget
+get_screen: uma variavel para ser asseçada de uma 'Screen' = tela
+App.get_running_app().root.current = 'main_screen'  => # Para pegar a tela em python
+
+# ==================================== Label Metodos ========================================
+
+underline:True ==> Para colocar uma linha de baixo do texto
+outline_width:2  ==> Especifica a espessura da linha em volta do texto. Aqui especificamos 1 pixel
+outline_color:1,0,0  ==> Especifica a cor da linha, Aqui especificamos verde puro ([r,g.b])
+
+Label:     # para subir as letras pelo meio Não fiz o teste ainda
+    id: the_right_pane
+    text: ''
+    text_size: self.size
+    halign: 'center'
+    valign: 'middle'
+
+#  =================================== FloatLayout ==============================
+# EXEMPLO:
+    FloatLayout:
+    Button:
+        size_hint: .1, .1
+        pos_hint: {'x':.0, 'top': 1.}   # <= Posiciona o botão no top a esquerda da janela
+        text: 'A'
+    Button:
+        size_hint: .1, .2
+        pos_hint: {'center_x': .5, 'center_y': .5}
+# <= Posiciona o botão no centro da janela com prescisão "X e Y"
+        text: 'B'
+    Button:
+        size_hint: .1, .1
+        pos_hint: {'y': 0, 'right': 1.}     # <= Posiciona o botão no canto inferior direito da janela
+        text: 'C'
+
+#   =================================   BoxLayout   =============================
+#EXEMPLO:
+    BoxLayout:
+    orientation:'vertical'
+    padding: 20     # <= Espaçamento da margen dos widgets da janela
+    spacing: 50     # <= Espaçamento de um widget para outro
+    Button:
+        size_hint: 1., .5
+        text:'A'
+    Button:
+        size_hint: 1.,1.
+        text:'B'
+    Button:
+        size_hint: 1., 1.
+        text:'C'
+
+# ================================== TextInput =====================================
+var.readonly = True    => somente leitura signigica que o texto não pode ser auterado
+cursor_width: 3    => Largura do cursor
+multiline: False   => Não dixa pular linhas para baixo
+
+
+# Text rst ========================= RstDocument =================================
+
+arquivo.kv
+     RstDocument:
+            text:root.texto
+
+
+EX.:  # O Texto vai ser transferido para o width RstDocument
+texto = """
+.. _teste:
+Cadastro de joão
+===========
+fulano de tal
+===========
+*aqui deixa Italico*  muita coisa teste_
+e agora **vamos que vamos!**::
+    Coloca :: acima na ultima frase e da um tab
+"""
+
+
+# ================================= ScrollView ===================================
+# ScrollView => Barra de rolagen
+EX.:
+    ScrollView:
+        id: sv
+        bar_color: [.1, .75, .1, .95]           # Cor da barra
+        bar_inactive_color: [.5, .5, .5, .8]    # Cor da barra inativa
+        bar_width: '20dp'                       # Tamanho da barra
+
+# ================================= Spinner ========================================
+"Spinner"  => # Cria uma caixa de celeção
+EX.:
+Spinner:
+    text: 'bottom'
+    values: 'bottom', 'middle', 'top','exit'
+    on_text: app.valign=self.text
+
+# ================================= Scatter ========================================
+Scatter  => # Serve para mover um widget na noss aplicação
+EX.:
+    Scatter:
+        size_hint:None, None
+        pos:400, 300
+        rotation:45
+
+# ========================== ScreenManager e screen ================================
+    get_screen('Tela1')  => pega o nome como se foce id da screen
+    Exemplo:
+        on_release: app.root.get_screen('Tela1').ids.box.remoce_widget(root)
+
+    Ex.: # Muda a direção da tela
+    on_release:
+        app.root.current = 'tela1'
+        root.manager.transition.direction = 'left'    # Muda a direção da tela
+
+        # Para transition de tela
+    #:import Factory kivy.factory.Factory    # Para importar o modulo Factory no arquivo .kv
+    EX.:
+        Button:
+            text:'Login'
+            # 'manager' é o id de uma screen dentro de um boxlayout
+            on_press:manager.transition = Factory.get('FadeTransition')()
+
+            # Aqui é qual tela a screen vai receber
+            on_release:manager.current = 'screenlogin'
+
+
+# =================================  Clock  =========================================
+Clock =>  # Fas o mesmo que a função "sleep" para um pouco o tempo
+
+Clock.schedule_once(#A função, e o tempo aqui)
+EX.:
+    from kivy.clock import Clock
+
+    # Cria uma função com uma lista de argumentos "*args" para ser chamada
+    def tempo(self,*args):
+        print('Fassa algo')
+
+    # Depois chame a função com o tempo desejado
+    Clock.schedule_once(self.tempo,5) # Vai execultar e 5 segundos
+
+
+# ========================== Image =================================================
+Ex: Image:
+            size_hint:None
+            height: 100
+            source:'path/foto.png'
+            allow_stretch: True     # para poder esticar o image
+
+# ============================     ActionBar     ===================================
+Ex: ActionBar:      # Barra de Menu
+    pos_hint:{'top':1}
+    ActionView:            # para poder colocar os widgets
+        ActionPrevious:    # Botão do Menu para voutar a tela do Menu
+            title: 'Tela'
+            on_release: app.root.current = 'Menu'    # Volta para o Menu
+        ActionButton:
+            text:'sair'
+            on_release: app.stop()
+        ActionSeparator:        # Para colocar um separador entre os botões
+
+ActionBar:      # Barra de Menu
+ActiActionView:   # para poder colocar os widgets
+ActionPrevious:    # Botão do Menu para voutar a tela do Menu
+ActionButton:    # Botão
+ActionSeparator:   # Um separador
+
+# Curso:HashLDash =============  Evento de Teclados  ====================== Aula 12
+#               EVENTOS DA CLASSE "Screen"
+
+from kivy.core.window import Window
+
+def on_pre_enter(self):         # Eventos de apertar um botão no teclado
+    Window.bind(on_keyboard=self.voltar)
+
+def voltar(self,window,key, *args):     # class que execulta o evento de um botão precionado
+    App.get_running_app().root.current = 'Menu'     # Aqui para voltar a tela Menu
+    # print(key)
+    return True
+
+def on_pre_leave(self):         # class para desvincular o botão precionado
+    Window.unbind(on_keyboard=self.voltar)
+
+
+# ============================     android.txt     ==================================
+AULA - 186
+from kivy
+kivy.require('1.9.1')  # tenque ser a versão do kivyLauncher
+
+" O ARQUIVO PYTHON TEM QUE SER CHAMADO main.py"
+
+title=Ola mundo
+author=Betuel
+orientation=landscape "que é horizontal"
+orientation=portrait  "que é vertical"
+
+
+# CLASS:============================ seção 27 empacotamento ==============================
+
+- 192 empacotamento do Kivy ==============================
+pyi-makespec main.py  => para gerar a estenção  "spec" da nossa aplicação para algumas mudanças
+pyinstaller -wF myfile.py =>  O -wF irá criar um único arquivo EXE. Como todos os meus programas têm uma GUI e não quero que a janela de comando seja exibida, a opção -w ocultará a janela de comando.
+
+ Arquivo file.spec
+from kivy_deps import sdl2, glew, gstreamer   # Importando tudo de kivy
+
+coll = COLLECT(
+     *[Treen(p) for p in (sdl2.dep_bins + glew.dep_bins + gstreamer.dep_bins)],
+
+
+#Aula 15 - HashLDash ====================== CANVAS =========================================#
+Ex:
+BoxLayout:
+    canvas:
+        Color:
+            rgba:1,1,1,1
+        Rectangle:
+            size:self.size   # Com "self.size" Aqui o rectangle fica do tamanho do BoxLayout
+            pos:self.pos     # Com "self.pos" Fica na posição do BoxLayout
+            source:'image/moldura.png'   # Aqui paço uma image No canvas
+
+#Aula 16 ====================== CANVAS.BEFORE Desenhando o botão ===========================#
+<Botao@ButtonBehavior+Label>:
+    canvas.before:      # "before" é para desenha antes do Label etc.. a parte grafica fica atraz dando para ver o Label
+        Color:
+            rgba:0.4,0.5,9.8,1
+        Ellipse:
+            pos:self.pos
+            size:self.height, self.height
+        Ellipse:
+            pos:self.x+self.width-self.height, self.y
+            size:self.height, self.height
+        Rectangle:
+            pos:self.x+self.height/2, self.y
+            size:self.width-self.height, self.height
+
+#Aula 18 ================= canvas no python Variaveis com cores =============================#
+
+ from kivy.properties import StringProperty
+ from kivy.properties import NumericProperty
+
+ from kivy.properties import ListProperty  # Como as cores são uma lista importamos ListProperty
+
+
+ class Botal(ButtonBehavior,Label):
+    cor = ListProperty([0.1,0.5,0.7,1])     #Variavel da cor
+    cor2 = ListProperty([0,0,0,1])
+
+    def on_cor(self,*args):        # Para quando for mudar de cor
+        self.atualizar()
+
+    def on_press(self,*args):       # Quando apertar o botão muda as corer as variaveis de cores recebem uma a cor da outra ao mesmo tempo
+        self.cor,self.cor2 = self.cor2,self.cor
+    def on_release(self,*args):
+        self.cor,self.cor2 = self.cor2,self.cor
+
+
+    def atualizar(self,**kwargs):
+        self.canvas.before.clear()
+
+        with self.canvas.before:
+            Color(rgba=self.cor)
+            Ellipse(size=(self.height,self.height),
+                    pos=self.pos)
+            Ellipse(size=(self.height,self.height),
+                    pos=(self.x+self.width-self.height,self.y))
+            Rectangle(size=(self.width-self.height, self.height),
+                      pos=(self.x+self.height/2.0,self.y))
+
+#Aula 19 ==================  Popup  ==================================================#
+from kivy.uix.popup import Popup
+
+# Popup(auto_dismiss=False) => para o popup não fechar inserimos
+# Ex: Com botão para fechar o "Popup"
+    def popup():
+        bt = Button()
+
+        pop = Popup(auto_dismiss=False, content= bt)
+
+        bt.bind(on_press:pop.dismiss)
+        pop.open()
+    -----------------------------------------------------------------/EX:
+
+class Menu(Screen):
+    def confirmacao(self,*args):
+
+        box = BoxLayout(orientation='vertical',padding=10)  #Criamos essa variavel contendo um BoxLayout para adicionar aqui a image eo BoxLayout do Botao
+        botoes = BoxLayout(padding=10,spacing=10)           # Aqui para colocarmos os botões
+
+        pop = Popup(title='Deseja realmente sair?', content=box,    #Aqui é o Popup propriamente dito e o "content" é o conteudo para adicionarmos o box
+                    size_hint=(None, None),
+                    size=(300, 180))
+
+        imag = Image(source='image/atencao.png')
+
+        bt_sim = Botao(text='Sim', on_release=App.get_running_app().stop)
+        bt_nao = Botao(text='Não', on_release=pop.dismiss)
+
+        botoes.add_widget(bt_sim)
+        botoes.add_widget(bt_nao)
+
+        box.add_widget(imag)
+        box.add_widget(botoes)
+
+        pop.open()
+
+#Aula 21 =========================== Animation ===========================================#
+from kivy.animation import Animation
+
+class Menu(Screen):
+
+    def on_pre_enter(self,*args):
+        Window.bind(on_request_close=self.sair)
+
+    def sair(self,*args,**kwargs):
+
+        box = BoxLayout(orientation='vertical')
+        pop = Popup(title='Deseja realmenter sair?', content=box, size_hint=(None,None),
+                    size=(160,160))
+
+        # Aqui criamos uma variavel da animação ====
+        animacao = Animation(size=(300,180),duration=0.1, t="in_out_bounce")
+        animacao.start(pop)
+
+        # Aqui animamos o texto do botão ===
+        anim_texto_bt = Animation(color=(0,0,0,1)) + Animation(color=(1,1,1,1))
+        anim_texto_bt.start(bt_nao  )
+        anim_texto_bt.repeat = True
+
+        pop.open()
+        return True
+
+#Aula 22 ======================== Salvando no arq.json =====================
+import json
+
+with open('data.json','w') as data: =>  # abrindo ou criando um arquivo json
+
+json.dump(lista, data) =>       #"dunp" despeja oque tiver na lista no arquivo.json
+
+with open('data.json','r') =>   #abre para leitura
+json.load(data)  =>             # para ler o arquivo data
+
+    ======== #para pegar o path onde guarda informações de usuario ===========
+
+dados_usuario = App.get_running_app().user_data_dir+'/'
+
+
+Aula 25 ======================== Efeitos sonoros ===============================
+from kivy.core.audio import SoundLoader
+
+class Name():
+    pop_sound = None  #Recebe None para o audio não ser carregado sempre
+
+    def on_pre_enter(self):
+        if self.pop_sound == None:  # Aqui se ele não for carregado então ele vai carregar
+            self.pop_sound = SoundLoader.load('poppap.mp3')
+
+    def press(sefl):
+        self.pop_sound.play()   # Aqui será executado o som
+
+
+============  OS ====================== Criando um diretorio ====================================================
+import os
+
+os.makedirs => Cria todos os diretórios que forem especificados no parâmetro
+    EX.: os.makedirs('./temp/2016/12/09') irá criar as pastas temp,2016,12 e 09
+
+os.mkdir => Só cria o último diretório. Se os diretórios anterior não existirem causará um erro.
+    EX.: os.mkdir('./temp/2016/12/09') só criará o diretório '09'e somente se os anteriores existirem,
+    caso contrário, causará um seguint erro
+
+os.remove() => Remove o arquivo
+
+#Para excluir um arquivo do diretorio
+EX.:
+    import os
+
+    def etc():
+        path = "diretorio"`
+        dir = os.listdir(path)
+        for file in dir:
+            if file == "arquivo.txt":
+                os.remove(file)
+
+#=========================   Excluindo Um diretorio  ==================================================
+
+"shutil.rmtree()" apaga uma árvore de diretórios inteira, em outras palavras, todos os arquivos e
+subdiretórios nela contidos. Ele levanta exceções se o argumento de entrada não for um diretório, ou se
+ele não existir ou se o usuário não tiver a permissão para apagá-lo.
+
+EX.:
+        import shutil
+
+        def limpar(self):
+            pasta = r"arq"  # Aqui pega o diretorio ("especifique o caminho") ex.: pasta = r"C:\diretório"
+            try:
+                shutil.rmtree(pasta)  # Aqui exclui o diretório
+            except OSError as e:
+                print(e)
+            else:
+                print('O diretorio foi excluido com sucesso!')
+
+# veja se tem a imagem na pasta e retorne um True ou False
+sis = os.path.exists('image/image_parts/'+ imag + '.png')

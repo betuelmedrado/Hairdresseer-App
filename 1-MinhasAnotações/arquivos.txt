@@ -1,0 +1,12 @@
+
+# ingnorancia zero - video 52 aula 52 ========== arquivo.txt ================
+
+'r' =>  modo leitura
+'w' =>  Modo escrita cria arquivo
+'a' =>  Adicionar no arquivo no final
+
+arquivo.read() => Lendo arquivo
+arquivo.write() => Escrevendo no arquivo
+arquivo.seek(8)  => Le 8 caracteres para frente
+arquivo.tell()  => Em qual byte do arquivo você parou
+arquivo.eval()  => Para retornar lista

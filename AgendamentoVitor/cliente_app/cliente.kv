@@ -84,6 +84,7 @@
             height:self.minimum_height
             spacing:'20dp'
             orientation:'vertical'
+            md_bg_color:0.53, 0.54, 0.56, .4
             MDCard:
                 size_hint_y:None
                 height:'60dp'
@@ -107,10 +108,11 @@
                     markup:True
                     text:'Escolha\nOs tipos de serviços'
                     bold:True
-                    color:1,1,1,1
+                    color:0,0,0,1
 #                font_size:'30dp'
             MDSeparator:
-
+                size_hint_x:.8
+                pos_hint:{'center_x':.5}
             MDCard:
                 size_hint:.8,None
                 height:'100dp'
@@ -188,20 +190,20 @@
                                 size_hint_x:.40
                                 font_size:'10dp'
                                 bold:True
-                                color:0,0,0,1
+                                color:0,0,0,.6
                                 text:'Serviços'
                             MDLabel:
                                 size_hint_x:.40
                                 font_size:'10dp'
                                 bold:True
                                 text:'Tempo'
-                                color:0,0,0,1
+                                color:0,0,0,.6
                             MDLabel:
                                 size_hint_x:.20
                                 font_size:'10dp'
                                 bold:True
                                 text:'ValorR$'
-                                color:0,0,0,1
+                                color:0,0,0,.6
                         MDBoxLayout:
                             md_bg_color:1,1,1,.3
                             ScrollView:
@@ -229,17 +231,17 @@
                         MDLabel:
                             text:'tempo'
                             font_size:'11dp'
-                            color:1,1,1,.3
+                            color:0.13, 0.53, 0.95,.5
                         MDLabel:
                             text:'Valor R$'
                             font_size:'11dp'
-                            color:1,1,1,.3
+                            color:0.13, 0.53, 0.95,.5
                     MDBoxLayout:
                         MDLabel:
-                            color:1,1,1,1
+                            color:0.13, 0.53, 0.95,1
                             id:time
                         MDLabel:
-                            color:1,1,1,1
+                            color:0.13, 0.53, 0.95,1
                             id:valor
                 MDCard:
                     orientation:'vertical'
@@ -264,7 +266,8 @@
                         bold:True
                         halign:'center'
             MDSeparator:
-
+                size_hint_x:.8
+                pos_hint:{'center_x':.5}
             MDBoxLayout:
                 size_hint_y:None
                 height:'70dp'
