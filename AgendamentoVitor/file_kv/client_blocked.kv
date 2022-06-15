@@ -1,0 +1,24 @@
+
+<CLientBlocked>:
+    MDBoxLayout:
+        orientation:'vertical'
+        md_bg_color:0.78, 0.80, 0.83,1
+        MDToolbar:
+            title:'Cliente bloqueado'
+            left_action_items:[['arrow-left', lambda x: root.return_home()]]
+
+        MDBoxLayout:
+            orientation:'vertical'
+            MDTextField
+                size_hint_x:.8
+                pos_hint:{'center_x':.5}
+                hint_text:'Pesquisar!'
+                icon_right:'magnify'
+            ScrollView:
+                MDBoxLayout:
+                    orientation:'vertical'
+                    size_hint_y:None
+                    height:self.minimum_height
+                    spacing:'15dp'
+                    padding:('8dp',0,'8dp',0)
+                    id:scrool_blocked

@@ -324,6 +324,53 @@ class HomePage(Screen):
         MDApp.get_running_app().root.current = 'loginmanager'
 
 
+class ClientBlocked(Screen):
+
+    LINK_DATA = 'https://shedule-vitor-default-rtdb.firebaseio.com'
+
+    def on_pre_enter(self):
+        self.insert_box()
+
+    def return_home(self):
+        MDApp.get_running_app().root.current = 'homepage'
+
+
+    def insert_box(self,*args):
+        self.ids.scrool_blocked.clear_widgets()
+
+        LINK = f'{self.LINK_DATA}/client.json'
+
+        list_id = []
+
+        # Geting id of client ##########################################################################
+        requisicao = requests.get(LINK)
+        requisicao_dic = requisicao.json()
+
+        for id in requisicao_dic:
+            list_id.append(id)
+        # ##############################################################################################
+
+        for data_id in list_id:
+            link_data = f'{self.LINK_DATA}/client/{data_id}.json'
+
+            requisicao_data = requests.get(link_data)
+            data_dic = requisicao_data.json()
+
+            if data_dic["bloqueado"] == "True":
+                if int(data_dic["quant_cancelado"]) <= 1:
+                    # self.ids.color_card.md_bg_color = (0.75, 0.86, 0.44, .4)
+                    self.ids.scrool_blocked.add_widget(BoxBlocked(data_dic["nome"],data_dic["quant_cancelado"],'3212344-2','93223-3223', data_id))
+                elif int(data_dic["quant_cancelado"]) == 2:
+                    # self.ids.color_card.md_bg_color = (1.00, 0.61, 0.44, .4)
+                    self.ids.scrool_blocked.add_widget(BoxBlocked(data_dic["nome"],data_dic["quant_cancelado"],'3212344-2','93223-3223', data_id))
+                elif int(data_dic["quant_cancelado"]) >= 3:
+                    # self.ids.color_card.md_bg_color = (0.48, 0.04, 0.00, .4)
+                    self.ids.scrool_blocked.add_widget(BoxBlocked(data_dic["nome"],data_dic["quant_cancelado"],'3212344-2','93223-3223', data_id))
+            else:
+                pass
+
+
+
 class ManagerProfile(Screen):
     API_KEY = 'AIzaSyAue2_eYU5S5TsUc692vHNlyxIHrlBVZjk'
     LINK_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao'
@@ -815,6 +862,70 @@ class Popup_widgets(MDBoxLayout):
             toast('Deu Algum erro! não foi excluido ')
 
 
+class BoxBlocked(MDCard):
+
+    LINK_DATA = 'https://shedule-vitor-default-rtdb.firebaseio.com'
+
+    def __init__(self,nome, quant_cancel, cpf, tel='', id_client='', *args, **kwargs):
+        super().__init__(**kwargs)
+
+        self.nome = nome
+        self.quant_cancel = quant_cancel
+        self.cpf = cpf
+        self.tel = tel
+        self.id_client = id_client
+
+        if int(quant_cancel) <= 1:
+            self.ids.color_card.md_bg_color = (0.75, 0.86, 0.44, .4)
+            self.ids.text_quant.color = (0.75, 0.86, 0.44, 1)
+        elif int(quant_cancel) == 2:
+            self.ids.color_card.md_bg_color = (1.00, 0.61, 0.44, .4)
+            self.ids.text_quant.color = (1.00, 0.61, 0.44, 1)
+
+        elif int(quant_cancel) >= 3:
+            self.ids.color_card.md_bg_color = (0.83, 0.04, 0.00, .4)
+            self.ids.text_quant.color = (0.83, 0.04, 0.00, 1)
+
+    def pop_dis_block(self,eu, nome, id_client, *args, **kwargs):
+        box = MDBoxLayout(orientation='vertical')
+        box_button = MDBoxLayout(padding=15, spacing='70dp')
+
+        img = Label(text=f'"{nome}"?',bold=True)
+
+        bt_sim = MDTextButton(text='Sim', theme_text_color="Custom",text_color=(1, 0, 0, .8), size_hint=(1, None),
+                        width='23dp')
+        bt_nao = MDTextButton(text='Não', color=(0, 0, 0, 1), size_hint=(1, None),
+                        width='23dp')
+
+        box_button.add_widget((bt_sim))
+        box_button.add_widget((bt_nao))
+
+
+        box.add_widget((img))
+        box.add_widget((box_button))
+
+        self.popup = Popup(title=f'Deseja desbloquear',
+                           size_hint=(.7, .3), content=box)
+
+        bt_sim.bind(on_release=partial(self.dis_blocked,eu, id_client))
+        bt_nao.bind(on_release=self.popup.dismiss)
+
+        self.popup.open()
+
+    def dis_blocked(self, eu, id_client, *args):
+        print(id_client)
+
+        link_client = f'{self.LINK_DATA}/client/{id_client}.json'
+
+        info = f'{{"bloqueado":"False",' \
+               f'"quant_cancelado":"0"}}'
+
+        requisicao = requests.patch(link_client, data=info)
+
+        toast('Cliente Desbloqueado!', duration=5)
+        # eu.root.clear_widgets()
+
+
 class MyButtonCard(MDCard):
     pass
 
@@ -1269,7 +1380,6 @@ class ViewSchedule(Screen):
             json.dump(hours_dic, arquivo, indent=2)
         MDApp.get_running_app().root.current = 'hoursschedule'
 
-
     def inf_schedule_client(self,id_button, id_schedule, hours, hours_second, time, client):
         dic_info = {}
 
@@ -1543,7 +1653,7 @@ class HoursSchedule(Screen):
         posicao = info['id_button']
         hora = info['hours']
         try:
-            lista_pos =lista_content[int(posicao)]
+            lista_pos = lista_content[int(posicao)]
         except:
             pass
 

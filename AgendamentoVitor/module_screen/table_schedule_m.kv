@@ -79,12 +79,12 @@
 
     MDCard:
         orientation:'vertical'
-        ripple_behavior:True
+#        ripple_behavior:True
         md_bg_color:1,1,1,.3
         radius:7,7,7,7
         id:card
-        on_release: app.root.get_screen('viewshedule').get_hours(root.id_button, root.id_schedule,root.hours, root.hours_second, root.time, root.client)
-#        on_release: app.root.get_screen('viewshedule').blocked_schedule(root.id_button, root.hours)
+#        on_release: app.root.get_screen('viewshedule').get_hours(root.id_button, root.id_schedule,root.hours, root.hours_second, root.time, root.client)
+#        on_release: app.root.get_screen('viewshedule').popup_block(root.id_button, root.id_schedule,root.hours, root.hours_second, root.time, root.client)
         MDBoxLayout:
             MDBoxLayout:
                 orientation:'vertical'
@@ -110,7 +110,19 @@
                     color:0,0,0,1
                     text:root.hours_second
             FloatLayout:
-                Label:#
+                MDBoxLayout:
+                    size_hint_y:None
+                    height:'40dp'
+                    spacing:'10dp'
+                    padding:'12dp'
+                    pos_hint:{'center_x':.4, 'center_y':.3}
+                    MyButtonCard:
+                        first_text:'Bloquear!'
+
+                    MyButtonCard:
+                        first_text:'Agendar!'
+                        on_release: app.root.get_screen('viewshedule').get_hours(root.id_button, root.id_schedule,root.hours, root.hours_second, root.time, root.client)
+                Label:
                     font_size:'25dp'
                     bold:True
                     halign:'center'
