@@ -13,7 +13,7 @@
         MDToolbar:
             title:'Agendas'
             left_action_items:[['arrow-left-thick', lambda x:root.return_homepage()]]
-
+            right_action_items:[['menu', lambda x:nav_drawer.set_state('open')]]
         ScrollView:
             MDBoxLayout:
                 orientation:'vertical'
@@ -21,3 +21,25 @@
                 height:self.minimum_height
                 spacing:'20dp'
                 id:choice_schedule
+    MDNavigationDrawer:
+        id: nav_drawer
+        MDBoxLayout:
+            orientation:'vertical'
+            spacing:'15dp'
+            padding:('15dp',0,'5dp',0)
+            Image:
+                source:'images/person.png'
+            MDSeparator:
+            MDBoxLayout:
+                size_hint_y:None
+                height:'30dp'
+                Image:
+                    size_hint_x:None
+                    height:'20dp'
+                    source:'images/block.png'
+                MyButtonCard:
+                    first_text:'Clientes'
+                    secound_text:'Bloqueado'
+                    on_release:app.root.current = 'clientblocked'
+            MDSeparator:
+            Widget:

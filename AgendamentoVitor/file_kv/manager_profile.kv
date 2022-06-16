@@ -350,36 +350,7 @@
             Widget:
                 size_hint_y:None
                 height:'15dp'
-## ========== Socios =========
-#            MDBoxLayout:
-#                orientation:'vertical'
-#                size_hint:.9,None
-#                height:'200dp'
-#                pos_hint:{'center_x':.5}
-#                Widget:
-#                    size_hint_y:
-#                    height:'25dp'
-#                MDLabel:
-#                    size_hint_y:None
-#                    height:'30dp'
-#                    halign:'center'
-#                    bold:True
-#                    text:'Adicione Seus Socios'
-#                MDTextFieldRect:
-#                    size_hint:.7,None
-#                    height:'30dp'
-#                    pos_hint:{'center_x':.5}
-#                    hint_text:'Nome/Socio'
-#                    id:text_socio
-#                MDBoxLayout:
-#                    size_hint:.7,None
-#                    height:'30dp'
-#                    pos_hint:{'center_x':.5}
-#                    MyButtonCard:
-#                        first_text:'Adicionar'
-#                        secound_text:'Socio'
-#                        on_release:app.root.get_screen('managerprofile').save_socio()
-                Widget:
+            Widget:
             MDCard:
                 size_hint:.7,None
                 height:'100dp'
@@ -410,6 +381,24 @@
                                 size_hint_y:None
                                 height:self.minimum_height
                                 id:box_socio
+            Widget:
+                size_hint_y:None
+                height:'15dp'
+            MDSeparator:
+                size_hint_x:.9
+                pos_hint:{'center_x':.5}
+            Widget:
+                size_hint_y:None
+                height:'15dp'
+
+            Label:
+                text:'Informe a localização do salão!'
+            MDBoxLayout:
+                size_hint:.7,None
+                height:'100dp'
+                pos_hint:{'center_x':.5}
+                MDCard:
+
             Widget:
                 size_hint_y:None
                 height:'15dp'

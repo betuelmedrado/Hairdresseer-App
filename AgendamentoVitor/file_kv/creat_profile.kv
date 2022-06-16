@@ -29,7 +29,7 @@
                 font_size:'12dp'
                 color:1,1,1,.5
                 text:'Nome'
-            TextInput:
+            MDTextFieldRect:
                 hint_text:'Nome'
                 multiline:False
                 id:nome
@@ -39,7 +39,7 @@
                 font_size:'12dp'
                 color:1,1,1,.5
                 text:'Email'
-            TextInput:
+            MDTextFieldRect:
                 hint_text:'Email'
                 multiline:False
                 id:email
@@ -49,8 +49,8 @@
                 font_size:'12dp'
                 color:1,1,1,.5
                 text:'Senha'
-            TextInput:
-                font_size:'30dp'
+            MDTextFieldRect:
+                font_size:'20dp'
                 bold:True
                 hint_text:'******'
                 foreground_color:0,1,1,1
@@ -63,8 +63,8 @@
                 font_size:'12dp'
                 color:1,1,1,.5
                 text:'Confirmar senha'
-            TextInput:
-                font_size:'30dp'
+            MDTextFieldRect:
+                font_size:'20dp'
                 bold:True
                 foreground_color:0,1,1,1
                 hint_text:'******'
@@ -97,5 +97,5 @@
                 font_size:'10dp'
                 text:'Conta'
         MDIconButton:
-            icon:'arrow-left-top'
+            icon:'arrow-left'
             on_release:app.root.current = 'loginmanager'

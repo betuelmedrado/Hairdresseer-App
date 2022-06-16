@@ -114,7 +114,7 @@
         MDToolbar:
             elevation:10
             id:title_toobar
-            right_action_items:[['refresh',lambda x: root.actualizar()]]
+            right_action_items:[['refresh',lambda x: root.actualizar()],['menu', lambda x:nav_drawer.set_state('open')]]
             left_action_items:[['arrow-left-bold-outline', lambda x: root.return_schoice_schedule()]]
         MDBoxLayout:
             size_hint:1,.7
@@ -128,3 +128,26 @@
                     spacing:'11dp'
                     padding:'11dp'
                     id:grid_shedule
+
+    MDNavigationDrawer:
+        id: nav_drawer
+        MDBoxLayout:
+            orientation:'vertical'
+            spacing:'15dp'
+            padding:('15dp',0,'5dp',0)
+            Image:
+                source:'images/person.png'
+            MDSeparator:
+            MDBoxLayout:
+                size_hint_y:None
+                height:'30dp'
+                Image:
+                    size_hint_x:None
+                    height:'20dp'
+                    source:'images/block.png'
+                MyButtonCard:
+                    first_text:'Clientes'
+                    secound_text:'Bloqueado'
+                    on_release:app.root.current = 'clientblocked'
+            MDSeparator:
+            Widget:

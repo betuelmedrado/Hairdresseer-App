@@ -278,10 +278,8 @@ class CreatProfile(Screen):
                 if requisicao.ok:
                     if self.verification_if_manger():
                         self.creat_socio(idtoken, localid, refreshtoken)
-                        print('socio')
                     else:
                         self.creat_profile(idtoken, localid, refreshtoken)
-                        print('managerr')
 
                     self.ids.warning.text = '[b][color=D40A00]Conta criada[/color] com sucesso![/b]'
                     MDApp.get_running_app().root.current = 'homepage'
@@ -356,17 +354,20 @@ class ClientBlocked(Screen):
             requisicao_data = requests.get(link_data)
             data_dic = requisicao_data.json()
 
-            if data_dic["bloqueado"] == "True":
-                if int(data_dic["quant_cancelado"]) <= 1:
-                    # self.ids.color_card.md_bg_color = (0.75, 0.86, 0.44, .4)
-                    self.ids.scrool_blocked.add_widget(BoxBlocked(data_dic["nome"],data_dic["quant_cancelado"],'3212344-2','93223-3223', data_id))
-                elif int(data_dic["quant_cancelado"]) == 2:
-                    # self.ids.color_card.md_bg_color = (1.00, 0.61, 0.44, .4)
-                    self.ids.scrool_blocked.add_widget(BoxBlocked(data_dic["nome"],data_dic["quant_cancelado"],'3212344-2','93223-3223', data_id))
-                elif int(data_dic["quant_cancelado"]) >= 3:
-                    # self.ids.color_card.md_bg_color = (0.48, 0.04, 0.00, .4)
-                    self.ids.scrool_blocked.add_widget(BoxBlocked(data_dic["nome"],data_dic["quant_cancelado"],'3212344-2','93223-3223', data_id))
-            else:
+            try:
+                if data_dic["bloqueado"] == "True":
+                    if int(data_dic["quant_cancelado"]) <= 1:
+                        # self.ids.color_card.md_bg_color = (0.75, 0.86, 0.44, .4)
+                        self.ids.scrool_blocked.add_widget(BoxBlocked(data_dic["nome"],data_dic["quant_cancelado"],'3212344-2','93223-3223', data_id))
+                    elif int(data_dic["quant_cancelado"]) == 2:
+                        # self.ids.color_card.md_bg_color = (1.00, 0.61, 0.44, .4)
+                        self.ids.scrool_blocked.add_widget(BoxBlocked(data_dic["nome"],data_dic["quant_cancelado"],'3212344-2','93223-3223', data_id))
+                    elif int(data_dic["quant_cancelado"]) >= 3:
+                        # self.ids.color_card.md_bg_color = (0.48, 0.04, 0.00, .4)
+                        self.ids.scrool_blocked.add_widget(BoxBlocked(data_dic["nome"],data_dic["quant_cancelado"],'3212344-2','93223-3223', data_id))
+                else:
+                    pass
+            except:
                 pass
 
 
@@ -922,8 +923,9 @@ class BoxBlocked(MDCard):
 
         requisicao = requests.patch(link_client, data=info)
 
+        self.popup.dismiss()
         toast('Cliente Desbloqueado!', duration=5)
-        # eu.root.clear_widgets()
+        eu.parent.remove_widget(eu)
 
 
 class MyButtonCard(MDCard):
@@ -1079,6 +1081,12 @@ class ViewSchedule(Screen):
 
     def on_pre_enter(self, *args):
         Clock.schedule_once(self.actualizar, 1)
+
+    def get_manager(self, *args):
+        requisicao = requests.get(self.LINK_SALAO + '.json')
+        requisicao_dic = requisicao.json()
+        for id in requisicao_dic:
+            return id
 
     def get_id_proficional(self, *args):
         dic_information = {}
@@ -1347,10 +1355,12 @@ class ViewSchedule(Screen):
 
     def cancel_schedule(self, id_user, *args, **kwargs):
         id_proficional = self.get_id_proficional()
+        id_manager = self.id_manager
+
         link = ''
 
         if id_proficional['manager'] == "False":
-            link = self.LINK_SALAO + f'/socios/{id_proficional["id_user"]}/agenda/{id_user}.json'
+            link = self.LINK_SALAO + f'/{id_manager}/socios/{id_proficional["id_user"]}/agenda/{id_user}.json'
 
         elif id_proficional['manager'] == "True":
             link = self.LINK_SALAO + f'/agenda/{id_user}.json'
@@ -1699,8 +1709,12 @@ class HoursSchedule(Screen):
             requisicao = requests.get(link)
             info_dic = requisicao.json()
 
-        else:
-            pass
+        elif info_user['manager'] == 'False':
+            id_manager = self.get_manager()
+            link = f'{self.LINK_SALAO}/{id_manager}/socios/{info_user["id_user"]}.json'
+
+            requisicao = requests.get(link)
+            info_dic = requisicao.json()
 
         print(info_dic)
 
@@ -1835,29 +1849,32 @@ class InfoScheduleClient(Screen):
         requisicao = requests.get(link)
         requisicao_dic = requisicao.json()
 
-        self.ids.quant_cancelada.text = str(requisicao_dic['quant_cancelado'])
+        try:
+            self.ids.quant_cancelada.text = str(requisicao_dic['quant_cancelado'])
 
-        # Here change the color and the number of quant cancel #########################################################
-        if int(requisicao_dic['quant_cancelado']) == 0:
-            self.ids.color_quant.md_bg_color = [0,1,0,1]
-            self.ids.quant_cancelada.color = [0,1,0,1]
-        elif int(requisicao_dic['quant_cancelado']) == 1:
-            self.ids.color_quant.md_bg_color = 1.00, 0.65, 0.16,1
-            self.ids.quant_cancelada.color = 1.00, 0.65, 0.16,1
-        elif int(requisicao_dic['quant_cancelado']) == 2:
-            self.ids.color_quant.md_bg_color = 1.00, 0.33, 0.03,1
-            self.ids.quant_cancelada.color = 1.00, 0.33, 0.03,1
-        elif int(requisicao_dic['quant_cancelado']) >= 3:
-            self.ids.color_quant.md_bg_color = 1,0,0,1
-            self.ids.quant_cancelada.color = 1,0,0,1
+            # Here change the color and the number of quant cancel #########################################################
+            if int(requisicao_dic['quant_cancelado']) == 0:
+                self.ids.color_quant.md_bg_color = [0,1,0,1]
+                self.ids.quant_cancelada.color = [0,1,0,1]
+            elif int(requisicao_dic['quant_cancelado']) == 1:
+                self.ids.color_quant.md_bg_color = 1.00, 0.65, 0.16,1
+                self.ids.quant_cancelada.color = 1.00, 0.65, 0.16,1
+            elif int(requisicao_dic['quant_cancelado']) == 2:
+                self.ids.color_quant.md_bg_color = 1.00, 0.33, 0.03,1
+                self.ids.quant_cancelada.color = 1.00, 0.33, 0.03,1
+            elif int(requisicao_dic['quant_cancelado']) >= 3:
+                self.ids.color_quant.md_bg_color = 1,0,0,1
+                self.ids.quant_cancelada.color = 1,0,0,1
 
-        # Get if go cancel or not ######################################################################################
-        if requisicao_dic['bloqueado'] == 'True':
-            self.ids.img_block.source = 'images/bloqueado.png'
-            self.ids.label_block.text = 'Cliente bloqueado!'
-        else:
-            self.ids.img_block.source = ''
-            self.ids.label_block.text = ''
+            # Get if go cancel or not ######################################################################################
+            if requisicao_dic['bloqueado'] == 'True':
+                self.ids.img_block.source = 'images/bloqueado.png'
+                self.ids.label_block.text = 'Cliente bloqueado!'
+            else:
+                self.ids.img_block.source = ''
+                self.ids.label_block.text = ''
+        except TypeError:
+            pass
 
     def client_missed(self):
 
