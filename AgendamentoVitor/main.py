@@ -314,12 +314,41 @@ class CreatProfile(Screen):
 
 
 class HomePage(Screen):
+    LINK_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao'
 
     def return_login(self):
         with open('refreshtoken.json','w') as file:
             json.dump('',file)
 
         MDApp.get_running_app().root.current = 'loginmanager'
+
+    def on_pre_enter(self):
+        Clock.schedule_once(self.get_local, 5)
+
+    def get_id_manager(self, *args):
+        requisicao = requests.get(self.LINK_SALAO + '.json')
+        requisicao_dic = requisicao.json()
+
+        for id in requisicao_dic:
+            return id
+
+    def get_local(self, *args):
+        id_manager = self.get_id_manager()
+
+        link = f'{self.LINK_SALAO}/{id_manager}.json'
+
+        requisicao = requests.get(link)
+        requisicao_dic = requisicao.json()
+
+        local = requisicao_dic['local']
+        number = requisicao_dic['numero']
+
+        try:
+            self.ids.rua.text = str(local.title())
+            self.ids.num.text = str(number)
+        except KeyError:
+            pass
+
 
 
 class ClientBlocked(Screen):
@@ -462,7 +491,6 @@ class ManagerProfile(Screen):
 
         else:
             self.ids.tempo.text = str(tamanho[0:len(tamanho)-1])
-
 
     def on_pre_enter(self, *args):
         self.creat_profile()
@@ -771,6 +799,25 @@ class ManagerProfile(Screen):
                 self.ids.box_socio.add_widget(MyBoxSocio(str(nome_dic['nome'])))
         except:
             pass
+
+    def insert_local(self):
+
+        link = f'{self.LINK_SALAO}/{self.id_manager}.json'
+
+        local = self.ids.rua.text
+        number = self.ids.number.text
+
+        if local != '' and number != '':
+
+            info = f'{{"local":"{local}",' \
+                   f'"numero":{number} }}'
+
+            requisicao = requests.patch(link, data=info)
+
+            toast('Local inserido com exito!')
+        else:
+            toast('Local não foi inserido folta de informação!')
+
 
     def pop_alteration(self,id_work, servico, tempo, valor, *args, **kwargs):
         box_main = MDBoxLayout(orientation='vertical',md_bg_color=([1,1,1,1]),radius=(5,5,5,5))

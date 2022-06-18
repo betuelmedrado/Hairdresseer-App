@@ -341,6 +341,52 @@
                                     size_hint_y:None
                                     height:self.minimum_height
                                     id:categorie
+
+            Widget:
+                size_hint_y:None
+                height:'15dp'
+            MDSeparator:
+                size_hint_x:.9
+                pos_hint:{'center_x':.5}
+            Widget:
+                size_hint_y:None
+                height:'15dp'
+
+            Label:
+                text:'Informe a localização do salão!'
+                bold:True
+                color:0,0,0,.4
+            Widget:
+                size_hint_y:None
+                height:'15dp'
+            MDBoxLayout:
+                size_hint:.7,None
+                height:'100dp'
+                pos_hint:{'center_x':.5}
+                id:box_local
+                MDCard:
+                    orientation:'vertical'
+                    radius:8,8,8,8
+                    padding:'20dp'
+                    spacing:'10dp'
+                    MDTextFieldRect:
+                        hint_text:'Local:'
+                        multiline:False
+                        id:rua
+                    MDBoxLayout:
+                        spacing:'10dp'
+                        MDTextFieldRect:
+                            size_hint_x:None
+                            width:'70dp'
+                            hint_text:'N°:'
+                            multiline:False
+                            id:number
+                        MyButtonCard:
+                            first_text:'Inserir'
+                            on_release:root.insert_local()
+
+
+
             Widget:
                 size_hint_y:None
                 height:'15dp'
@@ -381,23 +427,7 @@
                                 size_hint_y:None
                                 height:self.minimum_height
                                 id:box_socio
-            Widget:
-                size_hint_y:None
-                height:'15dp'
-            MDSeparator:
-                size_hint_x:.9
-                pos_hint:{'center_x':.5}
-            Widget:
-                size_hint_y:None
-                height:'15dp'
 
-            Label:
-                text:'Informe a localização do salão!'
-            MDBoxLayout:
-                size_hint:.7,None
-                height:'100dp'
-                pos_hint:{'center_x':.5}
-                MDCard:
 
             Widget:
                 size_hint_y:None

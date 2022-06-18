@@ -79,6 +79,29 @@
                         color:0,0,0,1
                         markup:True
                         text:'[size=20][b]Ver[/b][/size]\n[color=#D40A00][size=40][b]Agenda[/b][/size][/color]'
+        MDBoxLayout:
+            size_hint_y:None
+            height:'40dp'
+            MDLabel:
+                size_hint_x:None
+                width:'40dp'
+                text:'Local:'
+                color:0,0,0,.5
+            MDLabel:
+                font_size:'11dp'
+                id:rua
+
+            MDLabel:
+                size_hint_x:None
+                width:'30dp'
+                text:'N°:'
+                color:0,0,0,.5
+            MDLabel:
+                size_hint_x:None
+                width:'50dp'
+                font_size:'11dp'
+                id:num
+
     MDNavigationDrawer:
         id: nav_drawer
         MDBoxLayout:

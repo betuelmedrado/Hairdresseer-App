@@ -39,6 +39,31 @@
                 size_hint_y:None
                 height:self.minimum_height
                 id:my_card_button
+    MDBoxLayout:
+        size_hint_y:None
+        height:'40dp'
+        MDLabel:
+            size_hint_x:None
+            width:'45dp'
+            text:'Local:'
+            color:1,1,1,.5
+        MDLabel:
+            font_size:'11dp'
+            color:1,1,1,1
+            id:rua
+
+        MDLabel:
+            size_hint_x:None
+            width:'30dp'
+            text:'N°:'
+            color:1,1,1,.5
+        MDLabel:
+            size_hint_x:None
+            width:'50dp'
+            font_size:'11dp'
+            color:1,1,1,1
+            id:num
+
 
 <ViewSchedule>:
     canvas:

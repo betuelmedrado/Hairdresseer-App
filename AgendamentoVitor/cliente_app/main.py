@@ -48,8 +48,23 @@ class HomePage(Screen):
         self.creat_files()
         toast('Aguarde estamos carregando as informações!...')
         Clock.schedule_once(self.get_info, 1)
+        Clock.schedule_once(self.get_local, 2)
 
+    def get_local(self, *args):
 
+        link = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}.json'
+
+        requisicao = requests.get(link)
+        requisicao_dic = requisicao.json()
+
+        local = requisicao_dic['local']
+        number = requisicao_dic['numero']
+
+        try:
+            self.ids.rua.text = str(local.title())
+            self.ids.num.text = str(number)
+        except KeyError:
+            pass
 
     def get_id_manager(self, *args):
         id = ''
