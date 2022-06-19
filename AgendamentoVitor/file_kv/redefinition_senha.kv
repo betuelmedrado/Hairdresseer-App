@@ -1,0 +1,35 @@
+<RedefinitionSenha>:
+    canvas:
+        Color:
+            rgba:1,1,1,.7
+        Rectangle:
+            pos:root.pos
+            size:root.size
+            source:'images/degrade.jpg'
+    MDBoxLayout:
+        orientation:'vertical'
+        spacing:'20dp'
+        MDToolbar:
+            title:'Redefinir senha!'
+            elevation:9
+            left_action_items:[['arrow-left',lambda x: root.return_login()]]
+        Widget:
+        MDCard:
+            orientation:'vertical'
+            size_hint:.8, None
+            height:'100dp'
+            spacing:'20dp'
+            padding:'5dp'
+            pos_hint:{'center_x':.5}
+            radius:8,8,8,8
+            MDTextFieldRect:
+                size_hint_y:None
+                height:'30dp'
+                hint_text:'Email'
+                id:email
+
+        MDRaisedButton:
+            text:'Enviar'
+            pos_hint:{'center_x':.5}
+            on_release:root.send_email()
+        Widget:

@@ -35,13 +35,13 @@ class Manager(ScreenManager):
 
 class LoginManager(Screen):
     API_KEY = 'AIzaSyAue2_eYU5S5TsUc692vHNlyxIHrlBVZjk'
+    LINK_ID_MANAGER = 'https://shedule-vitor-default-rtdb.firebaseio.com/salao'
 
     def get_id_manager(self, *args):
-        LINK_ID_MANAGER = 'https://shedule-vitor-default-rtdb.firebaseio.com/salao.json'
 
         id_manager = ''
-
-        requisicao = requests.get(LINK_ID_MANAGER)
+        link = f'{self.LINK_ID_MANAGER}.json'
+        requisicao = requests.get(link)
         requisicao_dic = requisicao.json()
 
         for id in requisicao_dic:
@@ -50,10 +50,10 @@ class LoginManager(Screen):
     def not_can_client(self):
         lista_info_ids = []
         ID_MANAGER = ''
+        link = f'{self.LINK_ID_MANAGER}.json'
 
         # Geting id of manager #########################################################################################
-        LINK_MANAGER = 'https://shedule-vitor-default-rtdb.firebaseio.com/salao.json'
-        requisicao_manager = requests.get(LINK_MANAGER)
+        requisicao_manager = requests.get(link)
         requisicao_manager_dic = requisicao_manager.json()
 
         for id in requisicao_manager_dic:
@@ -93,7 +93,9 @@ class LoginManager(Screen):
             if requisicao_dic['localId'] in lista_info_ids:
                 with open('refreshtoken.json','w') as file:
                     json.dump(requisicao_dic['refreshToken'], file)
-                MDApp.get_running_app().root.current = 'homepage'
+
+                self.info_login(requisicao_dic['localId'])
+
             else:
                 self.ids.warning.text = 'Email ou senha [color=D40A00]Invalida[/color]'
         else:
@@ -107,6 +109,26 @@ class LoginManager(Screen):
                 self.ids.warning.text = 'Senha [color=D40A00]Invalido[/color]'
             elif erro == 'EMAIL_NOT_FOUND':
                 self.ids.warning.text = 'Email não [color=D40A00]Encontrado[/color]'
+
+    def info_login(self, localo_id):
+
+        try:
+            link = f'{self.LINK_ID_MANAGER}/{localo_id}.json'
+            requisicao = requests.get(link)
+            requisicao_dic = requisicao.json()
+            info = requisicao_dic['manager']
+
+            with open('is_manager_or_socio.json','w') as file:
+                json.dump('manager', file)
+
+            MDApp.get_running_app().root.current = 'homepage'
+        except:
+
+            with open('is_manager_or_socio.json','w') as file:
+                json.dump('socio', file)
+
+            MDApp.get_running_app().root.current = 'homepage'
+
 
     def load_refresh(self, *args):
         try:
@@ -165,6 +187,13 @@ class LoginManager(Screen):
         except:
             with open('select_works.json', 'w') as file_work:
                 json.dump([],file_work)
+
+        try:
+            with open('is_manager_or_socio.json', 'r') as file_is_manager:
+                json.load(file_is_manager)
+        except:
+            with open('is_manager_or_socio.json', 'w') as file_is_manager:
+                json.dump('', file_is_manager)
 
     def on_pre_enter(self, *args):
         self.load_refresh()
@@ -276,10 +305,14 @@ class CreatProfile(Screen):
                 refreshtoken = requisicao_dic['refreshToken']
 
                 if requisicao.ok:
-                    if self.verification_if_manger():
+                    manager_socio = self.verification_if_manger()
+
+                    if manager_socio == False:
                         self.creat_socio(idtoken, localid, refreshtoken)
+                        print('socio')
                     else:
                         self.creat_profile(idtoken, localid, refreshtoken)
+                        print('manager')
 
                     self.ids.warning.text = '[b][color=D40A00]Conta criada[/color] com sucesso![/b]'
                     MDApp.get_running_app().root.current = 'homepage'
@@ -312,6 +345,32 @@ class CreatProfile(Screen):
         else:
             pass
 
+
+class RedefinitionSenha(Screen):
+    API_KEY = 'AIzaSyAue2_eYU5S5TsUc692vHNlyxIHrlBVZjk'
+
+
+    def send_email(self, *args):
+        """
+        Function for redefinited the password
+        :param args:
+        :return:
+        """
+        LINK_FOR_API = f'https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key={self.API_KEY}'
+
+        email = self.ids.email.text
+        senha = self.ids.senha.text
+
+        info = {"requestType":"PASSWORD_RESET",
+               "email": email}
+
+        requisicao = requests.post(LINK_FOR_API, data=info)
+        requisicao_dic = requisicao.json()
+
+        toast('Foi enviado uma mensagem no email informado para redefinir a senha!')
+
+    def return_login(self):
+        MDApp.get_running_app().root.current = 'loginmanager'
 
 class HomePage(Screen):
     LINK_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao'
@@ -495,6 +554,7 @@ class ManagerProfile(Screen):
     def on_pre_enter(self, *args):
         self.creat_profile()
         self.insert_hours()
+        self.only_manager_local()
         Clock.schedule_once(self.get_socios,2)
         Clock.schedule_once(self.infill,3)
 
@@ -504,6 +564,13 @@ class ManagerProfile(Screen):
 
         for id in requisicao_dic:
             return id
+
+    # def get_id_proficional(self, *args):
+    #     dic_information = {}
+    #
+    #     with open('write_id_manager.json', 'r') as arquivo:
+    #         dic_informing = json.load(arquivo)
+    #     return dic_informing
 
     # Here only return the id of user
     def get_id_whith_refreshtoken(self, *args):
@@ -800,7 +867,20 @@ class ManagerProfile(Screen):
         except:
             pass
 
-    def insert_local(self):
+    def only_manager_local(self, *args):
+        with open('is_manager_or_socio.json','r') as file:
+            manager_or_socio = json.load(file)
+
+        if manager_or_socio == 'manager':
+            bt = self.ids.button_local
+            bt.bind(on_release=self.insert_local)
+            bt.md_bg_color = (0.13, 0.53, 0.95,1)
+        elif manager_or_socio == 'socio':
+            bt = self.ids.button_local
+            bt.unbind(on_release=self.insert_local)
+            bt.md_bg_color = (1,0,0,1)
+
+    def insert_local(self, *args):
 
         link = f'{self.LINK_SALAO}/{self.id_manager}.json'
 

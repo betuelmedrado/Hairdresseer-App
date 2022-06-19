@@ -43,12 +43,12 @@ class HomePage(Screen):
         self.id_manager = self.get_id_manager()
         self.id_socios = self.get_id_socios()
         # Clock.schedule_once(self.get_info, 1)
+        Clock.schedule_once(self.get_local, 2)
 
     def on_pre_enter(self, *args):
         self.creat_files()
         toast('Aguarde estamos carregando as informações!...')
         Clock.schedule_once(self.get_info, 1)
-        Clock.schedule_once(self.get_local, 2)
 
     def get_local(self, *args):
 

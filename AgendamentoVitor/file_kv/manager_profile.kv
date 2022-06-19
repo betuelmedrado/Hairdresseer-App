@@ -363,7 +363,6 @@
                 size_hint:.7,None
                 height:'100dp'
                 pos_hint:{'center_x':.5}
-                id:box_local
                 MDCard:
                     orientation:'vertical'
                     radius:8,8,8,8
@@ -383,7 +382,9 @@
                             id:number
                         MyButtonCard:
                             first_text:'Inserir'
-                            on_release:root.insert_local()
+                            id:button_local
+#                            on_release:root.insert_local()
+                        # on_release it is used in function "only_manager"
 
 
 
