@@ -146,8 +146,29 @@
                     MDLabel:
                         size_hint_y:None
                         height:'30dp'
+                        bold:True
+                        color:0,0,0,.6
                         text:'Serviços Pedido'
                         halign:'center'
+                    MDBoxLayout:
+                        size_hint_y:None
+                        height:'30dp'
+                        MDLabel:
+                            size_hint_x:.40
+                            text:'Servicos:'
+                            font_size:'11dp'
+                            color:0,0,0,.6
+                        MDLabel:
+                            size_hint_x:.40
+                            text:'Horas:'
+                            font_size:'11dp'
+                            color:0,0,0,.6
+                        MDLabel:
+                            size_hint_x:.20
+                            font_size:'11dp'
+                            text:'Valor/R$'
+                            color:0,0,0,.6
+
                     ScrollView:
                         MDBoxLayout:
                             orientation:'vertical'

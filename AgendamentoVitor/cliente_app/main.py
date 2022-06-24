@@ -435,6 +435,42 @@ class CreatBill(Screen):
         else:
             print('last')
 
+class RedefinitionSenha(Screen):
+    API_KEY = 'AIzaSyAue2_eYU5S5TsUc692vHNlyxIHrlBVZjk'
+
+
+    def send_email(self, *args):
+        """
+        Function for redefinited the password
+        :param args:
+        :return:
+        """
+        LINK_FOR_API = f'https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key={self.API_KEY}'
+
+        email = self.ids.email.text
+
+        info = {"requestType":"PASSWORD_RESET",
+               "email": email}
+
+        requisicao = requests.post(LINK_FOR_API, data=info)
+        requisicao_dic = requisicao.json()
+
+        error = requisicao_dic['error']['message']
+
+        if requisicao.ok:
+            toast('Foi enviado uma mensagem no email informado para redefinir a senha!')
+        elif error == 'MISSING_EMAIL':
+            toast('Insira um e-mail valido!',duration= 5)
+        elif error == 'INVALID_EMAIL':
+            toast('Email invalido!', duration=5)
+        elif error  == 'EMAIL_NOT_FOUND':
+            toast('Email não encontrado!')
+        else:
+            pass
+
+    def return_login(self):
+        MDApp.get_running_app().root.current = 'register'
+
 class Table_shedule(MDBoxLayout):
     def __init__(self,id_button='',id_schedule='',hours='',client='',hours2='',**kwargs):
 

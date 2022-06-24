@@ -77,6 +77,8 @@ class LoginManager(Screen):
 
         id_manager = self.get_id_manager()
 
+        dic_login = {}
+
         LINK_API = f'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={self.API_KEY}'
 
         email = self.ids.email.text
@@ -93,6 +95,12 @@ class LoginManager(Screen):
             if requisicao_dic['localId'] in lista_info_ids:
                 with open('refreshtoken.json','w') as file:
                     json.dump(requisicao_dic['refreshToken'], file)
+
+                dic_login['email'] = requisicao_dic['email']
+                dic_login['id_login'] = requisicao_dic['localId']
+
+                with open('info_login.json','w') as file_login:
+                    json.dump(dic_login, file_login, indent=2)
 
                 self.info_login(requisicao_dic['localId'])
 
@@ -195,9 +203,17 @@ class LoginManager(Screen):
             with open('is_manager_or_socio.json', 'w') as file_is_manager:
                 json.dump('', file_is_manager)
 
+        try:
+            with open('info_login.json', 'r') as file_login:
+                json.load(file_login)
+        except:
+            with open('info_login.json', 'w') as file_login:
+                json.dump('', file_login)
+
+
     def on_pre_enter(self, *args):
-        self.load_refresh()
         self.creat_files()
+        self.load_refresh()
 
 
 class CreatProfile(Screen):
@@ -309,10 +325,9 @@ class CreatProfile(Screen):
 
                     if manager_socio == False:
                         self.creat_socio(idtoken, localid, refreshtoken)
-                        print('socio')
+
                     else:
                         self.creat_profile(idtoken, localid, refreshtoken)
-                        print('manager')
 
                     self.ids.warning.text = '[b][color=D40A00]Conta criada[/color] com sucesso![/b]'
                     MDApp.get_running_app().root.current = 'homepage'
@@ -359,7 +374,6 @@ class RedefinitionSenha(Screen):
         LINK_FOR_API = f'https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key={self.API_KEY}'
 
         email = self.ids.email.text
-        senha = self.ids.senha.text
 
         info = {"requestType":"PASSWORD_RESET",
                "email": email}
@@ -367,7 +381,19 @@ class RedefinitionSenha(Screen):
         requisicao = requests.post(LINK_FOR_API, data=info)
         requisicao_dic = requisicao.json()
 
-        toast('Foi enviado uma mensagem no email informado para redefinir a senha!')
+        print(requisicao_dic['error']['message'])
+        error = requisicao_dic['error']['message']
+
+        if requisicao.ok:
+            toast('Foi enviado uma mensagem no email informado para redefinir a senha!')
+        elif error == 'MISSING_EMAIL':
+            toast('Insira um e-mail valido!',duration= 5)
+        elif error == 'INVALID_EMAIL':
+            toast('Email invalido!', duration=5)
+        elif error  == 'EMAIL_NOT_FOUND':
+            toast('Email não encontrado!')
+        else:
+            pass
 
     def return_login(self):
         MDApp.get_running_app().root.current = 'loginmanager'
@@ -474,6 +500,7 @@ class ManagerProfile(Screen):
 
         self.id_manager = self.get_id_manager()
 
+
     def insert_day(self, state, dia):
         """
         function whit receive the state e the day to be inserting in database
@@ -550,6 +577,66 @@ class ManagerProfile(Screen):
 
         else:
             self.ids.tempo.text = str(tamanho[0:len(tamanho)-1])
+
+    def show_focus(self, stado, day, *args, **kwargs):
+
+        entrada = ''
+        saida = ''
+        space_temp = ''
+        dia = day
+        semana = ''
+
+        with open('is_manager_or_socio.json', 'r') as file:
+            is_manager = json.load(file)
+
+        if int(dia) == 1:
+            semana = 'Segunda'
+        elif int(dia) == 2:
+            semana = 'Terça'
+        elif int(dia) == 3:
+            semana = 'Quarta'
+        elif int(dia) == 4:
+            semana = 'Quinta'
+        elif int(dia) == 5:
+            semana = 'Sexta'
+        elif int(dia) == 6:
+            semana = 'Sabado'
+        elif int(dia) == 7:
+            semana = 'Domingo'
+
+        try:
+            if stado == 'down':
+                if is_manager == 'manager':
+                    link = f'{self.LINK_SALAO}/{self.id_manager}/{dia}.json'
+                    requisicao = requests.get(link)
+                    requisicao_dic = requisicao.json()
+
+                    entrada = requisicao_dic['entrada']
+                    saida = requisicao_dic['saida']
+                    space_temp = requisicao_dic['space_temp']
+
+
+                elif is_manager == 'socio':
+
+                    with open('info_login.json', 'r') as file_login:
+                        id = json.load(file_login)
+
+                    link = f'{self.LINK_SALAO}/{self.id_manager}/socios/{id["id_login"]}/{dia}.json'
+                    requisicao = requests.get(link)
+                    requisicao_dic = requisicao.json()
+
+                    entrada = requisicao_dic['entrada']
+                    saida = requisicao_dic['saida']
+                    space_temp = requisicao_dic['space_temp']
+
+                toast(f'       {semana}\nEntrada - {entrada}\nSaida   -   {saida}\ntempo  -  {space_temp}', duration=5)
+            else:
+                pass
+        except:
+            toast(f'"{semana}"\nNem uma agenda criada nesse dia!', duration=5)
+
+
+
 
     def on_pre_enter(self, *args):
         self.creat_profile()
@@ -815,7 +902,9 @@ class ManagerProfile(Screen):
                 tempo = requisicao_get_categoria_dic['tempo']
                 valor = str(float(requisicao_get_categoria_dic['valor']))
 
-                self.ids.categorie.add_widget(MyBoxCategorie(id, nome_servico,tempo,valor))
+                mybox_categorie = MyBoxCategorie(id, nome_servico,tempo,valor)
+                mybox_categorie.bind(on_release=partial(self.pop_alteration, id, nome_servico,tempo,valor))
+                self.ids.categorie.add_widget(mybox_categorie)
         except TypeError:
             pass
 
@@ -1115,14 +1204,22 @@ class TableEnpty(MDBoxLayout):
         self.client = str(client)
 
 class TableInfo(MDBoxLayout):
-    def __init__(self,id_button='',id_schedule='',hours='',client='',hours2='',**kwargs):
-
+    # def __init__(self,id_button='',id_schedule='',hours='',client='',hours2='',**kwargs):
+    def __init__(self,id_button='', id_schedule='',hours='', hours_second='', time='', client='',**kwargs):
         super().__init__(**kwargs)
+
+        #         # self.id_button = id_button
+        #         # self.id_schedule = id_schedule
+        #         # self.hours = str(hours)
+        #         # self.client = str(client)
+        #         # self.hours_2 = hours2
+
         self.id_button = id_button
         self.id_schedule = id_schedule
         self.hours = str(hours)
+        self.hours_2 = hours_second
+        self.time = time
         self.client = str(client)
-        self.hours_2 = hours2
 
 class CardButtonProficional(MDCard):
 
@@ -1352,8 +1449,11 @@ class ViewSchedule(Screen):
 
                                     if user_id == lista_info[num]['id_user']:
                                         # Insert table #####################################################################################
-                                        table = TableInfo(str(cont), '', entrada, 'Você agendou esse horarion',
-                                                          f'{soma_horas.strftime("%H:%M")}')
+                                        # table = TableInfo(str(cont), '', entrada, 'Você agendou esse horarion',
+                                        #                   f'{soma_horas.strftime("%H:%M")}')
+
+                                        table = TableInfo(str(cont), lista_info[num]['id_user'], entrada,
+                                                              f'{soma_horas.strftime("%H:%M")}', lista_info[num]['tempo'], lista_info[num]['nome'])
                                         self.ids.grid_shedule.add_widget(table)
                                         entrada = soma_horas.strftime('%H:%M')
                                         block = True
@@ -1445,7 +1545,7 @@ class ViewSchedule(Screen):
         except:
             print('actualizar ViewSchedule erro!')
 
-    def popup_mark_off(self,id_button,hours, *args, **kwargs):
+    def popup_mark_off(self,id_button, id_schedule, hours, hours_second, time, client, *args, **kwargs):
         id_user = ''
         # info_schedule = self.info_entrace_salao()
         # for id in info_schedule:
@@ -1457,7 +1557,7 @@ class ViewSchedule(Screen):
 
 
         box = MDBoxLayout(orientation='vertical')
-        box_button = MDBoxLayout(padding=15,spacing=15)
+        box_button = MDBoxLayout(padding=15,spacing=10)
 
         img = Image(source='images/atencao.png')
 
@@ -1473,11 +1573,11 @@ class ViewSchedule(Screen):
         box.add_widget((box_button))
 
         self.popup  = Popup(title='Deseja cancelar o agendamento?',
-                       size_hint=(.8,.5),content=box)
+                       size_hint=(.8,.4),content=box)
 
         bt_sim.bind(on_release = partial(self.cancel_schedule, id_user["id_user"]))
         bt_nao.bind(on_release = self.popup.dismiss)
-
+        bt_view.bind(on_release = partial(self.inf_schedule_client, id_button, id_schedule, hours, hours_second, time, client))
         self.popup.open()
 
     def cancel_schedule(self, id_user, *args, **kwargs):
@@ -1517,7 +1617,7 @@ class ViewSchedule(Screen):
             json.dump(hours_dic, arquivo, indent=2)
         MDApp.get_running_app().root.current = 'hoursschedule'
 
-    def inf_schedule_client(self,id_button, id_schedule, hours, hours_second, time, client):
+    def inf_schedule_client(self,id_button, id_schedule, hours, hours_second, time, client, *args):
         dic_info = {}
 
         dic_info['id_button'] = id_button
@@ -1531,6 +1631,7 @@ class ViewSchedule(Screen):
             json.dump(dic_info, file, indent=2)
 
         MDApp.get_running_app().root.current = 'infoscheduleclient'
+        self.popup.dismiss()
 
     def on_pre_leave(self, *args):
         self.ids.grid_shedule.clear_widgets()
@@ -1943,6 +2044,7 @@ class InfoScheduleClient(Screen):
         self.ids.img_block.source = ''
         self.ids.label_block.text = ''
 
+
     def id_manager(self):
 
         manager = ''
@@ -2000,35 +2102,38 @@ class InfoScheduleClient(Screen):
             else:
                 self.ids.img_block.source = ''
                 self.ids.label_block.text = ''
-        except TypeError:
+        except:
             pass
 
     def client_missed(self):
 
-        cancelada = int(self.ids.quant_cancelada.text)
-        cancelada += 1
+        try:
+            cancelada = int(self.ids.quant_cancelada.text)
+            cancelada += 1
 
-        with open('infoscheduleclient.json', 'r') as file:
-            info_schedule = json.load(file)
-        id_client = info_schedule['id_schedule']
+            with open('infoscheduleclient.json', 'r') as file:
+                info_schedule = json.load(file)
+            id_client = info_schedule['id_schedule']
 
 
-        link = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_client}.json'
+            link = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_client}.json'
 
-        info = f'{{"quant_cancelado":"{cancelada}"}}'
-        requisicao = requests.patch(link, data=info)
+            info = f'{{"quant_cancelado":"{cancelada}"}}'
+            requisicao = requests.patch(link, data=info)
 
-        self.ids.quant_cancelada.text = str(cancelada)
+            self.ids.quant_cancelada.text = str(cancelada)
 
-        if cancelada == 1:
-            self.ids.color_quant.md_bg_color = 1.00, 0.65, 0.16,1
-            self.ids.quant_cancelada.color = 1.00, 0.65, 0.16,1
-        elif cancelada == 2:
-            self.ids.color_quant.md_bg_color = 1.00, 0.33, 0.03,1
-            self.ids.quant_cancelada.color = 1.00, 0.33, 0.03,1
-        elif cancelada >= 3:
-            self.ids.color_quant.md_bg_color = 1,0,0,1
-            self.ids.quant_cancelada.color = 1,0,0,1
+            if cancelada == 1:
+                self.ids.color_quant.md_bg_color = 1.00, 0.65, 0.16,1
+                self.ids.quant_cancelada.color = 1.00, 0.65, 0.16,1
+            elif cancelada == 2:
+                self.ids.color_quant.md_bg_color = 1.00, 0.33, 0.03,1
+                self.ids.quant_cancelada.color = 1.00, 0.33, 0.03,1
+            elif cancelada >= 3:
+                self.ids.color_quant.md_bg_color = 1,0,0,1
+                self.ids.quant_cancelada.color = 1,0,0,1
+        except:
+            pass
 
     def block_client(self):
         with open('infoscheduleclient.json', 'r') as file:
@@ -2116,11 +2221,19 @@ class InfoScheduleClient(Screen):
 
         for enum, work in enumerate(list_work):
             valor += float(work['valor'])
-            self.ids.box_work.add_widget(MyBoxCategorie('',work['servico'], work['tempo'], work['valor']))
+            myboxcategorie = MyBoxCategorie('',work['servico'], work['tempo'], str(float(work['valor'])))
+
+            myboxcategorie.bind(on_release=self.nada_pass)
+            self.ids.box_work.add_widget(myboxcategorie)
 
         self.ids.id_valor.text = str(valor)
 
-
+    def nada_pass(selfm, *args):
+        """
+        Function with not return none
+        :return:
+        """
+        pass
 
     def return_schedule(self):
         MDApp.get_running_app().root.current = 'viewshedule'
