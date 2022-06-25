@@ -401,6 +401,16 @@ class RedefinitionSenha(Screen):
 class HomePage(Screen):
     LINK_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao'
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.day_semana = datetime.today().isoweekday()
+
+        self.id_manager = self.get_id_manager()
+
+        self.delet_day()
+
+
+
     def return_login(self):
         with open('refreshtoken.json','w') as file:
             json.dump('',file)
@@ -434,6 +444,55 @@ class HomePage(Screen):
         except KeyError:
             pass
 
+    def get_ids_socios(self):
+        # usad in fuction :
+            # delet_day,
+
+
+        lista_id = []
+
+        link = f'{self.LINK_SALAO}/{self.id_manager}/socios.json'
+        requisicao = requests.get(link)
+        requisicao_dic = requisicao.json()
+
+        for id in requisicao_dic:
+            lista_id.append(id)
+        return lista_id
+
+
+    def delet_day(self):
+
+    # Clean all schedule #############################################################
+
+        with open('info_login.json', 'r') as file_login:
+            id_login = json.load(file_login)
+
+        day = int(self.day_semana) + 1
+
+        if day > 7:
+            day = 1
+
+        lista_id = self.get_ids_socios()
+
+        # Here to delet three day before #################################################
+        for dia in range(2):
+            link = f'{self.LINK_SALAO}/{id_login["id_login"]}/agenda/{day}.json'
+            requisicao = requests.delete(link)
+            day += 1
+
+            if day > 7:
+                day = 1
+
+        #Here to delet three day of schedule socion  #################################################
+
+        for id_socio in lista_id:
+            for dia in range(2):
+                link = f'{self.LINK_SALAO}/{self.id_manager}/socios/{id_socio}/agenda/{day}.json'
+                requisicao = requests.delete(link)
+                day += 1
+
+                if day > 7:
+                    day = 1
 
 
 class ClientBlocked(Screen):
@@ -483,7 +542,6 @@ class ClientBlocked(Screen):
                     pass
             except:
                 pass
-
 
 
 class ManagerProfile(Screen):
@@ -1354,6 +1412,7 @@ class ViewSchedule(Screen):
                 requisicao_dic = requisicao.json()
 
                 nome = requisicao_dic['nome']
+                self.ids.title_toobar.title = f'Agenda {str(nome)}'
 
                 self.entrada = requisicao_dic[f'{self.dia_atual}']['entrada']
 
@@ -1361,10 +1420,9 @@ class ViewSchedule(Screen):
 
                 self.space_temp = requisicao_dic[f'{self.dia_atual}']['space_temp']
 
-                self.ids.title_toobar.title = f'Agenda {str(nome)}'
                 try:
-                    for id_agenda in requisicao_dic['agenda']:
-                        LINK_SCHEDULE = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{id_manager["id_user"]}/agenda/{id_agenda}.json'
+                    for id_agenda in requisicao_dic['agenda'][str(self.dia_atual)]:
+                        LINK_SCHEDULE = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{id_manager["id_user"]}/agenda/{self.dia_atual}/{id_agenda}.json'
                         requisicao_schedule = requests.get(LINK_SCHEDULE)
                         requisicao_schedule_dic = requisicao_schedule.json()
                         lista_info.append(requisicao_schedule_dic)
@@ -1379,6 +1437,8 @@ class ViewSchedule(Screen):
                 requisicao_dic = requisicao.json()
 
                 nome = requisicao_dic['nome']
+                self.ids.title_toobar.title = f'Agenda {str(nome)}'
+
 
                 self.entrada = requisicao_dic[f'{self.dia_atual}']['entrada']
 
@@ -1386,11 +1446,9 @@ class ViewSchedule(Screen):
 
                 self.space_temp = requisicao_dic[f'{self.dia_atual}']['space_temp']
 
-                self.ids.title_toobar.title = f'Agenda {str(nome)}'
-
                 try:
-                    for id_agenda in requisicao_dic['agenda']:
-                        LINK_SCHEDULE = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/agenda/{id_agenda}.json'
+                    for id_agenda in requisicao_dic['agenda'][str(self.dia_atual)]:
+                        LINK_SCHEDULE = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/agenda/{self.dia_atual}/{id_agenda}.json'
                         requisicao_schedule = requests.get(LINK_SCHEDULE)
                         requisicao_schedule_dic = requisicao_schedule.json()
 
@@ -1543,7 +1601,7 @@ class ViewSchedule(Screen):
             with open('list_content.json', 'w') as file:
                 json.dump(list_content, file)
         except:
-            print('actualizar ViewSchedule erro!')
+            toast('Nenhuma agenda para hoje!', duration=4)
 
     def popup_mark_off(self,id_button, id_schedule, hours, hours_second, time, client, *args, **kwargs):
         id_user = ''
@@ -1587,10 +1645,10 @@ class ViewSchedule(Screen):
         link = ''
 
         if id_proficional['manager'] == "False":
-            link = self.LINK_SALAO + f'/{id_manager}/socios/{id_proficional["id_user"]}/agenda/{id_user}.json'
+            link = self.LINK_SALAO + f'/{id_manager}/socios/{id_proficional["id_user"]}/agenda/{self.dia_atual}/{id_user}.json'
 
         elif id_proficional['manager'] == "True":
-            link = self.LINK_SALAO + f'/agenda/{id_user}.json'
+            link = self.LINK_SALAO + f'/agenda/{self.dia_atual}/{id_user}.json'
 
         requisicao = requests.delete(link)
         self.actualizar()
@@ -1631,10 +1689,15 @@ class ViewSchedule(Screen):
             json.dump(dic_info, file, indent=2)
 
         MDApp.get_running_app().root.current = 'infoscheduleclient'
-        self.popup.dismiss()
+
+        try:
+            self.popup.dismiss()
+        except:
+            pass
 
     def on_pre_leave(self, *args):
         self.ids.grid_shedule.clear_widgets()
+        self.ids.title_toobar.title = ''
 
     def return_schoice_schedule(self):
         MDApp.get_running_app().root.current = 'screenchoiceschedule'
@@ -1646,9 +1709,9 @@ class HoursSchedule(Screen):
     def __init__(self,hours='', **kwargs):
         super().__init__(**kwargs)
         # Clock.schedule_once(self.get_works, 2)
+        self.semana = datetime.today().isoweekday()
         self.hours = hours
         self.id_manager = self.get_manager()
-
 
     def on_pre_enter(self, *args):
         try:
@@ -1870,7 +1933,6 @@ class HoursSchedule(Screen):
 
         self.hours_limit(tempo)
 
-
     def hours_limit(self, tempo, *args):
 
         lista_pos = ''
@@ -1982,10 +2044,10 @@ class HoursSchedule(Screen):
         valor = self.ids.valor.text
 
         if if_manager['manager'] == "False":
-            link = self.LINK_SALAO + '/' + self.id_manager + '/socios/' + if_manager["id_user"] + '/agenda/' + id_user + '.json'
+            link = f'{self.LINK_SALAO}/{self.id_manager}/socios/{if_manager["id_user"]}/agenda/{self.semana}/{id_user}.json'
             get_requisicao = requests.get(link)
         elif if_manager['manager'] == "True":
-            link = self.LINK_SALAO + '/' + self.id_manager + '/' + 'agenda' + '/' + id_user + '.json'
+            link = f'{self.LINK_SALAO}/{self.id_manager}/agenda/{self.semana}/{id_user}.json'
 
 
         info = f'{{"id_posicao":"{id_pos["id_button"]}",' \
@@ -2035,6 +2097,8 @@ class InfoScheduleClient(Screen):
         super().__init__(**kwargs)
 
         self.manager_main = self.id_manager()
+
+        self.day_actual = datetime.today().isoweekday()
 
     def on_pre_enter(self):
 
@@ -2201,7 +2265,7 @@ class InfoScheduleClient(Screen):
             id_worker = json.load(file)
 
         if id_worker['manager'] == 'True':
-            link_work = self.LINK_DATA_BASE + f'/{id_worker["id_user"]}/agenda/{id_client}/servicos.json'
+            link_work = self.LINK_DATA_BASE + f'/{id_worker["id_user"]}/agenda/{self.day_actual}/{id_client}/servicos.json'
             requisicao = requests.get(link_work)
             requisicao_dic = requisicao.json()
 
@@ -2211,7 +2275,7 @@ class InfoScheduleClient(Screen):
 
             manager_main = self.manager_main
 
-            link_work = self.LINK_DATA_BASE + f'/{manager_main}/socios/{id_worker["id_user"]}/agenda/{id_client}/servicos.json'
+            link_work = self.LINK_DATA_BASE + f'/{manager_main}/socios/{id_worker["id_user"]}/agenda/{self.day_actual}/{id_client}/servicos.json'
             requisicao = requests.get(link_work)
             requisicao_dic = requisicao.json()
 

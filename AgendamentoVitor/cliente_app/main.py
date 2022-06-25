@@ -40,6 +40,8 @@ class HomePage(Screen):
 
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
+        self.day_semana = datetime.today().isoweekday()
+
         self.id_manager = self.get_id_manager()
         self.id_socios = self.get_id_socios()
         # Clock.schedule_once(self.get_info, 1)
@@ -186,7 +188,7 @@ class HomePage(Screen):
         # id_manager = self.id_manager()
 
         try:
-            LINK = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/agenda.json'
+            LINK = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/agenda/{self.day_semana}.json'
             requisicao = requests.get(LINK)
             requisicao_dic = requisicao.json()
 
@@ -562,6 +564,7 @@ class ViewSchedule(Screen):
                 requisicao_dic = requisicao.json()
 
                 nome = requisicao_dic['nome']
+                self.ids.title_toobar.title = f'Agenda {str(nome)}'
 
                 self.entrada = requisicao_dic[f'{self.dia_atual}']['entrada']
 
@@ -569,10 +572,9 @@ class ViewSchedule(Screen):
 
                 self.space_temp = requisicao_dic[f'{self.dia_atual}']['space_temp']
 
-                self.ids.title_toobar.title = f'Agenda {str(nome)}'
                 try:
                     for id_agenda in requisicao_dic['agenda']:
-                        LINK_SCHEDULE = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{id_manager["id_user"]}/agenda/{id_agenda}.json'
+                        LINK_SCHEDULE = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{id_manager["id_user"]}/agenda/{self.dia_atual}/{id_agenda}.json'
                         requisicao_schedule = requests.get(LINK_SCHEDULE)
                         requisicao_schedule_dic = requisicao_schedule.json()
                         lista_info.append(requisicao_schedule_dic)
@@ -586,6 +588,7 @@ class ViewSchedule(Screen):
                 requisicao_dic = requisicao.json()
 
                 nome = requisicao_dic['nome']
+                self.ids.title_toobar.title = f'Agenda {str(nome)}'
 
                 self.entrada = requisicao_dic[f'{self.dia_atual}']['entrada']
 
@@ -593,11 +596,10 @@ class ViewSchedule(Screen):
 
                 self.space_temp = requisicao_dic[f'{self.dia_atual}']['space_temp']
 
-                self.ids.title_toobar.title = f'Agenda {str(nome)}'
 
                 try:
-                    for id_agenda in requisicao_dic['agenda']:
-                        LINK_SCHEDULE = self.LINK_SALAO + '/agenda/' + f'{id_agenda}.json'
+                    for id_agenda in requisicao_dic['agenda'][str(self.dia_atual)]:
+                        LINK_SCHEDULE = f'{self.LINK_SALAO}/agenda/{self.dia_atual}/{id_agenda}.json'
                         requisicao_schedule = requests.get(LINK_SCHEDULE)
                         requisicao_schedule_dic = requisicao_schedule.json()
                         lista_info.append(requisicao_schedule_dic)
@@ -620,8 +622,6 @@ class ViewSchedule(Screen):
             # get user id ##################################################################################################
             user_id = self.log_aut()
             lista_info = self.info_entrace_salao()
-
-            print('actualizar ',lista_info)
 
             list_content = []
             entrada = self.entrada
@@ -758,7 +758,7 @@ class ViewSchedule(Screen):
             with open('list_content.json','w') as file:
                 json.dump(list_content, file)
         except:
-            pass
+            toast('Nenhuma agenda para hoje!', duration=4)
 
     # Open and inserting the hours in class HoursSchedule #######################################
 
@@ -807,10 +807,10 @@ class ViewSchedule(Screen):
         link = ''
 
         if id_proficional['manager'] == "False":
-            link = self.LINK_SALAO + f'/socios/{id_proficional["id_user"]}/agenda/{id_user}.json'
+            link = self.LINK_SALAO + f'/socios/{id_proficional["id_user"]}/agenda/{self.dia_atual}/{id_user}.json'
 
         elif id_proficional['manager'] == "True":
-            link = self.LINK_SALAO + f'/agenda/{id_user}.json'
+            link = self.LINK_SALAO + f'/agenda/{self.dia_atual}/{id_user}.json'
 
         requisicao = requests.delete(link)
         self.actualizar()
@@ -823,10 +823,13 @@ class ViewSchedule(Screen):
         requisicao = requests.get(link)
         requisicao_dic = requisicao.json()
 
-        if requisicao_dic['bloqueado'] == 'True':
-            toast('Você foi bloqueado! Entre em contato com um proficional ',duration=4)
-        elif requisicao_dic['bloqueado'] == 'False':
-            self.get_hours(id_button, hours)
+        try:
+            if requisicao_dic['bloqueado'] == 'True':
+                toast('Você foi bloqueado! Entre em contato com um proficional ',duration=4)
+            elif requisicao_dic['bloqueado'] == 'False':
+                self.get_hours(id_button, hours)
+        except:
+            pass
 
 
     def get_hours(self,id_button, hours):
@@ -856,9 +859,9 @@ class HoursSchedule(Screen):
     def __init__(self,hours='', **kwargs):
         super().__init__(**kwargs)
         # Clock.schedule_once(self.get_works, 2)
+        self.semana = datetime.today().isoweekday()
         self.hours = hours
         self.id_manager = self.get_manager()
-
 
     def on_pre_enter(self, *args):
         try:
@@ -1174,11 +1177,10 @@ class HoursSchedule(Screen):
         valor = self.ids.valor.text
 
         if if_manager['manager'] == "False":
-            link = self.LINK_SALAO + '/' + self.id_manager + '/socios/' + if_manager["id_user"] + '/agenda/' + id_user + '.json'
+            link = f'{self.LINK_SALAO}/{self.id_manager}/socios/{if_manager["id_user"]}/agenda/{self.semana}/{id_user}.json'
             get_requisicao = requests.get(link)
         elif if_manager['manager'] == "True":
-            link = self.LINK_SALAO + '/' + self.id_manager + '/' + 'agenda' + '/' + id_user + '.json'
-
+            link = f'{self.LINK_SALAO}/{self.id_manager}/agenda/{self.semana}/{id_user}.json'
 
         info = f'{{"id_posicao":"{id_pos["id_posicao"]}",' \
                f'"id_horas":"{horas}",' \
