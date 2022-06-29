@@ -35,7 +35,7 @@
             MDCard:
                 orientation:'vertical'
                 size_hint:.8,None
-                height:'290dp'
+                height:'400dp'
                 radius:12,12,12,12
                 pos_hint:{'center_x':.5}
                 spacing:'10dp'
@@ -47,12 +47,13 @@
                     spacing:'4dp'
                     MDLabel:
                         size_hint_y:None
-                        height:'30dp'
+                        height:'10dp'
                         pos_hint:{'center_x':.5}
                         bold:True
                         color:1,.5,.5,1
                         font_size:'30dp'
                         id:text_name
+                MDSeparator:
 
                 MDBoxLayout:
                     orientation:'vertical'
@@ -132,29 +133,40 @@
                             id:saturday
                             on_press:root.show_focus(self.state, self.dia)
                             on_state:root.insert_day(self.state, self.dia)
-
+                MDSeparator:
+                    size_hint_x:.9
+                    pos_hint:{'center_x':.5}
                 MDBoxLayout:
                     orientation:'vertical'
                     size_hint_y:None
-                    height:'60dp'
+                    height:'50dp'
                     spacing:'11dp'
+                    padding:('5dp',0,'5dp',0)
                     pos_hint:{'center_x':.5,'center_y':.67}
                     MDBoxLayout:
                         MDLabel:
                             font_size:'9dp'
                             text:'Entrada do serviço'
+                            bold:True
+                            color:0,0,0,.7
                         MDLabel:
                             font_size:'9dp'
                             text:'Horas'
+                            bold:True
+                            color:0,0,0,.7
                             halign:'center'
                         MDLabel:
                             font_size:'9dp'
                             halign:'right'
+                            bold:True
+                            color:0,0,0,.7
                             text:'saida do serviço'
                     MDBoxLayout:
                         MDTextFieldRect:
-                            size_hint_x:None
+                            size_hint:None,None
                             width:'50dp'
+                            height:'25dp'
+                            multiline:False
                             hint_text:'00:00'
                             on_focus:root.validate('entry')
                             id:entry
@@ -162,23 +174,61 @@
                             size_hint_y:None
                             height:'50dp'
                             pos_hint:{'center_y':.5}
+                            Widget:
                             ScrollView:
+                                size_hint_x:None
+                                width:'50dp'
+                                adaptive:'center'
                                 MDBoxLayout:
                                     orientation:'vertical'
                                     size_hint_y:None
                                     height:self.minimum_height
                                     id:hours
+                            Widget
                         MDTextFieldRect:
-                            size_hint_x:None
+                            size_hint:None,None
                             width:'50dp'
+                            height:'25dp'
     #                        pos_hint:{'center_x':.9}
                             hint_text:'00:00'
+                            multiline:False
                             on_focus:root.validate('exit')
                             id:exit
                 Widget:
                     size_hint_y:None
                     height:'10dp'
+                MDSeparator:
+                    size_hint_x:.9
+                    pos_hint:{'center_x':.5}
+                Widget:
+                    size_hint_y:None
+                    height:'10dp'
 
+                MDBoxLayout:
+                    size_hint_y:None
+                    height:'50dp'
+                    orientation:'vertical'
+                    spacing:'20dp'
+                    MDLabel:
+                        font_size:'9dp'
+                        text:'Informe o tempo que ocliente tem para cancelar o agendamento!'
+                        bold:True
+                        halign:'center'
+                        color:0,0,0,.7
+                    MDTextFieldRect:
+                        size_hint:None,None
+                        width:'50dp'
+                        height:'25dp'
+                        readonly:True
+                        pos_hint:{'center_x':.5}
+                        text:'00:30'
+                        id:time_cancel
+                        on_focus:root.validate('time_cancel')
+
+
+                MDSeparator:
+                    size_hint_x:.9
+                    pos_hint:{'center_x':.5}
                 MDBoxLayout:
                     orientation:'vertical'
                     size_hint_y:None
@@ -187,7 +237,8 @@
                     Label:
                         font_size:'9dp'
                         text:'Informe o tempo entre cada agenda'
-                        color:0,0,0,1
+                        bold:True
+                        color:0,0,0,.7
                     MDCard:
                         size_hint_y:None
                         height:'30dp'
@@ -230,6 +281,7 @@
                         color:1,0,0,.5
                         pos_hint:{'center_x':.5}
                         id:space_temp
+
                 MDBoxLayout:
                     size_hint_y:None
                     height:'30dp'

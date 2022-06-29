@@ -1,8 +1,9 @@
 {
-  "id_button": "1",
-  "id_schedule": "ysha0Hsx0nXrZRBRwDeLL5Bhe422",
-  "hours": "07:30",
-  "hours_second": "08:30",
-  "time": "01:00",
-  "client": "betuel2"
+  "proficional": "True",
+  "id_button": "2",
+  "id_schedule": "",
+  "hours": "09:00",
+  "hours_second": "",
+  "time": "",
+  "client": ""
 }

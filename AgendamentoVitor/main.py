@@ -407,9 +407,7 @@ class HomePage(Screen):
 
         self.id_manager = self.get_id_manager()
 
-        self.delet_day()
-
-
+        Clock.schedule_once(self.delet_day,2)
 
     def return_login(self):
         with open('refreshtoken.json','w') as file:
@@ -448,7 +446,6 @@ class HomePage(Screen):
         # usad in fuction :
             # delet_day,
 
-
         lista_id = []
 
         link = f'{self.LINK_SALAO}/{self.id_manager}/socios.json'
@@ -460,7 +457,7 @@ class HomePage(Screen):
         return lista_id
 
 
-    def delet_day(self):
+    def delet_day(self, *args):
 
     # Clean all schedule #############################################################
 
@@ -474,16 +471,19 @@ class HomePage(Screen):
 
         lista_id = self.get_ids_socios()
 
-        # Here to delet three day before #################################################
+        # Manager Here to delet three day before #################################################
         for dia in range(2):
-            link = f'{self.LINK_SALAO}/{id_login["id_login"]}/agenda/{day}.json'
-            requisicao = requests.delete(link)
+            # link = f'{self.LINK_SALAO}/{id_login["id_login"]}/agenda/{day}.json'
+            link = f'{self.LINK_SALAO}/{self.id_manager}/agenda/{day}.json'
+            requisicao_manager = requests.delete(link)
             day += 1
 
             if day > 7:
                 day = 1
 
         #Here to delet three day of schedule socion  #################################################
+
+        day = int(self.day_semana) + 1
 
         for id_socio in lista_id:
             for dia in range(2):
@@ -693,9 +693,6 @@ class ManagerProfile(Screen):
         except:
             toast(f'"{semana}"\nNem uma agenda criada nesse dia!', duration=5)
 
-
-
-
     def on_pre_enter(self, *args):
         self.creat_profile()
         self.insert_hours()
@@ -812,8 +809,39 @@ class ManagerProfile(Screen):
                 self.ids.entry.text = str(texto.text)
             elif msg == 'exit':
                 self.ids.exit.text = str(texto.text)
+            elif msg == 'time_cancel':
+                self.ids.time_cancel.text = str(texto.text)
         except AttributeError:
-            toast('escolha o campo a ser preenchido! Entrada ou Saida', duration=5)
+
+
+            self.focus_entry_press()
+            Clock.schedule_once(self.focus_exit_press,2)
+            Clock.schedule_once(self.focus_time_cancel_press,3)
+
+
+
+            toast('Escolha o campo a ser preenchido! Entrada ou Saida', duration=5)
+            # Clock.schedule_once(self.focus_time_cancel, 3)
+
+    # Functions to gyve  'Focus' in TextField ###############################
+    def focus_entry_press(self, *args):
+        self.ids.entry.focus = True
+        Clock.schedule_once(self.focus_entry_leave,2)
+    def focus_entry_leave(self, *args):
+        self.ids.entry.focus = False
+
+    def focus_exit_press(self, *args):
+        self.ids.exit.focus = True
+        Clock.schedule_once(self.focus_exit_leave,2)
+    def focus_exit_leave(self, *args):
+        self.ids.exit.focus = False
+
+    def focus_time_cancel_press(self, *args):
+        self.ids.time_cancel.focus = True
+        Clock.schedule_once(self.focus_time_cancel_leave,2)
+    def focus_time_cancel_leave(self, *args):
+        self.ids.time_cancel.focus = False
+    #/########################################################################
 
     def save_data(self,*args):
 
@@ -830,7 +858,7 @@ class ManagerProfile(Screen):
                 self.saida = self.ids.exit.text
                 self.space_tempo = self.ids.space_temp.text
 
-                get_requisicao = requests.get(LINK_BASE_SALAO)
+                # get_requisicao = requests.get(LINK_BASE_SALAO)
 
 
                 info = f'{{"entrada":"{self.entrada}",\
@@ -849,11 +877,12 @@ class ManagerProfile(Screen):
             self.ids.saturday.state = 'normal'
 
             toast('Tabela de horas salva com sucesso!', duration=4)
-
+# "For in end Point" ??????????????????????????????????????????????????????????????????????????????
         elif if_manager == 'manager':
 
             for day in self.list_day:
                 LINK_BASE_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.user_id}/{day}.json'
+
 
                 self.entrada = self.ids.entry.text
                 self.saida = self.ids.exit.text
@@ -863,7 +892,13 @@ class ManagerProfile(Screen):
                            "saida": "{self.saida}",\
                            "space_temp":"{self.space_tempo}"}}'
 
-                requisica = requests.patch(LINK_BASE_SALAO, info)
+                requisicao = requests.patch(LINK_BASE_SALAO, info)
+
+
+            time_cancel = self.ids.time_cancel.text
+            LINK_BASE_TIME_CANCEL = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.user_id}.json'
+            info_cancel = f'{{"time_cancel":"{time_cancel}"}}'
+            requisica = requests.patch(LINK_BASE_TIME_CANCEL, info_cancel)
 
             self.ids.sunday.state = 'normal'
             self.ids.monday.state = 'normal'
@@ -1053,8 +1088,8 @@ class ManagerProfile(Screen):
         box_buttons = MDBoxLayout(size_hint_y=None,height=('30dp'),spacing=8, padding=8)
 
         self.popup = Popup(title_color=(1, 1, 1, .0), separator_color=([0,1,1,1]), background_color=([1, 1, 1, 0]),
-                      size_hint=(None, None), size=('240dp', '400dp'),
-                      content=box_main)
+                           size_hint=(None, None), size=('240dp', '400dp'),
+                           content=box_main)
 
         box_widgets.add_widget(Popup_widgets(self.id_manager, self.user_id, id_work, servico, tempo, valor))
 
@@ -1354,12 +1389,10 @@ class ViewSchedule(Screen):
         # self.LINK = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao.json'
 
         self.LINK_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao'
-        requisicao = requests.get(self.LINK_SALAO + '.json')
-        requisicao_dic = requisicao.json()
 
         # Getting the id of manager ####################################################################################
-        for id in requisicao_dic:
-            self.id_manager = id
+        self.id_manager = self.get_manager()
+
 
     def on_pre_enter(self, *args):
         Clock.schedule_once(self.actualizar, 1)
@@ -1409,23 +1442,21 @@ class ViewSchedule(Screen):
                 # Here if not manager then get the socio #########################################################################
                 LINK_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{id_manager["id_user"]}.json'
                 requisicao = requests.get(LINK_SALAO)
-                requisicao_dic = requisicao.json()
+                requisicao_dic_socio = requisicao.json()
 
-                nome = requisicao_dic['nome']
+                nome = requisicao_dic_socio['nome']
                 self.ids.title_toobar.title = f'Agenda {str(nome)}'
 
-                self.entrada = requisicao_dic[f'{self.dia_atual}']['entrada']
+                self.entrada = requisicao_dic_socio[f'{self.dia_atual}']['entrada']
 
-                self.saida = requisicao_dic[f'{self.dia_atual}']['saida']
+                self.saida = requisicao_dic_socio[f'{self.dia_atual}']['saida']
 
-                self.space_temp = requisicao_dic[f'{self.dia_atual}']['space_temp']
+                self.space_temp = requisicao_dic_socio[f'{self.dia_atual}']['space_temp']
 
                 try:
-                    for id_agenda in requisicao_dic['agenda'][str(self.dia_atual)]:
-                        LINK_SCHEDULE = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{id_manager["id_user"]}/agenda/{self.dia_atual}/{id_agenda}.json'
-                        requisicao_schedule = requests.get(LINK_SCHEDULE)
-                        requisicao_schedule_dic = requisicao_schedule.json()
-                        lista_info.append(requisicao_schedule_dic)
+                    for id_agenda in requisicao_dic_socio['agenda'][str(self.dia_atual)]:
+                        lista_info.append(requisicao_dic_socio['agenda'][str(self.dia_atual)][id_agenda])
+
                     return lista_info
                 except:
                     return lista_info
@@ -1433,7 +1464,7 @@ class ViewSchedule(Screen):
             elif id_manager["manager"] == 'True':
 
                 # Here to geting the id of manager to get schedule #######################################
-                requisicao = requests.get(self.LINK_SALAO + f'/{self.id_manager}.json')
+                requisicao = requests.get(f'{self.LINK_SALAO}/{self.id_manager}.json')
                 requisicao_dic = requisicao.json()
 
                 nome = requisicao_dic['nome']
@@ -1446,13 +1477,12 @@ class ViewSchedule(Screen):
 
                 self.space_temp = requisicao_dic[f'{self.dia_atual}']['space_temp']
 
-                try:
-                    for id_agenda in requisicao_dic['agenda'][str(self.dia_atual)]:
-                        LINK_SCHEDULE = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/agenda/{self.dia_atual}/{id_agenda}.json'
-                        requisicao_schedule = requests.get(LINK_SCHEDULE)
-                        requisicao_schedule_dic = requisicao_schedule.json()
+                print('requisicao!!! ',requisicao_dic)
 
-                        lista_info.append(requisicao_schedule_dic)
+                try:
+                    for id_agenda in requisicao_dic['agenda'][self.dia_atual]:
+                        lista_info.append(requisicao_dic['agenda'][self.dia_atual][id_agenda])
+
                     return lista_info
                 except:
                     return lista_info
@@ -1465,6 +1495,8 @@ class ViewSchedule(Screen):
             # get user id ##################################################################################################
             user_id = self.log_aut()
             lista_info = self.info_entrace_salao()
+
+            print('lsita infooo ',lista_info)
 
             list_content = []
 
@@ -1762,6 +1794,7 @@ class HoursSchedule(Screen):
             if_manager = json.load(arquivo)
         return if_manager
 
+# Consert the endpoint this function ?????????????????????????????
     def get_works(self,*args):
         self.ids.categorie.clear_widgets()
 
@@ -1993,20 +2026,20 @@ class HoursSchedule(Screen):
 
         info_dic = {}
 
-        if info_user['manager'] == 'True':
-            link = f'{self.LINK_SALAO}/{info_user["id_user"]}.json'
+        # if info_user['manager'] == 'True':
+        try:
+            link = f'{self.LINK_SALAO}/{info_user["id_login"]}.json'
 
             requisicao = requests.get(link)
             info_dic = requisicao.json()
 
-        elif info_user['manager'] == 'False':
+        # elif info_user['manager'] == 'False':
+        except:
             id_manager = self.get_manager()
-            link = f'{self.LINK_SALAO}/{id_manager}/socios/{info_user["id_user"]}.json'
+            link = f'{self.LINK_SALAO}/{id_manager}/socios/{info_user["id_login"]}.json'
 
             requisicao = requests.get(link)
             info_dic = requisicao.json()
-
-        print(info_dic)
 
         return info_dic['nome']
 
@@ -2030,18 +2063,20 @@ class HoursSchedule(Screen):
         with open('select_works.json','r') as select_work:
             list_works = json.load(select_work)
 
-        with open('write_id_manager.json','r') as arquivo:
+        with open('info_login.json','r') as arquivo:
             info_user = json.load(arquivo)
 
         with open('infoscheduleclient.json', 'r') as file_info:
             id_pos = json.load(file_info)
 
 
-        id_user = info_user['id_user']
+        id_user = info_user['id_login']
         nome = self.get_name_user(info_user)
         horas = self.ids.hours.text
         tempo = self.ids.time.text
         valor = self.ids.valor.text
+
+        print('if manager ',if_manager)
 
         if if_manager['manager'] == "False":
             link = f'{self.LINK_SALAO}/{self.id_manager}/socios/{if_manager["id_user"]}/agenda/{self.semana}/{id_user}.json'
@@ -2049,7 +2084,7 @@ class HoursSchedule(Screen):
         elif if_manager['manager'] == "True":
             link = f'{self.LINK_SALAO}/{self.id_manager}/agenda/{self.semana}/{id_user}.json'
 
-
+        # Creating the schedule Here ##########################################################################
         info = f'{{"id_posicao":"{id_pos["id_button"]}",' \
                f'"id_horas":"{horas}",' \
                f'"id_user":"{id_user}",' \
