@@ -105,14 +105,17 @@
                 bold:True
                 color:1,1,1,.8
                 halign:'center'
-        MDLabel:
+        MDBoxLayout:
             size_hint_y:None
             height:'13dp'
-            font_size:'8dp'
-            color:0,0,0,1
-            halign:'center'
-            markup:True
-            text:root.time_cancel
+            md_bg_color:1,1,1,.2
+            MDLabel:
+                font_size:'8dp'
+                color:0,0,0,1
+                halign:'center'
+                bold:True
+                markup:True
+                text:root.time_cancel
 
 
 <Table_block>:
@@ -160,4 +163,4 @@
                 outline_color:1,0,0,1
                 bold:True
                 color:1,1,1,.8
-                pos_hint:{'center_x':.7, 'center_y':.5}
+                pos_hint:{'center_x':.6, 'center_y':.5}

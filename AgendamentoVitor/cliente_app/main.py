@@ -591,14 +591,11 @@ class ViewSchedule(Screen):
 
             self.space_temp = requisicao_dic[f'{self.dia_atual}']['space_temp']
 
-            print('diaa ',self.dia_atual)
             try:
                 for id_agenda in requisicao_dic['agenda'][str(self.dia_atual)]:
                     # LINK_SCHEDULE = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{id_manager["id_user"]}/agenda/{self.dia_atual}/{id_agenda}.json'
                     # requisicao_schedule = requests.get(LINK_SCHEDULE)
                     # requisicao_schedule_dic = requisicao_schedule.json()
-
-                    print(id_agenda)
 
                     lista_info.append(requisicao_dic['agenda'][str(self.dia_atual)][id_agenda])
                 return lista_info
@@ -619,7 +616,6 @@ class ViewSchedule(Screen):
 
             self.space_temp = requisicao_dic[f'{self.dia_atual}']['space_temp']
 
-
             # Here get the ids of schedule client ############################################################
             try:
                 for id_agenda in requisicao_dic['agenda'][self.dia_atual]:
@@ -639,13 +635,13 @@ class ViewSchedule(Screen):
         #     pass
 
     def actualizar(self, *args):
-        print('info manager ',self.info_manager['time_cancel'])
-
         try:
             # get user id ##################################################################################################
+            # Variaveis #############################
             user_id = self.log_aut()
             lista_info = self.info_entrace_salao()
 
+            self.agenda_marcada = False
             list_content = []
             entrada = self.entrada
             saida = self.saida
@@ -667,17 +663,20 @@ class ViewSchedule(Screen):
 
             self.ids.grid_shedule.clear_widgets()
 
+            # Here i am sorting the list "lista_info" in key "['id_horas']" #########################################################
+            ordem = sorted(lista_info, key=lambda valor: valor['id_horas'])
+            lista_info = ordem
+
             # try:
             while entrada[:2] < saida[:2]:
+                # Aqui é para saber a quantidade de agenda marcadas ############################################################
                 for num, agenda in enumerate(lista_info):
                     # try:
+                    # Aqui conpara o horario na posição horas e compara com o orario marcado na lista
                     if entrada[:2] == lista_info[num]['id_horas'][:2]:
                         for mim in range(ranger_init, ranger_last):
                             # conparing the minutes ###################################################################################
                             if str(mim).zfill(2) == lista_info[num]['id_horas'][3:] :
-
-                                # id_hours = lista_info[num]['id_horas']
-                                # entry = datetime.strptime(entrada,'%H:%M')
                                 ent = int(str(entrada[:2]).zfill(2))
                                 entrada = f'{str(ent).zfill(2)}:{str(mim).zfill(2)}'
 
@@ -694,6 +693,8 @@ class ViewSchedule(Screen):
                                     entrada = soma_horas.strftime('%H:%M')
                                     block = True
                                     permition_to_sum = False
+                                    # Variable to not permiting the cliet make other schedule ###########################################
+                                    self.agenda_marcada = True
                                     del(lista_info[num])
 
                                     # Exemplo: conta por exemplo 07:30  e depois 08:00  para saber si já tem agenda marcada nesse horário para não ocultar agenda ############
@@ -702,7 +703,7 @@ class ViewSchedule(Screen):
                                         ranger_last = 60
                                     elif ranger_init == int(tempo[3:]):
                                         ranger_init = 0
-                                        ranger_last = int(tempo[3:])
+                                        ranger_last = int(tempo[3:]) + 1
 
                                     break
                                 else:
@@ -720,7 +721,7 @@ class ViewSchedule(Screen):
                                         ranger_last = 60
                                     elif ranger_init == int(tempo[3:]):
                                         ranger_init = 0
-                                        ranger_last = int(tempo[3:])
+                                        ranger_last = int(tempo[3:]) + 1
                                     break
 
                             # para não dá erro, de sumir o agendamento anterior
@@ -737,8 +738,7 @@ class ViewSchedule(Screen):
                                     ranger_last = 60
                                 elif ranger_init == int(tempo[3:]):
                                     ranger_init = 0
-                                    ranger_last = int(tempo[3:])
-
+                                    ranger_last = int(tempo[3:]) + 1
 
                     # except:
                     #     print('Deu algum erro na função actualizar da class "ViewSchedule"')
@@ -764,7 +764,7 @@ class ViewSchedule(Screen):
                         ranger_last = 60
                     elif ranger_init == int(tempo[3:]):
                         ranger_init = 0
-                        ranger_last = int(tempo[3:])
+                        ranger_last = int(tempo[3:]) + 1
                 block = False
 
                 if permition_to_sum == True:
@@ -840,12 +840,6 @@ class ViewSchedule(Screen):
 
         soma_horas = delta_temp + time_s
 
-
-        print(time_s.strftime('%H:%M'))
-        print(soma_horas.strftime('%H:%M'))
-
-        print(hour_now)
-
         info = hour_now > soma_horas.strftime('%H:%M')
 
         return info
@@ -853,6 +847,8 @@ class ViewSchedule(Screen):
 
     def cancel_schedule(self, id_user, *args, **kwargs):
         id_proficional = self.get_id_proficional()
+        time_cancel = self.info_manager['time_cancel']
+
         link = ''
 
         if id_proficional['manager'] == "False":
@@ -864,10 +860,10 @@ class ViewSchedule(Screen):
         requisicao = requests.get(link)
         requisicao_dic = requisicao.json()
 
-        cancelar = self.check_time_cancel('01:00',requisicao_dic['horas_agendamento'])
+        cancelar = self.check_time_cancel(str(time_cancel),requisicao_dic['horas_agendamento'])
 
         if cancelar:
-            toast(f'O agendamento não pode ser cancelado\nPassou do tempo de 01:00 !', duration=5)
+            toast(f'O agendamento não pode ser cancelado\nPassou do tempo de {time_cancel} h/m!', duration=5, background=[.3,0,0,1])
         else:
             requisicao = requests.delete(link)
             self.actualizar()
@@ -876,18 +872,21 @@ class ViewSchedule(Screen):
 
     def if_blocked(self,id_button, hours):
 
-        link = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{self.user_id}.json'
+        if self.agenda_marcada:
+            toast('Você já tem um agendamento marcado aqui para fazer outro agendamento\nCancele o seu agendamento!', duration=8,background=[0,0,.6,1])
+        else:
+            link = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{self.user_id}.json'
 
-        requisicao = requests.get(link)
-        requisicao_dic = requisicao.json()
+            requisicao = requests.get(link)
+            requisicao_dic = requisicao.json()
 
-        try:
-            if requisicao_dic['bloqueado'] == 'True':
-                toast('Você foi bloqueado! Entre em contato com um proficional ',duration=4)
-            elif requisicao_dic['bloqueado'] == 'False':
-                self.get_hours(id_button, hours)
-        except:
-            pass
+            try:
+                if requisicao_dic['bloqueado'] == 'True':
+                    toast('Você foi bloqueado! Entre em contato com um proficional ',duration=4)
+                elif requisicao_dic['bloqueado'] == 'False':
+                    self.get_hours(id_button, hours)
+            except:
+                pass
 
     def get_hours(self,id_button, hours):
         hours_dic = {}
@@ -1203,6 +1202,9 @@ class HoursSchedule(Screen):
     def disable_release(self,*args):
         toast('O gendamento excede o horario do proximo agendamento escolha outro horario ou outro cabeleleiro!')
 
+    def verification_if_schedule(self, *args):
+        link = f'{self.LINK_SALAO}/'
+
     def save_scheduleing(self, *args):
         horas_hoje = self.time_now()
         list_works = []
@@ -1232,7 +1234,6 @@ class HoursSchedule(Screen):
 
         if if_manager['manager'] == "False":
             link = f'{self.LINK_SALAO}/{self.id_manager}/socios/{if_manager["id_user"]}/agenda/{self.semana}/{id_user}.json'
-            # get_requisicao = requests.get(link)
         elif if_manager['manager'] == "True":
             link = f'{self.LINK_SALAO}/{self.id_manager}/agenda/{self.semana}/{id_user}.json'
 
@@ -1245,31 +1246,33 @@ class HoursSchedule(Screen):
                f'"horas_agendamento": "{horas_hoje}",'\
                f'"servicos":"{list_works}"}}'
 
+        # requisicao_if_scheduled = requests.get(link)
+
         requisicao = requests.patch(link, data=info)
 
         toast('Agendamento Marcado! Você tem Uma(1) Hora para cancelar\n "3" cancelamento abaixo disso você tera que pagar uma taxa', duration=10)
 
-        if if_manager['manager'] == "False":
-            # getting ids that are already scheduled ###########################################################################
-                link_cliente = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_user}/ids_agendado.json'
-                requisicao_client_get = requests.get(link_cliente)
-                requisicao_client_get_dic = requisicao_client_get.json()
-
-            # list_ids_schedule receiver the ids what is in cloud ##############################################################
-                if requisicao_client_get_dic != '':
-                    list_ids_schedule.append(requisicao_client_get_dic)
-
-            # list_ids_schedule receiver the id what go be schedule ############################################################
-                list_ids_schedule.append(if_manager['id_user'])
-
-            # Insert ids of schedule in user ###################################################################################
-                link_cliente = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_user}/ids_agendado.json'
-
-                info = f'{{"ids_agendado":"{list_ids_schedule}" }}'
-
-                requisicao_client = requests.patch(link_cliente, data=info)
-        else:
-            pass
+        # if if_manager['manager'] == "False":
+        #     # getting ids that are already scheduled ###########################################################################
+        #         link_cliente = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_user}/ids_agendado.json'
+        #         requisicao_client_get = requests.get(link_cliente)
+        #         requisicao_client_get_dic = requisicao_client_get.json()
+        #
+        #     # list_ids_schedule receiver the ids what is in cloud ##############################################################
+        #         if requisicao_client_get_dic != '':
+        #             list_ids_schedule.append(requisicao_client_get_dic)
+        #
+        #     # list_ids_schedule receiver the id what go be schedule ############################################################
+        #         list_ids_schedule.append(if_manager['id_user'])
+        #
+        #     # Insert ids of schedule in user ###################################################################################
+        #         link_cliente = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_user}/ids_agendado.json'
+        #
+        #         info = f'{{"ids_agendado":"{list_ids_schedule}" }}'
+        #
+        #         requisicao_client = requests.patch(link_cliente, data=info)
+        # else:
+        #     pass
 
     # Clearing file "select_work" after of save ########################################################################
         with open('select_works.json','w') as file:

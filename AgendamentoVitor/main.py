@@ -1489,14 +1489,15 @@ class ViewSchedule(Screen):
         except:
             pass
 
+    def loop_actualizar(self, *args):
+        Clock.schedule_once(self.actualizar,30)
+
     def actualizar(self, *args):
 
         try:
             # get user id ##################################################################################################
             user_id = self.log_aut()
             lista_info = self.info_entrace_salao()
-
-            print('lsita infooo ',lista_info)
 
             list_content = []
 
@@ -1518,6 +1519,10 @@ class ViewSchedule(Screen):
 
             self.ids.grid_shedule.clear_widgets()
 
+            # Here i am sorting the list "lista_info" in key "['id_horas']" #########################################################
+            ordem = sorted(lista_info, key=lambda valor: valor['id_horas'])
+            lista_info = ordem
+
             # try:
             while entrada[:2] < saida[:2]:
                 for num, agenda in enumerate(lista_info):
@@ -1526,8 +1531,6 @@ class ViewSchedule(Screen):
                             for mim in range(ranger_init, ranger_last):
                                 # conparing the minutes ###################################################################################
                                 if str(mim).zfill(2) == lista_info[num]['id_horas'][3:]:
-                                    # id_hours = lista_info[num]['id_horas']
-                                    # entry = datetime.strptime(entrada,'%H:%M')
                                     ent = int(str(entrada[:2]).zfill(2))
                                     entrada = f'{str(ent).zfill(2)}:{str(mim).zfill(2)}'
 
@@ -1539,9 +1542,6 @@ class ViewSchedule(Screen):
 
                                     if user_id == lista_info[num]['id_user']:
                                         # Insert table #####################################################################################
-                                        # table = TableInfo(str(cont), '', entrada, 'Você agendou esse horarion',
-                                        #                   f'{soma_horas.strftime("%H:%M")}')
-
                                         table = TableInfo(str(cont), lista_info[num]['id_user'], entrada,
                                                               f'{soma_horas.strftime("%H:%M")}', lista_info[num]['tempo'], lista_info[num]['nome'])
                                         self.ids.grid_shedule.add_widget(table)
@@ -1556,7 +1556,7 @@ class ViewSchedule(Screen):
                                             ranger_last = 60
                                         elif ranger_init == int(tempo[3:]):
                                             ranger_init = 0
-                                            ranger_last = int(tempo[3:])
+                                            ranger_last = int(tempo[3:]) + 1
 
                                         break
                                     else:
@@ -1575,7 +1575,7 @@ class ViewSchedule(Screen):
                                             ranger_last = 60
                                         elif ranger_init == int(tempo[3:]):
                                             ranger_init = 0
-                                            ranger_last = int(tempo[3:])
+                                            ranger_last = int(tempo[3:]) + 1
                                         break
 
                                 # para não dá erro, de sumir o agendamento anterior
@@ -1592,7 +1592,7 @@ class ViewSchedule(Screen):
                                         ranger_last = 60
                                     elif ranger_init == int(tempo[3:]):
                                         ranger_init = 0
-                                        ranger_last = int(tempo[3:])
+                                        ranger_last = int(tempo[3:]) + 1
 
                     except:
                         print('Deu algum erro na função actualizar da class "ViewSchedule"')
@@ -1634,6 +1634,8 @@ class ViewSchedule(Screen):
                 json.dump(list_content, file)
         except:
             toast('Nenhuma agenda para hoje!', duration=4)
+
+        Clock.schedule_once(self.loop_actualizar, 3)
 
     def popup_mark_off(self,id_button, id_schedule, hours, hours_second, time, client, *args, **kwargs):
         id_user = ''
