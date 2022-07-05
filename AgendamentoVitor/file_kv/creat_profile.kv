@@ -13,9 +13,9 @@
             size_hint_y:None
             height:'5dp'
             bold:True
-            font_size:'20dp'
+            font_size:'25sp'
             color:1,0,0,1
-            pos_hint:{'center_x':.5,'center_y':.9}
+            pos_hint:{'center_x':.5,'top':.9}
             id:enter_as_socio
         MDBoxLayout:
             size_hint:.8,None
@@ -25,31 +25,37 @@
             pos_hint:{'center_x':.5, 'center_y':.6}
             MDLabel:
                 size_hint_y:None
-                height:'12dp'
-                font_size:'12dp'
+                height:'15dp'
+                font_size:'15dp'
                 color:1,1,1,.5
                 text:'Nome'
             MDTextFieldRect:
+                size_hint_y:None
+                height:'40dp'
                 hint_text:'Nome'
                 multiline:False
                 id:nome
             MDLabel:
                 size_hint_y:None
-                height:'12dp'
-                font_size:'12dp'
+                height:'15dp'
+                font_size:'15dp'
                 color:1,1,1,.5
                 text:'Email'
             MDTextFieldRect:
+                size_hint_y:None
+                height:'40dp'
                 hint_text:'Email'
                 multiline:False
                 id:email
             MDLabel:
                 size_hint_y:None
-                height:'12dp'
-                font_size:'12dp'
+                height:'15dp'
+                font_size:'15dp'
                 color:1,1,1,.5
                 text:'Senha'
             MDTextFieldRect:
+                size_hint_y:None
+                height:'40dp'
                 font_size:'20dp'
                 bold:True
                 hint_text:'******'
@@ -59,11 +65,13 @@
                 id:senha
             MDLabel:
                 size_hint_y:None
-                height:'12dp'
-                font_size:'12dp'
+                height:'15dp'
+                font_size:'15dp'
                 color:1,1,1,.5
                 text:'Confirmar senha'
             MDTextFieldRect:
+                size_hint_y:None
+                height:'40dp'
                 font_size:'20dp'
                 bold:True
                 foreground_color:0,1,1,1
@@ -73,19 +81,21 @@
                 id:rep_senha
 
         Label:
+            font_size:'25dp'
             text:'Faça o seu cadastro'
             markup:True
-            pos_hint:{'center_x':.5,'center_y':.3}
+            pos_hint:{'center_x':.5,'center_y':.40}
             color:1,1,1,1
             id:warning
         MDCard:
             orientation:'vertical'
             size_hint:.8,None
-            height:'40dp'
+            height:'60dp'
             pos_hint:{'center_x':.5,'center_y':.2}
             ripple_behavior:True
             md_bg_color:0.16, 0.50, 0.73,1
             radius:20,5,20,5
+            padding:'10dp'
             on_release:root.creat_bill()
             Label:
                 bold:True

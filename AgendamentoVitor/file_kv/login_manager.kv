@@ -15,20 +15,22 @@
             pos_hint:{'center_x':.5, 'center_y':.6}
             spacing:'20dp'
             MDLabel:
+                font_size:'15dp'
                 text:'Email'
                 color:1,1,1,.4
             MDTextFieldRect:
                 size_hint_y:None
-                height:'30dp'
+                height:'40dp'
                 multiline:False
                 hint_text:'Email'
                 id:email
             MDLabel:
+                font_size:'15dp'
                 text:'Senha'
                 color:1,1,1,.4
             MDTextFieldRect:
                 size_hint_y:None
-                height:'30dp'
+                height:'40dp'
                 font_size:'20dp'
                 multiline:False
                 bold:True
@@ -36,7 +38,11 @@
                 foreground_color:0,1,1,1
                 password:True
                 id:senha
+            Widget:
+                size_hint_y:None
+                height:'15dp'
             Label:
+                font_size:'25dp'
                 text:'Faça o seu cadastro'
                 markup:True
                 color:1,1,1,1
@@ -44,10 +50,11 @@
         MDCard:
             orientation:'vertical'
             size_hint:.8,None
-            height:'40dp'
+            height:'60sp'
             pos_hint:{'center_x':.5,'center_y':.32}
             md_bg_color:0.13, 0.59, 0.95,1
             radius:20,5,20,5
+            padding:'10sp'
             on_release:root.login()
             Label:
                 size_hint_y:None
@@ -62,11 +69,12 @@
         MDCard:
             orientation:'vertical'
             size_hint:.8,None
-            height:'40dp'
+            height:'60sp'
             pos_hint:{'center_x':.5,'center_y':.2}
             ripple_behavior:True
             md_bg_color:0.16, 0.50, 0.73,1
             radius:20,5,20,5
+            padding:'10sp'
             on_release:app.root.current = 'creatprofile'
             Label:
                 bold:True

@@ -27,18 +27,20 @@
                 color:0,0,0,.6
             MDTextFieldRect:
                 size_hint_y:None
-                height:'30dp'
+                height:'40dp'
                 hint_text:'Email'
+                font_size:'20sp'
                 id:email
 
         MDCard:
             orientation:'vertical'
             size_hint:.8,None
-            height:'40dp'
+            height:'60sp'
             pos_hint:{'center_x':.5}
             ripple_behavior:True
             md_bg_color:0.16, 0.50, 0.73,1
             radius:20,5,20,5
+            padding:'10sp'
             on_release:root.send_email()
             Label:
                 bold:True

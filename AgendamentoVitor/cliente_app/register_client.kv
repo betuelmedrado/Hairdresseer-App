@@ -15,20 +15,23 @@
             pos_hint:{'center_x':.5, 'center_y':.6}
             spacing:'20dp'
             MDLabel:
+                font_size:'15dp'
                 text:'Email'
                 color:1,1,1,.4
             TextInput:
                 size_hint_y:None
-                height:'30dp'
+                height:'40dp'
                 multiline:False
                 hint_text:'Email'
+                font_size:'20sp'
                 id:email
             MDLabel:
+                font_size:'15dp'
                 text:'Senha'
                 color:1,1,1,.4
             TextInput:
                 size_hint_y:None
-                height:'30dp'
+                height:'40dp'
                 hint_text:'******'
                 bold:True
                 font_size:'30dp'
@@ -36,46 +39,50 @@
                 password:True
                 foreground_color:0,1,1,1
                 id:senha
+            Widget:
+                size_hint_y:None
+                height:'15dp'
             Label:
                 text:'Faça o seu cadastro'
+                font_size:'25sp'
                 markup:True
                 color:1,1,1,1
                 id:warning
         MDCard:
             orientation:'vertical'
             size_hint:.8,None
-            height:'40dp'
+            height:'60sp'
             pos_hint:{'center_x':.5,'center_y':.32}
             md_bg_color:0.13, 0.59, 0.95,1
             radius:20,5,20,5
             ripple_behavior:True
+            padding:'10sp'
             on_release:root.logar()
             Label:
-                size_hint_y:None
-                height:'10dp'
+#                size_hint_y:None
+#                height:'15dp'
                 text:'Faser'
             Label:
                 size_hint_y:None
                 height:'25dp'
                 bold:True
-                font_size:'20dp'
+                font_size:'25dp'
                 text:'Login'
         MDCard:
             orientation:'vertical'
             size_hint:.8,None
-            height:'40dp'
+            height:'60sp'
             pos_hint:{'center_x':.5,'center_y':.2}
             ripple_behavior:True
             md_bg_color:0.16, 0.50, 0.73,1
             radius:20,5,20,5
+            padding:'10sp'
             on_release:app.root.current = 'creatbill'
             Label:
                 bold:True
                 font_size:'25dp'
                 text:'Criar'
             Label:
-                size_hint_y:None
-                height:'10dp'
                 font_size:'10dp'
                 text:'Conta'
     MDTextButton:
@@ -95,37 +102,56 @@
     FloatLayout:
         MDBoxLayout:
             size_hint:.8,None
-            height:'220dp'
+            height:'200dp'
             orientation:'vertical'
             spacing:'10dp'
-            pos_hint:{'center_x':.5, 'center_y':.7}
+            pos_hint:{'center_x':.5, 'top':.75}
             MDLabel:
                 size_hint_y:None
-                height:'12dp'
-                font_size:'12dp'
+                height:'15dp'
+                font_size:'15dp'
                 color:1,1,1,.5
                 text:'Nome'
             TextInput:
+                size_hint_y:None
+                height:'40dp'
                 hint_text:'Nome'
                 id:nome
                 multiline:False
             MDLabel:
                 size_hint_y:None
-                height:'12dp'
-                font_size:'12dp'
+                height:'15dp'
+                font_size:'15dp'
                 color:1,1,1,.5
                 text:'Email'
             TextInput:
+                size_hint_y:None
+                height:'40dp'
                 hint_text:'Email'
                 multiline:False
                 id:email
             MDLabel:
                 size_hint_y:None
-                height:'12dp'
-                font_size:'12dp'
+                height:'15dp'
+                font_size:'15dp'
+                color:1,1,1,.5
+                text:'CPF'
+            TextInput:
+                size_hint_y:None
+                height:'40dp'
+                hint_text:'Email'
+                multiline:False
+                id:cpf
+
+            MDLabel:
+                size_hint_y:None
+                height:'15dp'
+                font_size:'15dp'
                 color:1,1,1,.5
                 text:'Senha'
             TextInput:
+                size_hint_y:None
+                height:'40dp'
                 font_size:'30dp'
                 bold:True
                 hint_text:'******'
@@ -135,11 +161,13 @@
                 id:senha
             MDLabel:
                 size_hint_y:None
-                height:'12dp'
-                font_size:'12dp'
+                height:'15sp'
+                font_size:'15dp'
                 color:1,1,1,.5
                 text:'Confirmar Senha'
             TextInput:
+                size_hint_y:None
+                height:'40dp'
                 font_size:'30dp'
                 bold:True
                 hint_text:'******'
@@ -150,18 +178,20 @@
 
         Label:
             text:'Faça o seu cadastro'
+            font_size:'20sp'
             markup:True
-            pos_hint:{'center_x':.5,'center_y':.34}
+            pos_hint:{'center_x':.5,'center_y':.45}
             color:1,1,1,1
             id:warning
         MDCard:
             orientation:'vertical'
             size_hint:.8,None
-            height:'40dp'
+            height:'60sp'
             pos_hint:{'center_x':.5,'center_y':.2}
             ripple_behavior:True
             md_bg_color:0.16, 0.50, 0.73,1
             radius:20,5,20,5
+            padding:'10sp'
             on_release:root.creat_bill()
             Label:
                 bold:True

@@ -19,15 +19,23 @@ from kivy.uix.popup import Popup
 from kivy.uix.widget import Widget
 from kivy.uix.button import Button
 from kivy.uix.image import Image
+from kivy.core.window import Window
 
 # importando firebase
 import requests
+import os
+import certifi
 import json
 
 from functools import partial
 from datetime import datetime, timedelta
 
 # print(datetime.today().isoweekday())
+
+# Window.size = 400,820
+
+os.environ["SSL_CERT_FILE"] = certifi.where()
+
 
 class Manager(ScreenManager):
     pass
@@ -381,15 +389,14 @@ class RedefinitionSenha(Screen):
         requisicao = requests.post(LINK_FOR_API, data=info)
         requisicao_dic = requisicao.json()
 
-        print(requisicao_dic['error']['message'])
         error = requisicao_dic['error']['message']
 
         if requisicao.ok:
             toast('Foi enviado uma mensagem no email informado para redefinir a senha!')
         elif error == 'MISSING_EMAIL':
-            toast('Insira um e-mail valido!',duration= 5)
+            toast('Insira um e-mail valido!')
         elif error == 'INVALID_EMAIL':
-            toast('Email invalido!', duration=5)
+            toast('Email invalido!')
         elif error  == 'EMAIL_NOT_FOUND':
             toast('Email não encontrado!')
         else:
@@ -554,9 +561,10 @@ class ManagerProfile(Screen):
 
         self.dia_atual = datetime.today().isoweekday()
 
-        print('dia ',self.dia_atual)
+        # print('dia ',self.dia_atual)
 
         self.id_manager = self.get_id_manager()
+        self.state_focus = None
 
 
     def insert_day(self, state, dia):
@@ -687,11 +695,11 @@ class ManagerProfile(Screen):
                     saida = requisicao_dic['saida']
                     space_temp = requisicao_dic['space_temp']
 
-                toast(f'       {semana}\nEntrada - {entrada}\nSaida   -   {saida}\ntempo  -  {space_temp}', duration=5)
+                toast(f'       {semana}\nEntrada - {entrada}\nSaida   -   {saida}\ntempo  -  {space_temp}', background=[0,0,1,1])
             else:
                 pass
         except:
-            toast(f'"{semana}"\nNem uma agenda criada nesse dia!', duration=5)
+            toast(f'"{semana}"\nNem uma agenda criada nesse dia!')
 
     def on_pre_enter(self, *args):
         self.creat_profile()
@@ -820,7 +828,7 @@ class ManagerProfile(Screen):
 
 
 
-            toast('Escolha o campo a ser preenchido! Entrada ou Saida', duration=5)
+            toast('Escolha o campo a ser preenchido! Entrada ou Saida')
             # Clock.schedule_once(self.focus_time_cancel, 3)
 
     # Functions to gyve  'Focus' in TextField ###############################
@@ -876,7 +884,7 @@ class ManagerProfile(Screen):
             self.ids.friday.state = 'normal'
             self.ids.saturday.state = 'normal'
 
-            toast('Tabela de horas salva com sucesso!', duration=4)
+            toast('Tabela de horas salva com sucesso!')
 # "For in end Point" ??????????????????????????????????????????????????????????????????????????????
         elif if_manager == 'manager':
 
@@ -908,7 +916,7 @@ class ManagerProfile(Screen):
             self.ids.friday.state = 'normal'
             self.ids.saturday.state = 'normal'
 
-            toast('Tabela de horas salva com sucesso!', duration=4)
+            toast('Tabela de horas salva com sucesso!')
 
     def save_servicos(self,*args):
 
@@ -931,7 +939,7 @@ class ManagerProfile(Screen):
                        f'"agenda":""}}'
 
                 requisicao = requests.post(LINK_BASE_SALAO, info)
-                toast('Categoria criada', duration=4)
+                toast('Categoria criada')
 
                 self.infill()
 
@@ -948,7 +956,7 @@ class ManagerProfile(Screen):
                        f'"servicos":""}}'
 
                 requisicao = requests.post(LINK_BASE_SALAO, info)
-                toast('Categoria criada', duration=4)
+                toast('Categoria criada')
 
                 self.infill()
 
@@ -956,7 +964,7 @@ class ManagerProfile(Screen):
                 self.ids.tempo.text = ''
                 self.ids.valor.text = ''
         else:
-            toast('Precisa de todas as informções de serviços!', duration=4)
+            toast('Precisa de todas as informções de serviços!')
 
     def infill(self, *args):
         socio_ou_gerente = False
@@ -1233,7 +1241,7 @@ class BoxBlocked(MDCard):
         requisicao = requests.patch(link_client, data=info)
 
         self.popup.dismiss()
-        toast('Cliente Desbloqueado!', duration=5)
+        toast('Cliente Desbloqueado!')
         eu.parent.remove_widget(eu)
 
 
@@ -1633,7 +1641,7 @@ class ViewSchedule(Screen):
             with open('list_content.json', 'w') as file:
                 json.dump(list_content, file)
         except:
-            toast('Nenhuma agenda para hoje!', duration=4)
+            toast('Nenhuma agenda para hoje!')
 
         Clock.schedule_once(self.loop_actualizar, 3)
 
@@ -1649,13 +1657,13 @@ class ViewSchedule(Screen):
 
 
         box = MDBoxLayout(orientation='vertical')
-        box_button = MDBoxLayout(padding=15,spacing=10)
+        box_button = MDBoxLayout(padding=5,spacing=5)
 
         img = Image(source='images/atencao.png')
 
-        bt_sim = Button(text='Sim',background_color=(0,1,1,1),color=(1,0,0,.8), size_hint=(1,None),width='23dp')
-        bt_nao = Button(text='Não',background_color=(0,1,1,1),color=(0,0,0,1),size_hint=(1,None),width='23dp')
-        bt_view = Button(text='View',background_color=(0,1,1,1),color=(0,0,0,1),size_hint=(1,None),width='23dp')
+        bt_sim = Button(text='Sim',background_color=(0,1,1,1),color=(1,0,0,.8), size_hint=(1,None),height='40dp')
+        bt_nao = Button(text='Não',background_color=(0,1,1,1),color=(0,0,0,1),size_hint=(1,None),height='40dp')
+        bt_view = Button(text='View',background_color=(0,1,1,1),color=(0,0,0,1),size_hint=(1,None),height='40dp')
 
         box_button.add_widget((bt_sim))
         box_button.add_widget((bt_nao))
@@ -1665,7 +1673,7 @@ class ViewSchedule(Screen):
         box.add_widget((box_button))
 
         self.popup  = Popup(title='Deseja cancelar o agendamento?',
-                       size_hint=(.8,.4),content=box)
+                       size_hint=(.8,None), height='200dp',content=box)
 
         bt_sim.bind(on_release = partial(self.cancel_schedule, id_user["id_user"]))
         bt_nao.bind(on_release = self.popup.dismiss)
@@ -2012,7 +2020,7 @@ class HoursSchedule(Screen):
             self.ids.card_save.md_bg_color = 1,0,0,.1
             self.ids.card_save.unbind(on_release = self.save_scheduleing)
             self.ids.card_save.bind(on_release = self.disable_release)
-            toast('O gendamento excede o horario do proximo agendamento escolha outro horario ou outro cabeleleiro!', duration=6)
+            toast('Excedeu o horário do proximo agendamento escolha outro horário ou outro Proficional!')
         elif boolian == False:
             self.ids.card_save.unbind(on_release = self.disable_release)
             self.ids.card_save.md_bg_color = 0.13, 0.53, 0.95,1
@@ -2049,7 +2057,7 @@ class HoursSchedule(Screen):
         toast('Selecione o tipo de serviço!')
 
     def disable_release(self,*args):
-        toast('O gendamento excede o horario do proximo agendamento escolha outro horario ou outro cabeleleiro!')
+        toast('Excedeu o horário do proximo agendamento escolha outro horário ou outro Proficional!')
 
     def save_scheduleing(self, *args):
         horas_hoje = self.time_now()
@@ -2078,11 +2086,8 @@ class HoursSchedule(Screen):
         tempo = self.ids.time.text
         valor = self.ids.valor.text
 
-        print('if manager ',if_manager)
-
         if if_manager['manager'] == "False":
             link = f'{self.LINK_SALAO}/{self.id_manager}/socios/{if_manager["id_user"]}/agenda/{self.semana}/{id_user}.json'
-            get_requisicao = requests.get(link)
         elif if_manager['manager'] == "True":
             link = f'{self.LINK_SALAO}/{self.id_manager}/agenda/{self.semana}/{id_user}.json'
 
@@ -2098,7 +2103,7 @@ class HoursSchedule(Screen):
 
         requisicao = requests.patch(link, data=info)
 
-        toast('Agendamento Marcado! Você tem Uma(1) Hora para cancelar\n "3" cancelamento abaixo disso você tera que pagar uma taxa', duration=10)
+        toast('Agendamento Marcado! Você tem Uma(1) Hora para cancelar\n "3" cancelamento abaixo disso você tera que pagar uma taxa')
 
         if if_manager['manager'] == "False":
             # getting ids that are already scheduled ###########################################################################
@@ -2125,6 +2130,7 @@ class HoursSchedule(Screen):
     # Clearing file "select_work" after of save ########################################################################
         with open('select_works.json','w') as file:
             json.dump([], file)
+        MDApp.get_running_app().root.current = 'viewshedule'
 
 class InfoScheduleClient(Screen):
 

@@ -29,9 +29,11 @@
         orientation:'vertical'
         MDToolbar:
             markup:True
-            title:'Seja bem vindo'
+            title:'Sejam bem vindos'
             specific_text_color:0,0,0,1
             left_action_items:[['account-arrow-left-outline', lambda x: root.return_login()]]
+        Widget:
+            size_hint_y:.10
         ScrollView:
 #            FloatLayout:
             MDBoxLayout:
@@ -78,8 +80,8 @@
         MDToolbar:
             elevation:10
             id:title_toobar
+            left_action_items:[['arrow-left-bold', lambda x: root.return_homepage()]]
             right_action_items:[['refresh',lambda x: root.actualizar()]]
-            left_action_items:[['arrow-left-bold-outline', lambda x: root.return_homepage()]]
 
     #    Button:
     #        size_hint:None,None
@@ -117,7 +119,7 @@
                 height:'60dp'
                 md_bg_color:0,1,1,1
                 MDIconButton:
-                    icon:'arrow-left-thick'
+                    icon:'arrow-left'
                     theme_icon_color: "Custom"
                     color:1,0,0,1
                     on_release:app.root.current = 'viewshedule'
@@ -132,6 +134,7 @@
                 height:'20dp'
                 pos_hint:{'center_x':.5}
                 MDLabel:
+                    font_size:'25dp'
                     markup:True
                     text:'Escolha\nOs tipos de serviços'
                     bold:True
@@ -142,7 +145,7 @@
                 pos_hint:{'center_x':.5}
             MDCard:
                 size_hint:.8,None
-                height:'100dp'
+                height:'200dp'
 #                md_bg_color:0.78, 0.80, 0.83,1
                 md_bg_color:1,1,1,1
                 radius:8,8,8,8
@@ -161,19 +164,19 @@
                         height:'10dp'
                         MDLabel:
                             size_hint_x:.40
-                            font_size:'10dp'
+                            font_size:'15sp'
                             bold:True
                             color:1,0,0,1
                             text:'Serviços'
                         MDLabel:
                             size_hint_x:.40
-                            font_size:'10dp'
+                            font_size:'15sp'
                             bold:True
                             text:'Tempo'
                             color:1,0,0,1
                         MDLabel:
                             size_hint_x:.20
-                            font_size:'10dp'
+                            font_size:'15sp'
                             bold:True
                             text:'ValorR$'
                             color:1,0,0,1
@@ -191,11 +194,12 @@
             MDBoxLayout:
                 orientation:'vertical'
                 size_hint:.8,None
-                height:'130dp'
+                height:'200dp'
                 pos_hint:{'center_x':.5}
                 MDLabel:
                     size_hint_y:None
                     height:'20dp'
+                    font_size:'25sp'
                     text:'Serviços escolhidos!'
                 MDCard:
                     md_bg_color:0.78, 0.80, 0.83,1
@@ -211,23 +215,23 @@
                         pos_hint:{'center_x':.5,'center_y':.5}
                         MDBoxLayout:
                             size_hint_y:None
-                            height:'10dp'
+                            height:'15dp'
                             md_bg_color:1,1,1,.3
                             MDLabel:
                                 size_hint_x:.40
-                                font_size:'10dp'
+                                font_size:'15sp'
                                 bold:True
                                 color:0,0,0,.6
                                 text:'Serviços'
                             MDLabel:
                                 size_hint_x:.40
-                                font_size:'10dp'
+                                font_size:'15sp'
                                 bold:True
                                 text:'Tempo'
                                 color:0,0,0,.6
                             MDLabel:
                                 size_hint_x:.20
-                                font_size:'10dp'
+                                font_size:'15sp'
                                 bold:True
                                 text:'ValorR$'
                                 color:0,0,0,.6
@@ -244,10 +248,10 @@
             MDBoxLayout:
                 orientation:'vertical'
                 size_hint:.7,None
-                height:'85dp'
+                height:'150dp'
                 padding:'10dp',0,0,0
                 pos_hint:{'center_x':.5}
-                spacing:'5dp'
+                spacing:'8dp'
                 radius:8,8,8,8
                 MDCard:
                     orientation:'vertical'
@@ -257,26 +261,29 @@
                     MDBoxLayout:
                         MDLabel:
                             text:'tempo'
-                            font_size:'11dp'
+                            font_size:'18sp'
                             color:0.13, 0.53, 0.95,.5
                         MDLabel:
                             text:'Valor R$'
-                            font_size:'11dp'
+                            font_size:'18sp'
                             color:0.13, 0.53, 0.95,.5
                     MDBoxLayout:
                         MDLabel:
+                            font_size:'25sp'
                             color:0.13, 0.53, 0.95,1
                             id:time
                         MDLabel:
+                            font_size:'25sp'
                             color:0.13, 0.53, 0.95,1
                             id:valor
                 MDCard:
                     orientation:'vertical'
                     size_hint_y:None
-                    height:'30dp'
+                    height:'60dp'
                     radius:8,8,8,8
                     md_bg_color:0.13, 0.53, 0.95,1
                     ripple_behavior:True
+                    padding:'10dp'
 #                    disabled:True
                     id:card_save
 
@@ -285,11 +292,11 @@
                     MDLabel:
                         text:'Salvar'
                         color:0,0,0,.7
-                        font_size:'9dp'
                         bold:True
                         halign:'center'
                     MDLabel:
                         text:'Agendamento'
+                        font_size:'25sp'
                         bold:True
                         halign:'center'
             MDSeparator:
@@ -298,3 +305,4 @@
             MDBoxLayout:
                 size_hint_y:None
                 height:'70dp'
+                md_bg_color:0.53, 0.54, 0.56, .4

@@ -21,6 +21,8 @@ from kivy.uix.button import Button
 
 # importando firebase
 import requests
+import os
+import certifi
 import json
 from kivymd.toast import toast
 
@@ -29,7 +31,9 @@ from datetime import datetime, timedelta
 
 # from datetime import datetime
 
-# Window.size = 590,800
+# Window.size = 400,820
+
+os.environ["SSL_CERT_FILE"] = certifi.where()
 
 class Manager(ScreenManager):
     pass
@@ -49,7 +53,10 @@ class HomePage(Screen):
 
     def on_pre_enter(self, *args):
         self.creat_files()
-        toast('Aguarde estamos carregando as informações!...')
+        try:
+            toast('Aguarde estamos carregando as informações!.....', length_long=True)
+        except TypeError:
+            toast('Aguarde estamos carregando as informações!...')
         Clock.schedule_once(self.get_info, 1)
 
     def get_local(self, *args):
@@ -234,6 +241,12 @@ class Register(Screen):
 
     API_KEY = "AIzaSyAue2_eYU5S5TsUc692vHNlyxIHrlBVZjk"
 
+    def on_pre_enter(self, *args):
+        Clock.schedule_once(self.log_aut,1)
+
+    def entry_home(self, *args):
+        MDApp.get_running_app().root.current = 'homepage'
+
     def log_aut(self,*args):
         LINK = f'https://securetoken.googleapis.com/v1/token?key={self.API_KEY}'
         try:
@@ -249,7 +262,7 @@ class Register(Screen):
             user_id = requisicao_dic["user_id"]
 
             if requisicao.ok:
-                MDApp.get_running_app().root.current = 'homepage'
+                Clock.schedule_once(self.entry_home, 1)
             else:
                 pass
             return user_id
@@ -342,8 +355,6 @@ class Register(Screen):
             elif erro == 'EMAIL_NOT_FOUND':
                 self.ids.warning.text = 'Email não [color=D40A00]Encontrado[/color]'
 
-    def on_pre_enter(self, *args):
-        Clock.schedule_once(self.log_aut,1)
 
 class CreatBill(Screen):
     #idToken
@@ -462,9 +473,9 @@ class RedefinitionSenha(Screen):
         if requisicao.ok:
             toast('Foi enviado uma mensagem no email informado para redefinir a senha!')
         elif error == 'MISSING_EMAIL':
-            toast('Insira um e-mail valido!',duration= 5)
+            toast('Insira um e-mail valido!')
         elif error == 'INVALID_EMAIL':
-            toast('Email invalido!', duration=5)
+            toast('Email invalido!')
         elif error  == 'EMAIL_NOT_FOUND':
             toast('Email não encontrado!')
         else:
@@ -783,7 +794,7 @@ class ViewSchedule(Screen):
             with open('list_content.json','w') as file:
                 json.dump(list_content, file)
         except:
-            toast('Nenhuma agenda para hoje!', duration=4)
+            toast('Nenhuma agenda para hoje!')
 
     # Open and inserting the hours in class HoursSchedule #######################################
 
@@ -804,13 +815,13 @@ class ViewSchedule(Screen):
 
 
         box = MDBoxLayout(orientation='vertical')
-        box_button = MDBoxLayout(padding=15,spacing=15)
+        box_button = MDBoxLayout(padding=5,spacing=5)
 
         img = Image(source='images/atencao.png')
 
-        bt_sim = Button(text='Sim',background_color=(0,1,1,1),color=(1,0,0,.8), size_hint=(1,None),width='23dp')
-        bt_nao = Button(text='Sair',background_color=(0,1,1,1),color=(0,0,0,1),size_hint=(1,None),width='23dp')
-        bt_view = Button(text='View',background_color=(0,1,1,1),color=(0,0,0,1),size_hint=(1,None),width='23dp')
+        bt_sim = Button(text='Sim',background_color=(0,1,1,1),color=(1,0,0,.8), size_hint=(1,None),height='40dp')
+        bt_nao = Button(text='Sair',background_color=(0,1,1,1),color=(0,0,0,1),size_hint=(1,None),height='40dp')
+        bt_view = Button(text='View',background_color=(0,1,1,1),color=(0,0,0,1),size_hint=(1,None),height='40dp')
 
         box_button.add_widget((bt_sim))
         box_button.add_widget((bt_nao))
@@ -820,7 +831,7 @@ class ViewSchedule(Screen):
         box.add_widget((box_button))
 
         self.popup  = Popup(title='Deseja cancelar o agendamento?',
-                            size_hint=(.8,.4),content=box)
+                            size_hint=(.8,None), height='200dp',content=box)
 
         bt_sim.bind(on_release = partial(self.cancel_schedule, id_user["id_user"]))
         bt_nao.bind(on_release = self.popup.dismiss)
@@ -863,7 +874,7 @@ class ViewSchedule(Screen):
         cancelar = self.check_time_cancel(str(time_cancel),requisicao_dic['horas_agendamento'])
 
         if cancelar:
-            toast(f'O agendamento não pode ser cancelado\nPassou do tempo de {time_cancel} h/m!', duration=5, background=[.3,0,0,1])
+            toast(f'O agendamento não pode ser cancelado\nPassou do tempo de {time_cancel} h/m!', background=[.3,0,0,1])
         else:
             requisicao = requests.delete(link)
             self.actualizar()
@@ -873,7 +884,7 @@ class ViewSchedule(Screen):
     def if_blocked(self,id_button, hours):
 
         if self.agenda_marcada:
-            toast('Você já tem um agendamento marcado aqui para fazer outro agendamento\nCancele o seu agendamento!', duration=8,background=[0,0,.6,1])
+            toast('Você já tem um agendamento marcado aqui para fazer outro agendamento\nCancele o seu agendamento!',background=[0,0,.6,1])
         else:
             link = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{self.user_id}.json'
 
@@ -882,7 +893,7 @@ class ViewSchedule(Screen):
 
             try:
                 if requisicao_dic['bloqueado'] == 'True':
-                    toast('Você foi bloqueado! Entre em contato com um proficional ',duration=4)
+                    toast('Você foi bloqueado! Entre em contato com um proficional ')
                 elif requisicao_dic['bloqueado'] == 'False':
                     self.get_hours(id_button, hours)
             except:
@@ -1180,7 +1191,7 @@ class HoursSchedule(Screen):
             self.ids.card_save.md_bg_color = 1,0,0,.1
             self.ids.card_save.unbind(on_release = self.save_scheduleing)
             self.ids.card_save.bind(on_release = self.disable_release)
-            toast('O gendamento excede o horario do proximo agendamento escolha outro horario ou outro cabeleleiro!', duration=6)
+            toast('O gendamento excede o horario do proximo agendamento escolha outro horario ou outro cabeleleiro!')
         elif boolian == False:
             self.ids.card_save.unbind(on_release = self.disable_release)
             self.ids.card_save.md_bg_color = 0.13, 0.53, 0.95,1
@@ -1250,7 +1261,7 @@ class HoursSchedule(Screen):
 
         requisicao = requests.patch(link, data=info)
 
-        toast('Agendamento Marcado! Você tem Uma(1) Hora para cancelar\n "3" cancelamento abaixo disso você tera que pagar uma taxa', duration=10)
+        toast('Agendamento Marcado! Você tem Uma(1) Hora para cancelar\n "3" cancelamento abaixo disso você tera que pagar uma taxa')
 
         # if if_manager['manager'] == "False":
         #     # getting ids that are already scheduled ###########################################################################
@@ -1277,7 +1288,7 @@ class HoursSchedule(Screen):
     # Clearing file "select_work" after of save ########################################################################
         with open('select_works.json','w') as file:
             json.dump([], file)
-
+        MDApp.get_running_app().root.current = 'viewshedule'
 
 class MyCardButton(MDCard):
 
