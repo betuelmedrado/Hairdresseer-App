@@ -31,7 +31,7 @@ from datetime import datetime, timedelta
 
 # from datetime import datetime
 
-# Window.size = 400,820
+Window.size = 400,820
 
 os.environ["SSL_CERT_FILE"] = certifi.where()
 
@@ -53,10 +53,8 @@ class HomePage(Screen):
 
     def on_pre_enter(self, *args):
         self.creat_files()
-        try:
-            toast('Aguarde estamos carregando as informações!.....', length_long=True)
-        except TypeError:
-            toast('Aguarde estamos carregando as informações!...')
+        toast('Aguarde estamos carregando as informações!...')
+
         Clock.schedule_once(self.get_info, 1)
 
     def get_local(self, *args):
@@ -855,7 +853,6 @@ class ViewSchedule(Screen):
 
         return info
 
-
     def cancel_schedule(self, id_user, *args, **kwargs):
         id_proficional = self.get_id_proficional()
         time_cancel = self.info_manager['time_cancel']
@@ -874,7 +871,7 @@ class ViewSchedule(Screen):
         cancelar = self.check_time_cancel(str(time_cancel),requisicao_dic['horas_agendamento'])
 
         if cancelar:
-            toast(f'O agendamento não pode ser cancelado\nPassou do tempo de {time_cancel} h/m!', background=[.3,0,0,1])
+            toast(f'O agendamento não pode ser cancelado\nPassou do tempo de {time_cancel} h/m!')
         else:
             requisicao = requests.delete(link)
             self.actualizar()
@@ -884,7 +881,7 @@ class ViewSchedule(Screen):
     def if_blocked(self,id_button, hours):
 
         if self.agenda_marcada:
-            toast('Você já tem um agendamento marcado aqui para fazer outro agendamento\nCancele o seu agendamento!',background=[0,0,.6,1])
+            toast('Você já tem um agendamento marcado aqui para fazer outro agendamento\nCancele o seu agendamento!')
         else:
             link = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{self.user_id}.json'
 
@@ -927,6 +924,9 @@ class HoursSchedule(Screen):
         self.hours = hours
         self.id_manager = self.get_manager()
 
+        self.LINK_SALAO_ID_MANAGER = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}'
+        self.info_manager = self._info_manager()
+
     def on_pre_enter(self, *args):
         try:
             with open('info_schedule.json', 'r') as arquivo:
@@ -942,6 +942,13 @@ class HoursSchedule(Screen):
 
         self.valid_button_save()
 
+    def _info_manager(self, *args):
+        link = f'{self.LINK_SALAO_ID_MANAGER}.json'
+        requisicao = requests.get(link)
+        requisicao_dic = requisicao.json()
+
+        return requisicao_dic
+
     def valid_button_save(self):
         with open('select_works.json', 'r') as arquivo:
             my_select = json.load(arquivo)
@@ -952,6 +959,7 @@ class HoursSchedule(Screen):
             self.ids.card_save.bind(on_release=self.nada)
         else:
             pass
+        self.ids.card_save.unbind(on_release=self.nada)
 
     def time_now(self):
         h = datetime.today().hour
@@ -1216,11 +1224,19 @@ class HoursSchedule(Screen):
     def verification_if_schedule(self, *args):
         link = f'{self.LINK_SALAO}/'
 
+
+
     def save_scheduleing(self, *args):
+        time_cancel = self.info_manager['time_cancel']
         horas_hoje = self.time_now()
-        list_works = []
-        list_ids_schedule = []
+        # list_works = []
+        # list_ids_schedule = []
+
+        # variable to infomation of schedule ######################
+        list_id_marked = []
         link = ''
+        free = ''
+        list_comparate_hours = []
 
         # geting the id of Manager ##############################
         # name_id = self.get_id_diverse()
@@ -1242,6 +1258,32 @@ class HoursSchedule(Screen):
         horas = self.ids.hours.text
         tempo = self.ids.time.text
         valor = self.ids.valor.text
+        link_info = ''
+
+        # Here is to know is have schedule marked ##############################################
+        if if_manager['manager'] == "False":
+            link_info = f'{self.LINK_SALAO}/{self.id_manager}/socios/{if_manager["id_user"]}/agenda/{self.semana}.json'
+        elif if_manager['manager'] == "True":
+            link_info = f'{self.LINK_SALAO}/{self.id_manager}/agenda/{self.semana}.json'
+        # ######################################################################################
+
+        try:
+            requisicao_if_scheduled = requests.get(link_info)
+            if_scheduled = requisicao_if_scheduled.json()
+
+            # Geting the id marked on schedule ###
+            for info in if_scheduled:
+                list_id_marked.append(info)
+
+            # Here getting the hours of marked ###
+            for id_marked in list_id_marked:
+                list_comparate_hours.append(if_scheduled[id_marked]['id_horas'])
+                print(list_comparate_hours)
+
+            free = horas in list_comparate_hours
+        except TypeError:
+            pass
+
 
         if if_manager['manager'] == "False":
             link = f'{self.LINK_SALAO}/{self.id_manager}/socios/{if_manager["id_user"]}/agenda/{self.semana}/{id_user}.json'
@@ -1257,11 +1299,12 @@ class HoursSchedule(Screen):
                f'"horas_agendamento": "{horas_hoje}",'\
                f'"servicos":"{list_works}"}}'
 
-        # requisicao_if_scheduled = requests.get(link)
+        if free:
+            toast('Desculpe mais alguem acabou de agendar esse horário!')
+        else:
+            requisicao = requests.patch(link, data=info)
+            toast(f'Agendamento Marcado! Você tem {time_cancel} H/m para cancelar!')
 
-        requisicao = requests.patch(link, data=info)
-
-        toast('Agendamento Marcado! Você tem Uma(1) Hora para cancelar\n "3" cancelamento abaixo disso você tera que pagar uma taxa')
 
         # if if_manager['manager'] == "False":
         #     # getting ids that are already scheduled ###########################################################################

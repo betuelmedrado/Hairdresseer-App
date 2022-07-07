@@ -2,24 +2,32 @@
 <MyButtonCard>:
     orientation:'vertical'
     size_hint_y:None
-    height:'30dp'
+    height:'60dp'
     md_bg_color:0.13, 0.53, 0.95,1
-    radius:3,3,3,3
+    radius:6,6,6,6
     ripple_behavior:True
-    elevation:'7dp'
+    elevation:7
     first_text:''
     secound_text:''
-    MDLabel:
+    MDBoxLayout:
+        orientation:'vertical'
         size_hint_y:None
-        height:'13dp'
-        color:1,1,1,1
-        bold:True
-        text:root.first_text
-        halign:'center'
-    MDLabel:
-        size_hint_y:None
-        height:'13dp'
-        bold:True
-        font_size:'12dp'
-        text:root.secound_text
-        halign:'center'
+        height:'34dp'
+        spacing:'5dp'
+        padding:'10dp'
+
+        MDLabel:
+            size_hint_y:None
+            height:'17dp'
+            font_size:'25sp'
+            color:1,1,1,1
+            bold:True
+            text:root.first_text
+            halign:'center'
+        MDLabel:
+            size_hint_y:None
+            height:'17dp'
+            bold:True
+            font_size:'20sp'
+            text:root.secound_text
+            halign:'center'

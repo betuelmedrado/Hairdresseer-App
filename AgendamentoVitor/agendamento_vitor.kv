@@ -52,8 +52,8 @@
 
             MDBoxLayout:
                 size_hint:None,None
-                width:'250dp'
-                height:'150dp'
+                width:'350dp'
+                height:'250dp'
                 spacing:'5dp'
                 pos_hint:{'center_x':.5,'center_y':.5}
                 MDCard:
@@ -65,10 +65,28 @@
                     on_release:app.root.current = 'managerprofile'
                     Image:
                         source:'images/profile.jpg'
-                    Label:
-                        color:0,0,0,1
-                        markup:True
-                        text:'[size=17][b]gerenciar[/b][/size]\n[color=#D40A00][size=40][b]Perfil[/b][/size][/color]'
+                    MDBoxLayout:
+                        orientation:'vertical'
+                        size_hint:.8,None
+                        height:'50dp'
+                        padding:'10dp'
+                        spacing:'5dp'
+                        pos_hint:{'center_x':.5}
+                        MDLabel:
+                            size_hint_y:None
+                            height:'25dp'
+                            font_size:'17sp'
+                            color:0,0,0,1
+                            bold:True
+                            text:'gerenciar'
+                            pos_hint:{'x':.1}
+                        Label:
+                            size_hint_y:None
+                            height:'25dp'
+                            font_size:'40sp'
+                            color:1,0,0,1
+                            bold:True
+                            text:'Salão'
                 MDCard:
                     orientation:'vertical'
                     md_bg_color:0.78, 0.80, 0.83,1
@@ -78,10 +96,28 @@
                     on_release:app.root.current = 'screenchoiceschedule'
                     Image:
                         source:'images/agenda.png'
-                    Label:
-                        color:0,0,0,1
-                        markup:True
-                        text:'[size=20][b]Ver[/b][/size]\n[color=#D40A00][size=40][b]Agenda[/b][/size][/color]'
+                    MDBoxLayout:
+                        orientation:'vertical'
+                        size_hint:.8,None
+                        height:'50dp'
+                        padding:'10dp'
+                        spacing:'5dp'
+                        pos_hint:{'center_x':.5}
+                        MDLabel:
+                            size_hint_y:None
+                            height:'25dp'
+                            font_size:'17sp'
+                            color:0,0,0,1
+                            bold:True
+                            text:'Ver'
+                        Label:
+                            size_hint_y:None
+                            height:'25dp'
+                            font_size:'40sp'
+                            color:1,0,0,1
+                            bold:True
+                            text:'Agenda'
+
         MDBoxLayout:
             size_hint_y:None
             height:'40dp'
@@ -114,9 +150,10 @@
             Image:
                 source:'images/person.png'
             MDSeparator:
+                md_bg_color:0.53, 0.54, 0.56,1
             MDBoxLayout:
                 size_hint_y:None
-                height:'30dp'
+                height:'60dp'
                 Image:
                     size_hint_x:None
                     height:'20dp'
@@ -126,6 +163,7 @@
                     secound_text:'Bloqueado'
                     on_release:app.root.current = 'clientblocked'
             MDSeparator:
+                md_bg_color:0.53, 0.54, 0.56,1
             Widget:
 
 

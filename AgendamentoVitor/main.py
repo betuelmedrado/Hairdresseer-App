@@ -32,7 +32,7 @@ from datetime import datetime, timedelta
 
 # print(datetime.today().isoweekday())
 
-# Window.size = 400,820
+Window.size = 400,820
 
 os.environ["SSL_CERT_FILE"] = certifi.where()
 
@@ -392,7 +392,7 @@ class RedefinitionSenha(Screen):
         error = requisicao_dic['error']['message']
 
         if requisicao.ok:
-            toast('Foi enviado uma mensagem no email informado para redefinir a senha!')
+            toast('Foi enviado uma mensagem no email informado para redefinir a senha!', length_long=False)
         elif error == 'MISSING_EMAIL':
             toast('Insira um e-mail valido!')
         elif error == 'INVALID_EMAIL':
@@ -695,7 +695,7 @@ class ManagerProfile(Screen):
                     saida = requisicao_dic['saida']
                     space_temp = requisicao_dic['space_temp']
 
-                toast(f'       {semana}\nEntrada - {entrada}\nSaida   -   {saida}\ntempo  -  {space_temp}', background=[0,0,1,1])
+                toast(f'       {semana}\nEntrada - {entrada}\nSaida   -   {saida}\ntempo  -  {space_temp}', length_long=False)
             else:
                 pass
         except:
@@ -1418,6 +1418,11 @@ class ViewSchedule(Screen):
             dic_informing = json.load(arquivo)
         return dic_informing
 
+    def info_login_file(self, *args):
+        with open('info_login.json','r') as file:
+            info_login = json.load(file)
+        return info_login
+
     def log_aut(self,*args):
         LINK = f'https://securetoken.googleapis.com/v1/token?key={self.API_KEY}'
         try:
@@ -1498,7 +1503,8 @@ class ViewSchedule(Screen):
             pass
 
     def loop_actualizar(self, *args):
-        Clock.schedule_once(self.actualizar,30)
+        # Clock.schedule_once(self.actualizar,30)
+        pass
 
     def actualizar(self, *args):
 
@@ -1643,7 +1649,7 @@ class ViewSchedule(Screen):
         except:
             toast('Nenhuma agenda para hoje!')
 
-        Clock.schedule_once(self.loop_actualizar, 3)
+        # Clock.schedule_once(self.loop_actualizar, 3)
 
     def popup_mark_off(self,id_button, id_schedule, hours, hours_second, time, client, *args, **kwargs):
         id_user = ''
@@ -1683,14 +1689,17 @@ class ViewSchedule(Screen):
     def cancel_schedule(self, id_user, *args, **kwargs):
         id_proficional = self.get_id_proficional()
         id_manager = self.id_manager
+        info_login = self.info_login_file()
 
         link = ''
 
+        print(id_user)
         if id_proficional['manager'] == "False":
-            link = self.LINK_SALAO + f'/{id_manager}/socios/{id_proficional["id_user"]}/agenda/{self.dia_atual}/{id_user}.json'
-
+            link = self.LINK_SALAO + f'/{id_manager}/socios/{id_user}/agenda/{self.dia_atual}/{info_login["id_login"]}.json'
+            print('False')
         elif id_proficional['manager'] == "True":
-            link = self.LINK_SALAO + f'/agenda/{self.dia_atual}/{id_user}.json'
+            print('True')
+            link = self.LINK_SALAO + f'/{id_manager}/agenda/{self.dia_atual}/{info_login["id_login"]}.json'
 
         requisicao = requests.delete(link)
         self.actualizar()
@@ -1764,7 +1773,7 @@ class HoursSchedule(Screen):
             pass
 
         self.ids.categorie.add_widget(MDSpinner(size_hint=(None,None,), size=('46dp','46dp'),pos_hint={'center_x':.5}))
-        Clock.schedule_once(self.get_works, 2)
+        Clock.schedule_once(self.get_works, 3)
         self.includ_color_select()
         self.soma_hours_values()
 
@@ -2020,7 +2029,7 @@ class HoursSchedule(Screen):
             self.ids.card_save.md_bg_color = 1,0,0,.1
             self.ids.card_save.unbind(on_release = self.save_scheduleing)
             self.ids.card_save.bind(on_release = self.disable_release)
-            toast('Excedeu o horário do proximo agendamento escolha outro horário ou outro Proficional!')
+            toast('Excedeu o horário do proximo agendamento escolha outro horário ou outro Proficional!', length_long=False)
         elif boolian == False:
             self.ids.card_save.unbind(on_release = self.disable_release)
             self.ids.card_save.md_bg_color = 0.13, 0.53, 0.95,1
@@ -2057,13 +2066,19 @@ class HoursSchedule(Screen):
         toast('Selecione o tipo de serviço!')
 
     def disable_release(self,*args):
-        toast('Excedeu o horário do proximo agendamento escolha outro horário ou outro Proficional!')
+        toast('Excedeu o horário do proximo agendamento escolha outro horário ou outro Proficional!', length_long=False)
 
     def save_scheduleing(self, *args):
         horas_hoje = self.time_now()
         list_works = []
         list_ids_schedule = []
         link = ''
+
+        # variable to infomation of schedule ######################
+        list_id_marked = []
+        link_info = ''
+        free = ''
+        list_comparate_hours = []
 
         # geting the id of Manager ##############################
         # name_id = self.get_id_diverse()
@@ -2086,6 +2101,30 @@ class HoursSchedule(Screen):
         tempo = self.ids.time.text
         valor = self.ids.valor.text
 
+        # Here is to know is have schedule marked ##############################################
+        if if_manager['manager'] == "False":
+            link_info = f'{self.LINK_SALAO}/{self.id_manager}/socios/{if_manager["id_user"]}/agenda/{self.semana}.json'
+        elif if_manager['manager'] == "True":
+            link_info = f'{self.LINK_SALAO}/{self.id_manager}/agenda/{self.semana}.json'
+
+        try:
+            requisicao_if_scheduled = requests.get(link_info)
+            if_scheduled = requisicao_if_scheduled.json()
+
+            # Geting the id marked on schedule ###
+            for info in if_scheduled:
+                list_id_marked.append(info)
+
+            # Here getting the hours of marked ###
+            for id_marked in list_id_marked:
+                list_comparate_hours.append(if_scheduled[id_marked]['id_horas'])
+
+            free = horas in list_comparate_hours
+        except TypeError:
+            pass
+        # ######################################################################################
+
+
         if if_manager['manager'] == "False":
             link = f'{self.LINK_SALAO}/{self.id_manager}/socios/{if_manager["id_user"]}/agenda/{self.semana}/{id_user}.json'
         elif if_manager['manager'] == "True":
@@ -2101,9 +2140,11 @@ class HoursSchedule(Screen):
                f'"horas_agendamento": "{horas_hoje}",'\
                f'"servicos":"{list_works}"}}'
 
-        requisicao = requests.patch(link, data=info)
-
-        toast('Agendamento Marcado! Você tem Uma(1) Hora para cancelar\n "3" cancelamento abaixo disso você tera que pagar uma taxa')
+        if free:
+            toast('Desculpe mais alguem acabou de agendar esse horário!')
+        else:
+            requisicao = requests.patch(link, data=info)
+            toast(f'Agendamento Marcado!')
 
         if if_manager['manager'] == "False":
             # getting ids that are already scheduled ###########################################################################
