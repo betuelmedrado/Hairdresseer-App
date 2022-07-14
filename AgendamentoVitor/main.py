@@ -1467,9 +1467,13 @@ class ViewSchedule(Screen):
                 self.space_temp = requisicao_dic_socio[f'{self.dia_atual}']['space_temp']
 
                 try:
-                    for id_agenda in requisicao_dic_socio['agenda'][str(self.dia_atual)]:
-                        lista_info.append(requisicao_dic_socio['agenda'][str(self.dia_atual)][id_agenda])
-
+                    # Estes "FOR" é porque esta dando erro as vêzes quer "self.dia_atual" STR ou INT #######################
+                    try:
+                        for id_agenda in requisicao_dic_socio['agenda'][int(self.dia_atual)]:
+                            lista_info.append(requisicao_dic_socio['agenda'][int(self.dia_atual)][id_agenda])
+                    except:
+                        for id_agenda in requisicao_dic_socio['agenda'][str(self.dia_atual)]:
+                            lista_info.append(requisicao_dic_socio['agenda'][str(self.dia_atual)][id_agenda])
                     return lista_info
                 except:
                     return lista_info
@@ -1490,13 +1494,17 @@ class ViewSchedule(Screen):
 
                 self.space_temp = requisicao_dic[f'{self.dia_atual}']['space_temp']
 
-                print('requisicao!!! ',requisicao_dic)
-
+                # Here get the ids of schedule client ######################################################################
                 try:
-                    for id_agenda in requisicao_dic['agenda'][self.dia_atual]:
-                        lista_info.append(requisicao_dic['agenda'][self.dia_atual][id_agenda])
-
+                    # Estes "FOR" é porque esta dando erro as vêzes quer "self.dia_atual" STR ou INT #######################
+                    try:
+                        for id_agenda in requisicao_dic['agenda'][int(self.dia_atual)]:
+                            lista_info.append(requisicao_dic['agenda'][int(self.dia_atual)][id_agenda])
+                    except:
+                        for id_agenda in requisicao_dic['agenda'][str(self.dia_atual)]:
+                            lista_info.append(requisicao_dic['agenda'][str(self.dia_atual)][id_agenda])
                     return lista_info
+
                 except:
                     return lista_info
         except:
