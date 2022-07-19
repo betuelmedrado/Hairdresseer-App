@@ -7,227 +7,243 @@
             title:'Informações do agendamento'
             elevation:'10dp'
             left_action_items:[['arrow-left',lambda x:root.return_schedule()]]
-        ScrollView:
-            MDBoxLayout:
-                size_hint_y:None
-                height:self.minimum_height
-                orientation:'vertical'
-                spacing:'20dp'
-                md_bg_color:0.78, 0.80, 0.83,1
+        MDBoxLayout:
+            orientation:'vertical'
+            md_bg_color:0.78, 0.80, 0.83,1
+            Widget:
+                size_hint_y:.1
+            ScrollView:
                 MDBoxLayout:
-                    size_hint:None,None
-                    width:'260dp'
-                    height:'260dp'
-                    pos_hint:{'center_x':.5}
-            # faixa of quant
-                    MDCard:
-                        size_hint_x:None
-                        width:'10dp'
-                        radius:10,0,0,10
-#                        md_bg_color:1,0,0,1
-                        pos_hint:{'center_x':.5}
-                        id:color_quant
+                    size_hint_y:None
+                    height:self.minimum_height
+                    orientation:'vertical'
+                    spacing:'20dp'
 
+                    MDBoxLayout:
+                        size_hint:None,None
+                        width:'360dp'
+                        height:'360dp'
+                        pos_hint:{'center_x':.5}
+                # faixa of quant
+                        MDCard:
+                            size_hint_x:None
+                            width:'10dp'
+                            radius:10,0,0,10
+    #                        md_bg_color:1,0,0,1
+                            pos_hint:{'center_x':.5}
+                            id:color_quant
+
+                        MDCard:
+                            orientation:'vertical'
+    #                        size_hint:None,None
+    #                        width:'240dp'
+    #                        height:'260dp'
+                            radius:0,10,10,0
+#                            padding:('15dp','15dp',0,0)
+                            elevation:8
+                            pos_hint:{'center_x':.5}
+                            MDLabel:
+                                size_hint_y:None
+                                height:'80dp'
+                                halign:'center'
+                                font_size:'25sp'
+                                bold:True
+                                markup:True
+                                id:nome
+                            MDBoxLayout:
+                                size_hint_y:None
+                                height:'85dp'
+                                MDCard:
+                                    orientation:'vertical'
+                                    elevation:0
+                                    on_release:root.popup_leave()
+                                    Image:
+                                        source:''
+                                        id:img_block
+                                    MDLabel:
+                                        size_hint_y:None
+                                        height:'5dp'
+                                        font_size:'15sp'
+                                        halign:'center'
+                                        id:label_block
+                                MDCard:
+                                    orientation:'vertical'
+                                    size_hint_x:None
+                                    width:'100dp'
+#                                    height:'45dp'
+                                    pos_hint:{'x':.6}
+                                    radius:7,7,7,7
+                                    md_bg_color:0.78, 0.80, 0.83,1
+                                    MDLabel:
+                                        font_size:'15sp'
+                                        color:0,0,0,1
+                                        text:'Quantidade cancelada!'
+                                    MDLabel:
+                                        bold:True
+                                        halign:'center'
+                                        font_size:'25sp'
+                                        id:quant_cancelada
+                            Widget:
+                                size_hint_y:None
+                                height:'10dp'
+                            MDSeparator:
+                                size_hint_x:.9
+                                pos_hint:{'center_x':.5}
+                                color:0.78, 0.80, 0.83,1
+                            MDBoxLayout:
+                                orientation:'vertical'
+                                MDLabel:
+                                    size_hint_y:None
+                                    height:'30dp'
+                                    halign:'center'
+                                    markup:True
+                                    id:hours
+                                MDLabel:
+                                    size_hint_y:None
+                                    height:'30dp'
+                                    halign:'center'
+                                    markup:True
+                                    id:hours_second
+                                MDLabel:
+                                    size_hint_y:None
+                                    height:'30dp'
+                                    halign:'center'
+                                    markup:True
+                                    id:time
+                #                Widget:
+                #                    size_hint_y:None
+                #                    height:'10dp'
+                                MDSeparator:
+                                    size_hint_x:.9
+                                    pos_hint:{'center_x':.5}
+                                    color:0.78, 0.80, 0.83,1
+                                MDLabel:
+                                    size_hint_y:None
+                                    height:'25sp'
+                                    font_size:'11dp'
+                                    color:0.61, 0.60, 0.58,1
+                                    text:'CPF:'
+                                    padding:[6,0]
+                                    bold:True
+                                MDBoxLayout:
+                                    size_hint_y:None
+                                    height:'15dp'
+                                    padding:[30,0]
+                                    MDLabel:
+                                        size_hint_y:None
+                                        height:'15sp'
+                                        text:'123212323-2'
+                                MDLabel:
+                                    size_hint_y:None
+                                    height:'25sp'
+                                    font_size:'11dp'
+                                    color:0.61, 0.60, 0.58,1
+                                    padding:[6,0]
+                                    text:'EMAIL:'
+                                    bold:True
+                                MDBoxLayout:
+                                    size_hint_y:None
+                                    height:'15dp'
+                                    padding:[30,0]
+                                    MDLabel:
+                                        size_hint_y:None
+                                        height:'15sp'
+                                        text:'www.email@gmail.com'
                     MDCard:
                         orientation:'vertical'
-#                        size_hint:None,None
-#                        width:'240dp'
-#                        height:'260dp'
-                        radius:0,10,10,0
+                        size_hint:None,None
+                        width:'360dp'
+                        height:'200dp'
+                        radius:10,10,10,10
                         elevation:8
                         pos_hint:{'center_x':.5}
                         MDLabel:
                             size_hint_y:None
-                            height:'40dp'
-                            halign:'center'
+                            height:'30sp'
                             bold:True
-                            markup:True
-                            id:nome
+                            color:0,0,0,.6
+                            text:'Serviços Pedido'
+                            halign:'center'
                         MDBoxLayout:
                             size_hint_y:None
-                            height:'45dp'
-                            MDCard:
-                                orientation:'vertical'
-                                elevation:0
-                                on_release:root.popup_leave()
-                                Image:
-                                    source:''
-                                    id:img_block
-                                MDLabel:
-                                    size_hint_y:None
-                                    height:'5dp'
-                                    font_size:'7dp'
-                                    halign:'center'
-                                    id:label_block
-                            MDCard:
-                                orientation:'vertical'
-                                size_hint:None,None
-                                width:'100dp'
-                                height:'45dp'
-                                pos_hint:{'x':.6}
-                                radius:7,7,7,7
-                                md_bg_color:0.78, 0.80, 0.83,1
-                                Label:
-                                    font_size:'8dp'
-                                    color:0,0,0,1
-                                    text:'Quantidade cancelada!'
-                                MDLabel:
-                                    bold:True
-                                    halign:'center'
-                                    font_size:'20dp'
-                                    id:quant_cancelada
+                            height:'30sp'
+                            MDLabel:
+                                size_hint_x:.40
+                                text:'Servicos:'
+                                font_size:'17sp'
+                                color:0,0,0,.6
+                            MDLabel:
+                                size_hint_x:.40
+                                text:'Horas:'
+                                font_size:'17sp'
+                                color:0,0,0,.6
+                            MDLabel:
+                                size_hint_x:.20
+                                font_size:'17sp'
+                                text:'Valor/R$'
+                                color:0,0,0,.6
 
-                        MDBoxLayout:
-                            orientation:'vertical'
-                            MDLabel:
-                                size_hint_y:None
-                                height:'30dp'
-                                halign:'center'
-                                markup:True
-                                id:hours
-                            MDLabel:
-                                size_hint_y:None
-                                height:'30dp'
-                                halign:'center'
-                                markup:True
-                                id:hours_second
-                            MDLabel:
-                                size_hint_y:None
-                                height:'30dp'
-                                halign:'center'
-                                markup:True
-                                id:time
-            #                Widget:
-            #                    size_hint_y:None
-            #                    height:'10dp'
-                            MDSeparator:
-                                size_hint_x:.9
-                                pos_hint:{'center_x':.5}
-                            MDLabel:
-                                size_hint_y:None
-                                height:'20dp'
-                                font_size:'11dp'
-                                color:0.61, 0.60, 0.58,1
-                                text:'CPF:'
-                                padding:[6,0]
-                                bold:True
+                        ScrollView:
                             MDBoxLayout:
+                                orientation:'vertical'
                                 size_hint_y:None
-                                height:'10dp'
-                                padding:[30,0]
-                                MDLabel:
-                                    size_hint_y:None
-                                    height:'10dp'
-                                    text:'123212323-2'
-                            MDLabel:
-                                size_hint_y:None
-                                height:'20dp'
-                                font_size:'11dp'
-                                color:0.61, 0.60, 0.58,1
-                                padding:[6,0]
-                                text:'EMAIL:'
-                                bold:True
-                            MDBoxLayout:
-                                size_hint_y:None
-                                height:'10dp'
-                                padding:[30,0]
-                                MDLabel:
-                                    size_hint_y:None
-                                    height:'10dp'
-                                    text:'www.email@gmail.com'
+                                height:self.minimum_height
+                                spacing:'5dp'
+                                padding:'5dp'
+                                id:box_work
+            MDBoxLayout:
+                size_hint_y:None
+                height:'40dp'
+                md_bg_color:1,0,0,.10
+                padding:'10dp'
+                MDLabel:
+                    bold:True
+                    font_size:'30sp'
+                    text:'Valor:'
+                MDLabel:
+                    font_size:'30sp'
+                    id:id_valor
+            MDBoxLayout:
+                size_hint_y:None
+                height:'60dp'
+                spacing:'10dp'
+                padding:'9dp'
+                md_bg_color:1,0,0,0
+
                 MDCard:
-                    orientation:'vertical'
-                    size_hint:None,None
-                    width:'260dp'
-                    height:'150dp'
-                    radius:10,10,10,10
-                    elevation:8
-                    pos_hint:{'center_x':.5}
+                    radius:7,7,7,7
+                    md_bg_color:app.theme_cls.primary_color
+                    ripple_behavior:True
+                    Image:
+                        size_hint_x:None
+                        width:'30dp'
+                        source:'images/check.png'
                     MDLabel:
-                        size_hint_y:None
-                        height:'30dp'
+                        text:'Feito!'
                         bold:True
-                        color:0,0,0,.6
-                        text:'Serviços Pedido'
-                        halign:'center'
-                    MDBoxLayout:
-                        size_hint_y:None
-                        height:'30dp'
-                        MDLabel:
-                            size_hint_x:.40
-                            text:'Servicos:'
-                            font_size:'11dp'
-                            color:0,0,0,.6
-                        MDLabel:
-                            size_hint_x:.40
-                            text:'Horas:'
-                            font_size:'11dp'
-                            color:0,0,0,.6
-                        MDLabel:
-                            size_hint_x:.20
-                            font_size:'11dp'
-                            text:'Valor/R$'
-                            color:0,0,0,.6
-
-                    ScrollView:
-                        MDBoxLayout:
-                            orientation:'vertical'
-                            size_hint_y:None
-                            height:self.minimum_height
-                            spacing:'5dp'
-                            padding:'5dp'
-                            id:box_work
-        MDBoxLayout:
-            size_hint_y:None
-            height:'30dp'
-            md_bg_color:1,0,0,.10
-            padding:'10dp'
-            MDLabel:
-                bold:True
-                text:'Valor:'
-            MDLabel:
-                id:id_valor
-        MDBoxLayout:
-            size_hint_y:None
-            height:'50dp'
-            spacing:'10dp'
-            padding:'9dp'
-            md_bg_color:1,0,0,0
-
-            MDCard:
-                radius:7,7,7,7
-                md_bg_color:app.theme_cls.primary_color
-                ripple_behavior:True
-                Image:
-                    size_hint_x:None
-                    width:'30dp'
-                    source:'images/check.png'
-                MDLabel:
-                    text:'Feito!'
-                    bold:True
-            MDCard:
-                radius:7,7,7,7
-                md_bg_color:app.theme_cls.primary_color
-                ripple_behavior:True
-                on_release:root.client_missed()
-                Image:
-                    size_hint_x:None
-                    width:'30dp'
-                    source:'images/Xis.png'
-                MDLabel:
-                    text:'Faltou!'
-                    bold:True
-            MDCard:
-                radius:7,7,7,7
-                md_bg_color:app.theme_cls.primary_color
-                ripple_behavior:True
-                on_release:root.block_client()
-                Image:
-                    size_hint_x:None
-                    width:'28dp'
-                    source:'images/block.png'
-                MDLabel:
-                    font_size:'15dp'
-                    text:'Bloquear!'
-                    bold:True
+                MDCard:
+                    radius:7,7,7,7
+                    md_bg_color:app.theme_cls.primary_color
+                    ripple_behavior:True
+                    on_release:root.client_missed()
+                    Image:
+                        size_hint_x:None
+                        width:'30dp'
+                        source:'images/Xis.png'
+                    MDLabel:
+                        text:'Faltou!'
+                        bold:True
+                MDCard:
+                    radius:7,7,7,7
+                    md_bg_color:app.theme_cls.primary_color
+                    ripple_behavior:True
+                    on_release:root.block_client()
+                    Image:
+                        size_hint_x:None
+                        width:'28dp'
+                        source:'images/block.png'
+                    MDLabel:
+                        font_size:'15dp'
+                        text:'Bloquear!'
+                        bold:True
 

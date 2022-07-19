@@ -4,7 +4,7 @@
     size_hint_y:None
     height:'60dp'
     md_bg_color:0.13, 0.53, 0.95,1
-    radius:6,6,6,6
+    radius:18,18,18,18
     ripple_behavior:True
     elevation:7
     first_text:''
@@ -31,3 +31,29 @@
             font_size:'20sp'
             text:root.secound_text
             halign:'center'
+
+
+<MyButtonCard_2>:
+    orientation:'vertical'
+    size_hint_y:None
+    height:'40dp'
+    md_bg_color:0.13, 0.53, 0.95,1
+    radius:18,18,18,18
+    ripple_behavior:True
+    elevation:7
+    first_text:''
+    MDBoxLayout:
+        orientation:'vertical'
+        size_hint_y:None
+        height:'34dp'
+        spacing:'5dp'
+        padding:'10dp'
+        MDLabel:
+            size_hint_y:None
+            height:'17dp'
+            font_size:'25sp'
+            color:1,1,1,1
+            bold:True
+            text:root.first_text
+            halign:'center'
+

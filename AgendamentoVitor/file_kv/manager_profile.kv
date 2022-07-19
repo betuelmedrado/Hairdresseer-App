@@ -1,13 +1,15 @@
 
 
 <ManagerProfile>:
-    ScrollView:
-        orientation:'vertical'
+#    ScrollView:
+#        orientation:'vertical'
+    MDCarousel:
+        id:carosel
         MDBoxLayout:
-            size_hint_y:None
-            height:self.minimum_height
+#            size_hint_y:None
+#            height:self.minimum_height
             orientation:'vertical'
-            md_bg_color:0.53, 0.54, 0.56, .4
+            md_bg_color:0.53, 0.54, 0.56, .2
             MDBoxLayout:
                 size_hint_y:None
                 height:'60dp'
@@ -30,13 +32,13 @@
                     on_release:root.infill()
 
             Widget:
-                size_hint_y:None
-                height:'10dp'
+#                size_hint_y:None
+#                height:'10dp'
             MDCard:
                 orientation:'vertical'
                 size_hint:.8,None
-                height:'500dp'
-                radius:12,12,12,12
+                height:'600dp'
+                radius:20,20,20,20
                 pos_hint:{'center_x':.5}
                 spacing:'10dp'
                 MDBoxLayout:
@@ -200,12 +202,14 @@
 
                             ScrollView:
                                 size_hint_x:None
-                                width:'50dp'
+                                width:'90dp'
                                 adaptive:'center'
                                 MDBoxLayout:
                                     orientation:'vertical'
                                     size_hint_y:None
                                     height:self.minimum_height
+                                    spacing:'5dp'
+                                    md_bg_color:.3,0,.1,.2
                                     id:hours
                             Widget:
 
@@ -231,7 +235,7 @@
 
                 MDBoxLayout:
                     size_hint_y:None
-                    height:'50dp'
+                    height:'100dp'
                     orientation:'vertical'
                     spacing:'20dp'
                     MDLabel:
@@ -242,9 +246,10 @@
                         color:0,0,0,.7
                     MDTextFieldRect:
                         size_hint:None,None
-                        width:'50dp'
-                        height:'25dp'
-                        readonly:True
+                        width:'70dp'
+                        height:'40dp'
+                        font_size:'20sp'
+                        multiline:False
                         pos_hint:{'center_x':.5}
                         text:'00:30'
                         id:time_cancel
@@ -254,59 +259,75 @@
                 MDSeparator:
                     size_hint_x:.9
                     pos_hint:{'center_x':.5}
+                Widget:
+                    size_hint_y:None
+                    height:'35dp'
                 MDBoxLayout:
                     orientation:'vertical'
                     size_hint_y:None
                     height:'70dp'
                     spacing:'10dp'
                     Label:
-                        font_size:'9dp'
+                        font_size:'15dp'
                         text:'Informe o tempo entre cada agenda'
                         bold:True
                         color:0,0,0,.7
+                    Widget:
+                        size_hint_y:None
+                        height:'15dp'
                     MDCard:
                         size_hint_y:None
                         height:'30dp'
                         spacing:'10dp'
-                        padding:['20dp','5dp']
+                        padding:['5dp','5dp']
                         MDTextFieldRect:
-                            size_hint_y:None
-                            height:'25dp'
-                            readonly:True
+                            size_hint:None,None
+                            width:'70dp'
+                            height:'40dp'
+                            font_size:'20sp'
+                            multiline:False
                             pos_hint:{'center_x':.5}
                             text:'00:30'
                             on_focus:space_temp.text = self.text
                         MDTextFieldRect:
-                            size_hint_y:None
-                            height:'25dp'
-                            readonly:True
+                            size_hint:None,None
+                            width:'70dp'
+                            height:'40dp'
+                            font_size:'20sp'
+                            multiline:False
                             pos_hint:{'center_x':.5}
                             text:'00:40'
                             on_focus:space_temp.text = self.text
                         MDTextFieldRect:
-                            size_hint_y:None
-                            height:'25dp'
-                            readonly:True
+                            size_hint:None,None
+                            width:'70dp'
+                            height:'40dp'
+                            font_size:'20sp'
+                            multiline:False
                             pos_hint:{'center_x':.5}
                             text:'00:50'
                             on_focus:space_temp.text = self.text
                         MDTextFieldRect:
-                            size_hint_y:None
-                            height:'25dp'
-                            readonly:True
+                            size_hint:None,None
+                            width:'70dp'
+                            height:'40dp'
+                            font_size:'20sp'
+                            multiline:False
                             pos_hint:{'center_x':.5}
                             text:'00:60'
                             on_focus:space_temp.text = self.text
                     MDTextButton:
                         size_hint:None,None
-                        width:'50dp'
-                        height:'25dp'
-#                        readonly:True
+                        width:'80dp'
+                        height:'30dp'
+                        font_size:'25sp'
                         bold:True
                         color:1,0,0,.5
                         pos_hint:{'center_x':.5}
                         id:space_temp
-
+                Widget:
+                    size_hint_y:None
+                    height:'35dp'
                 MDBoxLayout:
                     size_hint_y:None
                     height:'30dp'
@@ -316,14 +337,46 @@
                         secound_text:'Horas'
                         on_release:app.root.get_screen('managerprofile').save_data()
             Widget:
+            MDBoxLayout:
                 size_hint_y:None
-                height:'15dp'
-            MDSeparator:
-                size_hint_x:.9
-                pos_hint:{'center_x':.5}
+                height:'50dp'
+                MDLabel:
+                    text:'Informe seus serviços!'
+                    font_size:'20sp'
+                    bold:True
+                    halign:'right'
+                    color:0,0,0,.7
+                MDIconButton:
+                    icon:'arrow-right-bold-circle'
+                    on_release:carosel.load_next()
+
+# division *********************************
+
+        MDBoxLayout:
+            orientation:'vertical'
+            MDBoxLayout:
+                size_hint_y:None
+                height:'60dp'
+                md_bg_color:0.13, 0.53, 0.95,1
+                MDIconButton:
+                    icon:'arrow-left-bold-outline'
+                    color:1,1,1,1
+                    on_release:app.root.current = 'homepage'
+                MDLabel:
+                    size_hint_x:None
+                    width:'200dp'
+                    color:1,1,1,1
+                    font_size:'25dp'
+                    bold:True
+                    halign:'center'
+                    text:'Serviços!'
+                Widget:
+                MDIconButton:
+                    icon:'refresh'
+                    on_release:root.infill()
+
             Widget:
-                size_hint_y:None
-                height:'15dp'
+            Widget:
             MDBoxLayout:
                 orientation:'vertical'
                 size_hint:.7,None
@@ -361,7 +414,7 @@
                                 font_size:'10dp'
                             TextInput:
                                 size_hint_y:None
-                                height:'30dp'
+                                height:'35dp'
                                 hint_text:'00:00'
                                 multiline:False
                                 on_text:root.on_text_temp()
@@ -376,7 +429,7 @@
                                 text:'Valor:'
                             TextInput:
                                 size_hint_y:None
-                                height:'30dp'
+                                height:'35dp'
                                 hint_text:'R$:'
                                 multiline:False
                                 on_focus:root.on_valor()
@@ -387,8 +440,10 @@
                     on_release:app.root.get_screen('managerprofile').save_servicos()
 
                 MDCard:
+                    size_hint_y:None
+                    height:'250dp'
                     md_bg_color:0.78, 0.80, 0.83,1
-                    radius:8,8,8,8
+                    radius:15,15,15,15
                     MDCard:
                         orientation:'vertical'
                         size_hint:None,None
@@ -399,22 +454,22 @@
                         pos_hint:{'center_x':.5,'center_y':.5}
                         MDBoxLayout:
                             size_hint_y:None
-                            height:'10dp'
+                            height:'20dp'
                             MDLabel:
                                 size_hint_x:.40
-                                font_size:'10dp'
+                                font_size:'15sp'
                                 bold:True
                                 color:0,0,0,.5
                                 text:'Serviços'
                             MDLabel:
                                 size_hint_x:.40
-                                font_size:'10dp'
+                                font_size:'15sp'
                                 bold:True
                                 color:0,0,0,.5
                                 text:'Tempo'
                             MDLabel:
                                 size_hint_x:.20
-                                font_size:'10dp'
+                                font_size:'15sp'
                                 bold:True
                                 color:0,0,0,.5
                                 text:'ValorR$'
@@ -425,69 +480,141 @@
                                     size_hint_y:None
                                     height:self.minimum_height
                                     id:categorie
-
             Widget:
+            MDBoxLayout:
                 size_hint_y:None
-                height:'15dp'
-            MDSeparator:
-                size_hint_x:.9
-                pos_hint:{'center_x':.5}
-            Widget:
-                size_hint_y:None
-                height:'15dp'
+                height:'50dp'
+                MDIconButton:
+                    icon:'arrow-left-bold-circle'
+                    on_release:carosel.load_previous()
+                MDLabel:
+                    text:'Informe o local!'
+                    font_size:'20sp'
+                    bold:True
+                    halign:'right'
+                    color:0,0,0,.7
+                MDIconButton:
+                    icon:'arrow-right-bold-circle'
+                    on_release:carosel.load_next()
 
+# Division ***********************
+        MDBoxLayout:
+            orientation:'vertical'
+            MDBoxLayout:
+                size_hint_y:None
+                height:'60dp'
+                md_bg_color:0.13, 0.53, 0.95,1
+                MDIconButton:
+                    icon:'arrow-left-bold-outline'
+                    color:1,1,1,1
+                    on_release:app.root.current = 'homepage'
+                MDLabel:
+                    size_hint_x:None
+                    width:'200dp'
+                    color:1,1,1,1
+                    font_size:'25dp'
+                    bold:True
+                    halign:'center'
+                    text:'Local'
+                Widget:
+                MDIconButton:
+                    icon:'refresh'
+                    on_release:root.infill()
             Label:
                 text:'Informe a localização do salão!'
+                font_size:'20sp'
                 bold:True
                 color:0,0,0,.4
-            Widget:
-                size_hint_y:None
-                height:'15dp'
+
             MDBoxLayout:
-                size_hint:.7,None
-                height:'100dp'
+                size_hint:.8,None
+                height:'150dp'
                 pos_hint:{'center_x':.5}
                 MDCard:
                     orientation:'vertical'
-                    radius:8,8,8,8
+                    radius:15,15,15,15
                     padding:'20dp'
                     spacing:'10dp'
                     MDTextFieldRect:
+                        size_hint_y:None
+                        height:'40dp'
                         hint_text:'Local:'
+                        font_size:'17sp'
                         multiline:False
                         id:rua
                     MDBoxLayout:
                         spacing:'10dp'
                         MDTextFieldRect:
-                            size_hint_x:None
+                            size_hint:None,None
                             width:'70dp'
+                            height:'40dp'
+                            font_size:'18sp'
                             hint_text:'N°:'
                             multiline:False
                             id:number
                         MyButtonCard:
                             first_text:'Inserir'
+                            secound_text:'Local'
                             id:button_local
 #                            on_release:root.insert_local()
                         # on_release it is used in function "only_manager"
+            Widget:
+            MDBoxLayout:
+                size_hint_y:None
+                height:'50dp'
+                MDIconButton:
+                    icon:'arrow-left-bold-circle'
+                    on_release:carosel.load_previous()
+                MDLabel:
+                    text:'Seus socios!'
+                    font_size:'20sp'
+                    bold:True
+                    halign:'right'
+                    color:0,0,0,.7
+                MDIconButton:
+                    icon:'arrow-right-bold-circle'
+                    on_release:carosel.load_next()
+# Division ***********************
+        MDBoxLayout:
+            orientation:'vertical'
+            MDBoxLayout:
+                size_hint_y:None
+                height:'60dp'
+                md_bg_color:0.13, 0.53, 0.95,1
+                MDIconButton:
+                    icon:'arrow-left-bold-outline'
+                    color:1,1,1,1
+                    on_release:app.root.current = 'homepage'
+                MDLabel:
+                    size_hint_x:None
+                    width:'200dp'
+                    color:1,1,1,1
+                    font_size:'25dp'
+                    bold:True
+                    halign:'center'
+                    text:'Seus Socios'
+                Widget:
+                MDIconButton:
+                    icon:'refresh'
+                    on_release:root.infill()
 
+            Widget:
 
-
+            Label:
+                text:'Aqui estão o seus socios'
+                font_size:'20sp'
+                bold:True
+                color:0,0,0,.4
             Widget:
                 size_hint_y:None
                 height:'15dp'
-            MDSeparator:
-                size_hint_x:.9
-                pos_hint:{'center_x':.5}
-            Widget:
-                size_hint_y:None
-                height:'15dp'
-            Widget:
+
             MDCard:
                 size_hint:.7,None
-                height:'100dp'
+                height:'450dp'
                 pos_hint:{'center_x':.5}
                 md_bg_color:0.78, 0.80, 0.83,1
-                radius:8,8,8,8
+                radius:15,15,15,15
                 MDCard:
                     orientation:'vertical'
                     size_hint:None,None
@@ -498,10 +625,10 @@
                     pos_hint:{'center_x':.5,'center_y':.5}
                     MDBoxLayout:
                         size_hint_y:None
-                        height:'10dp'
+                        height:'20dp'
                         MDLabel:
                             size_hint_x:.40
-                            font_size:'10dp'
+                            font_size:'20sp'
                             bold:True
                             color:1,0,0,.7
                             text:' Socios!'
@@ -511,9 +638,14 @@
                                 orientation:'vertical'
                                 size_hint_y:None
                                 height:self.minimum_height
+                                padding:'10dp'
                                 id:box_socio
-
-
             Widget:
+            MDBoxLayout:
                 size_hint_y:None
-                height:'15dp'
+                height:'50dp'
+                MDIconButton:
+                    icon:'arrow-left-bold-circle'
+                    on_release:carosel.load_previous()
+
+
