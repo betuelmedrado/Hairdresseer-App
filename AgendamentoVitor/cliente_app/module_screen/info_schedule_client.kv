@@ -204,48 +204,4 @@
                     font_size:'30sp'
                     markup:True
                     id:id_valor
-            MDBoxLayout:
-                size_hint_y:None
-                height:'60dp'
-                spacing:'10dp'
-                padding:'9dp'
-                md_bg_color:1,0,0,0
-
-                MDCard:
-                    radius:7,7,7,7
-                    md_bg_color:app.theme_cls.primary_color
-                    ripple_behavior:True
-                    on_release:root.done()
-                    Image:
-                        size_hint_x:None
-                        width:'30dp'
-                        source:'images/check.png'
-                    MDLabel:
-                        text:'Feito!'
-                        bold:True
-                MDCard:
-                    radius:7,7,7,7
-                    md_bg_color:app.theme_cls.primary_color
-                    ripple_behavior:True
-                    on_release:root.client_missed()
-                    Image:
-                        size_hint_x:None
-                        width:'30dp'
-                        source:'images/Xis.png'
-                    MDLabel:
-                        text:'Faltou!'
-                        bold:True
-                MDCard:
-                    radius:7,7,7,7
-                    md_bg_color:app.theme_cls.primary_color
-                    ripple_behavior:True
-                    on_release:root.block_client()
-                    Image:
-                        size_hint_x:None
-                        width:'28dp'
-                        source:'images/block.png'
-                    MDLabel:
-                        font_size:'15dp'
-                        text:'Bloquear!'
-                        bold:True
 

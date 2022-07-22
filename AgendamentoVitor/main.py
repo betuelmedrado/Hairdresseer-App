@@ -8,6 +8,7 @@ from kivymd.toast import toast
 from kivymd.uix.card import MDCard
 from kivymd.uix.label import MDLabel
 from kivymd.uix.spinner import MDSpinner
+from kivymd.uix.navigationdrawer import  MDNavigationDrawer
 
 
 from kivy.uix.screenmanager import ScreenManager, Screen
@@ -104,6 +105,7 @@ class LoginManager(Screen):
                 with open('refreshtoken.json','w') as file:
                     json.dump(requisicao_dic['refreshToken'], file)
 
+                # dic_login['nome'] = requisicao_dic['']
                 dic_login['email'] = requisicao_dic['email']
                 dic_login['id_login'] = requisicao_dic['localId']
 
@@ -695,7 +697,7 @@ class ManagerProfile(Screen):
                     saida = requisicao_dic['saida']
                     space_temp = requisicao_dic['space_temp']
 
-                toast(f'       {semana}\nEntrada - {entrada}\nSaida   -   {saida}\ntempo  -  {space_temp}', length_long=False)
+                toast(f'       {semana}\nEntrada - {entrada}\nSaida   -   {saida}\ntempo  -  {space_temp}')
             else:
                 pass
         except:
@@ -835,6 +837,7 @@ class ManagerProfile(Screen):
     def focus_entry_press(self, *args):
         self.ids.entry.focus = True
         Clock.schedule_once(self.focus_entry_leave,2)
+
     def focus_entry_leave(self, *args):
         self.ids.entry.focus = False
 
@@ -884,6 +887,8 @@ class ManagerProfile(Screen):
             self.ids.friday.state = 'normal'
             self.ids.saturday.state = 'normal'
 
+            self.ids.carosel.load_next()
+
             toast('Tabela de horas salva com sucesso!')
 # "For in end Point" ??????????????????????????????????????????????????????????????????????????????
         elif if_manager == 'manager':
@@ -916,6 +921,8 @@ class ManagerProfile(Screen):
             self.ids.friday.state = 'normal'
             self.ids.saturday.state = 'normal'
 
+            self.ids.carosel.load_next()
+
             toast('Tabela de horas salva com sucesso!')
 
     def save_servicos(self,*args):
@@ -942,6 +949,7 @@ class ManagerProfile(Screen):
                 toast('Categoria criada')
 
                 self.infill()
+                self.ids.carosel.load_next()
 
                 self.ids.nome_servico.text = ''
                 self.ids.tempo.text = ''
@@ -959,6 +967,8 @@ class ManagerProfile(Screen):
                 toast('Categoria criada')
 
                 self.infill()
+
+                self.ids.carosel.load_next()
 
                 self.ids.nome_servico.text = ''
                 self.ids.tempo.text = ''
@@ -1085,6 +1095,7 @@ class ManagerProfile(Screen):
             requisicao = requests.patch(link, data=info)
 
             toast('Local inserido com exito!')
+            self.ids.carosel.load_next()
         else:
             toast('Local não foi inserido folta de informação!')
 
@@ -1409,6 +1420,13 @@ class ViewSchedule(Screen):
     def on_pre_enter(self, *args):
         Clock.schedule_once(self.actualizar, 1)
 
+    def time_now(self):
+        h = datetime.today().hour
+        mim = datetime.today().minute
+        horas = f'{str(h).zfill(2)}:{str(mim).zfill(2)}'
+
+        return horas
+
     def get_manager(self, *args):
         requisicao = requests.get(self.LINK_SALAO + '.json')
         requisicao_dic = requisicao.json()
@@ -1680,14 +1698,8 @@ class ViewSchedule(Screen):
 
     def popup_mark_off(self,id_button, id_schedule, hours, hours_second, time, client, *args, **kwargs):
         id_user = ''
-        # info_schedule = self.info_entrace_salao()
-        # for id in info_schedule:
-        #     if id['id_user'] == self.user_id:
-        #         id_user = id['id_user']
-
         with open('write_id_manager.json', 'r') as file:
             id_user = json.load(file)
-
 
         box = MDBoxLayout(orientation='vertical')
         box_button = MDBoxLayout(padding=5,spacing=5)
@@ -1720,23 +1732,111 @@ class ViewSchedule(Screen):
 
         link = ''
 
-        print(id_user)
         if id_proficional['manager'] == "False":
             link = self.LINK_SALAO + f'/{id_manager}/socios/{id_user}/agenda/{self.dia_atual}/{info_login["id_login"]}.json'
-            print('False')
         elif id_proficional['manager'] == "True":
-            print('True')
             link = self.LINK_SALAO + f'/{id_manager}/agenda/{self.dia_atual}/{info_login["id_login"]}.json'
 
         requisicao = requests.delete(link)
         self.actualizar()
         self.popup.dismiss()
 
-    def blocked_schedule(self,id_button, hours):
-        proficional = self.get_id_proficional()
+    def blocked_schedule(self,id_button, id_schedule, hours, hours_second, client, *args):
 
-        if proficional['manager'] == 'True':
-            link = f'{self.LINK_SALAO}'
+        # id_manager_id_button = self.id_manager + f'{id_button}'
+
+        horas_hoje = self.time_now()
+        list_works = []
+        list_ids_schedule = []
+        link = ''
+
+        # variable to infomation of schedule ######################
+        list_id_marked = []
+        link_info = ''
+        free = ''
+        list_comparate_hours = []
+
+        # geting the id of Manager ##############################
+        # name_id = self.get_id_diverse()
+        if_manager = self.get_id_proficional()
+
+
+        with open('info_login.json','r') as arquivo:
+            info_user = json.load(arquivo)
+
+        id_user = info_user['id_login']
+        id_log_id_button = id_user + f'{id_button}'
+
+        horas = hours
+        valor = 0
+
+        # Here is to know is have schedule marked ##############################################
+        if if_manager['manager'] == "False":
+            link_info = f'{self.LINK_SALAO}/{self.id_manager}/socios/{if_manager["id_user"]}/agenda/{self.dia_atual}.json'
+        elif if_manager['manager'] == "True":
+            link_info = f'{self.LINK_SALAO}/{self.id_manager}/agenda/{self.dia_atual}.json'
+
+        try:
+            requisicao_if_scheduled = requests.get(link_info)
+            if_scheduled = requisicao_if_scheduled.json()
+
+            # Geting the id marked on schedule ###
+            for info in if_scheduled:
+                list_id_marked.append(info)
+
+            # Here getting the hours of marked ###
+            for id_marked in list_id_marked:
+                list_comparate_hours.append(if_scheduled[id_marked]['id_horas'])
+
+            free = horas in list_comparate_hours
+        except TypeError:
+            pass
+        # ######################################################################################
+
+
+        if if_manager['manager'] == "False":
+            link = f'{self.LINK_SALAO}/{self.id_manager}/socios/{if_manager["id_user"]}/agenda/{self.dia_atual}/{id_log_id_button}.json'
+        elif if_manager['manager'] == "True":
+            link = f'{self.LINK_SALAO}/{self.id_manager}/agenda/{self.dia_atual}/{id_log_id_button}.json'
+
+        # Creating the schedule Here ##########################################################################
+        info = f'{{"id_posicao":"{id_button}",' \
+               f'"id_horas":"{horas}",' \
+               f'"id_user":"{id_user}",' \
+               f'"tempo":"{self.space_temp}",' \
+               f'"valor":"{valor}",' \
+               f'"nome":"Reservado!",'\
+               f'"horas_agendamento": "{horas_hoje}",'\
+               f'"servicos":"{[]}"}}'
+
+        if free:
+            toast('Desculpe mais alguem acabou de agendar esse horário!')
+        else:
+            requisicao = requests.patch(link, data=info)
+            toast(f'Hora reservada!')
+
+        if if_manager['manager'] == "False":
+            # getting ids that are already scheduled ###########################################################################
+                link_cliente = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_user}/ids_agendado.json'
+                requisicao_client_get = requests.get(link_cliente)
+                requisicao_client_get_dic = requisicao_client_get.json()
+
+            # list_ids_schedule receiver the ids what is in cloud ##############################################################
+                if requisicao_client_get_dic != '':
+                    list_ids_schedule.append(requisicao_client_get_dic)
+
+            # list_ids_schedule receiver the id what go be schedule ############################################################
+                list_ids_schedule.append(if_manager['id_user'])
+
+            # Insert ids of schedule in user ###################################################################################
+                link_cliente = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_user}/ids_agendado.json'
+
+                info = f'{{"ids_agendado":"{list_ids_schedule}" }}'
+
+                requisicao_client = requests.patch(link_cliente, data=info)
+        else:
+            pass
+        self.actualizar()
 
     def get_hours(self,id_button, id_schedule, hours, hours_second, time, client, *args):
         hours_dic = {}
@@ -2280,6 +2380,30 @@ class InfoScheduleClient(Screen):
         except:
             pass
 
+    def done(self):
+        try:
+            cancelada = int(self.ids.quant_cancelada.text)
+            cancelada  = 0
+
+            with open('infoscheduleclient.json', 'r') as file:
+                info_schedule = json.load(file)
+            id_client = info_schedule['id_schedule']
+
+
+            link = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_client}.json'
+
+            info = f'{{"quant_cancelado":"{cancelada}"}}'
+            requisicao = requests.patch(link, data=info)
+
+            self.ids.quant_cancelada.text = str(cancelada)
+
+            self.ids.color_quant.md_bg_color = [0, 1, 0, 1]
+            self.ids.quant_cancelada.color = [0, 1, 0, 1]
+
+        except:
+            pass
+
+
     def client_missed(self):
 
         try:
@@ -2331,10 +2455,10 @@ class InfoScheduleClient(Screen):
             box_bt = MDBoxLayout(spacing='10dp', padding='5dp')
 
             pop = Popup(title='Liberar cliente?', size_hint=(None, None),
-                        size=(450, 300), content=box_content)
+                        size=('240dp', '200dp'), content=box_content)
 
-            bt_sim = Button(text='Liberar',on_release=pop.dismiss)
-            bt_nao = Button(text='Não', on_release=pop.dismiss)
+            bt_sim = Button(text='Sim!', background_color=(0.13, 0.53, 0.95,1),on_release=pop.dismiss)
+            bt_nao = Button(text='Não!',color=(0,0,0,1),background_color=(0.13, 0.53, 0.95,1), on_release=pop.dismiss)
 
             box_bt.add_widget(bt_sim)
             box_bt.add_widget(bt_nao)
@@ -2391,17 +2515,22 @@ class InfoScheduleClient(Screen):
             requisicao_dic = requisicao.json()
 
             list_string = requisicao_dic
+        try:
+            # "eval" To transform str in dictionary ##################################################################
+            list_work = eval(list_string)
 
-        list_work = eval(list_string)
+            for enum, work in enumerate(list_work):
+                valor += float(work['valor'].replace(',','.'))
+                myboxcategorie = MyBoxCategorie('',work['servico'], work['tempo'], str(float(str(work['valor']).replace(',','.'))).replace('.',','))
 
-        for enum, work in enumerate(list_work):
-            valor += float(work['valor'])
-            myboxcategorie = MyBoxCategorie('',work['servico'], work['tempo'], str(float(work['valor'])))
+                myboxcategorie.bind(on_release=self.nada_pass)
+                self.ids.box_work.add_widget(myboxcategorie)
+        except TypeError:
+            pass
 
-            myboxcategorie.bind(on_release=self.nada_pass)
-            self.ids.box_work.add_widget(myboxcategorie)
+        self.ids.id_valor.text = str(valor).replace('.',',') + ' [size=15][b]R$[/b][/size]'
 
-        self.ids.id_valor.text = str(valor)
+
 
     def nada_pass(selfm, *args):
         """

@@ -1,19 +1,27 @@
 
 <ScreenChoiceSchedule>:
+    canvas:
+        Rectangle:
+            size:root.size
+            pos:root.pos
+            source:'images/wallpaper.png'
+
     MDBoxLayout:
         orientation:'vertical'
 #        canvas:
 #            Color:
-#                rgba:1,1,1,.5
+#                rgba:0,0,0,1
 #            Rectangle:
 #                size:self.size
 #                pos:self.pos
-#                source:'images/fundo_madeira.jpg'
-
+##                source:'images/fundo_madeira.jpg'
+#                source:'images/wallpaper.png'
         MDToolbar:
             title:'Agendas'
             left_action_items:[['arrow-left-thick', lambda x:root.return_homepage()]]
             right_action_items:[['menu', lambda x:nav_drawer.set_state('open')]]
+        Widget:
+            size_hint_y:.10
         ScrollView:
             MDBoxLayout:
                 orientation:'vertical'
@@ -21,18 +29,43 @@
                 height:self.minimum_height
                 spacing:'20dp'
                 id:choice_schedule
+
     MDNavigationDrawer:
+        orientation:"vertical"
         id: nav_drawer
+        state:'close'
+        MDBoxLayout:
+            orientation:'vertical'
+            size_hint_y:None
+            height:'250dp'
+            md_bg_color:0,0,0,.2
+            FloatLayout:
+                Image:
+                    source:'images/barbershop.png'
+                    pos_hint:{'center_x':.5, 'center_y':.5}
+                MDLabel:
+                    font_size:'30sp'
+                    bold:True
+                    text:'BarberShop'
+                    outline_width:'3dp'
+                    outline_color:1,1,1,1
+                    pos_hint:{'x':.05, 'center_y':.1}
+                MDLabel:
+                    font_size:'30sp'
+                    bold:True
+                    text:'299'
+                    outline_width:'3dp'
+                    outline_color:1,1,1,1
+                    pos_hint:{'x':.8, 'center_y':.1}
         MDBoxLayout:
             orientation:'vertical'
             spacing:'15dp'
-            padding:('15dp',0,'5dp',0)
-            Image:
-                source:'images/person.png'
+            padding:('10dp',0,'5dp',0)
             MDSeparator:
+                md_bg_color:0.53, 0.54, 0.56,1
             MDBoxLayout:
                 size_hint_y:None
-                height:'30dp'
+                height:'60dp'
                 Image:
                     size_hint_x:None
                     height:'20dp'
@@ -42,4 +75,20 @@
                     secound_text:'Bloqueado'
                     on_release:app.root.current = 'clientblocked'
             MDSeparator:
+                md_bg_color:0.53, 0.54, 0.56,1
+            MDCard:
+                size_hint_y:None
+                height:'60dp'
+                padding:('20dp',0,0,0)
+                ripple_behavior:True
+                MDIcon:
+                    size_hint_x:None
+                    width:'60dp'
+                    icon_size:'200dp'
+                    icon:'cash-register'
+                MDLabel:
+                    text:'Registro de caixa'
+                    font_size:'25sp'
+                    bold:True
+
             Widget:

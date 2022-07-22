@@ -1,10 +1,10 @@
 
 #:include register_client.kv
 #:include module_screen/redefinition_senha.kv
+#:include module_screen/info_schedule_client.kv
 
 <Manager>:
-#    HoursSchedule:
-#        name:'hoursschedule'
+
     Register:
         name:'register'
     CreatBill:
@@ -17,6 +17,8 @@
         name:'viewshedule'
     HoursSchedule:
         name:'hoursschedule'
+    InfoScheduleClient:
+        name:'infoscheduleclient'
 
 
 <HomePage>:
@@ -290,7 +292,7 @@
 #                    on_release:root.save_scheduleing()
                     MDLabel:
                         text:'Salvar'
-                        color:0,0,0,.7
+                        color:1,1,1,.7
                         bold:True
                         halign:'center'
                     MDLabel:

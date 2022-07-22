@@ -11,6 +11,7 @@
     id_user:''
     nome:''
     on_release:root.send_info(self.socio_or_manager, self.id_user)
+    on_press: app.root.transition = WipeTransition()
     Image:
         source:'images/person.png'
     MDLabel:

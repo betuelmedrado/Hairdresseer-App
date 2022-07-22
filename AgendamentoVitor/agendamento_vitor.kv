@@ -16,6 +16,16 @@
 #:include module_screen/categories_work.kv
 #:include module_screen/box_blocked.kv
 
+# Here import the transition of screens =====================================
+
+#:import random random.random
+#:import SlideTransition kivy.uix.screenmanager.SlideTransition
+#:import SwapTransition kivy.uix.screenmanager.SwapTransition
+#:import WipeTransition kivy.uix.screenmanager.WipeTransition
+#:import FadeTransition kivy.uix.screenmanager.FadeTransition
+#:import RiseInTransition kivy.uix.screenmanager.RiseInTransition
+#:import FallOutTransition kivy.uix.screenmanager.FallOutTransition
+#:import NoTransition kivy.uix.screenmanager.NoTransition
 
 <Manager>:
     LoginManager:
@@ -39,13 +49,17 @@
     InfoScheduleClient:
         name:'infoscheduleclient'
 
+#(list) Application requirements
+#comma separated e.g requirements = sqlite3, kivy
+# => requirements = python3, kivy==stable1.11.1,sdl2_ttf==2.0.15
+
 <HomePage>:
     MDBoxLayout:
         orientation:'vertical'
         MDToolbar:
             title:'Home Page'
             left_action_items:[['account-arrow-left-outline',lambda x:root.return_login()]]
-            right_action_items:[['menu', lambda x:nav_drawer.set_state('open')]]
+            right_action_items:[['menu', lambda x: nav_drawer.set_state('open')]]
 
 
         FloatLayout:
@@ -94,6 +108,9 @@
                     elevation:'7dp'
                     ripple_behavior:True
                     on_release:app.root.current = 'screenchoiceschedule'
+                    on_press: app.root.transition = RiseInTransition()
+
+#                    on_press: app.root.transition = SlideTransition(direction="up")
                     Image:
                         source:'images/agenda.png'
                     MDBoxLayout:
@@ -142,13 +159,36 @@
                 id:num
 
     MDNavigationDrawer:
+        orientation:"vertical"
         id: nav_drawer
+        state:'close'
+        MDBoxLayout:
+            orientation:'vertical'
+            size_hint_y:None
+            height:'250dp'
+            md_bg_color:0,0,0,.2
+            FloatLayout:
+                Image:
+                    source:'images/barbershop.png'
+                    pos_hint:{'center_x':.5, 'center_y':.5}
+                MDLabel:
+                    font_size:'30sp'
+                    bold:True
+                    text:'BarberShop'
+                    outline_width:'3dp'
+                    outline_color:1,1,1,1
+                    pos_hint:{'x':.05, 'center_y':.1}
+                MDLabel:
+                    font_size:'30sp'
+                    bold:True
+                    text:'299'
+                    outline_width:'3dp'
+                    outline_color:1,1,1,1
+                    pos_hint:{'x':.8, 'center_y':.1}
         MDBoxLayout:
             orientation:'vertical'
             spacing:'15dp'
-            padding:('15dp',0,'5dp',0)
-            Image:
-                source:'images/person.png'
+            padding:('10dp',0,'5dp',0)
             MDSeparator:
                 md_bg_color:0.53, 0.54, 0.56,1
             MDBoxLayout:
@@ -164,6 +204,21 @@
                     on_release:app.root.current = 'clientblocked'
             MDSeparator:
                 md_bg_color:0.53, 0.54, 0.56,1
+
+            MDCard:
+                size_hint_y:None
+                height:'60dp'
+                padding:('20dp',0,0,0)
+                ripple_behavior:True
+                MDIcon:
+                    size_hint_x:None
+                    width:'60dp'
+                    icon_size:'200dp'
+                    icon:'cash-register'
+                MDLabel:
+                    text:'Registro de caixa'
+                    font_size:'25sp'
+                    bold:True
             Widget:
 
 
@@ -194,17 +249,41 @@
                     id:grid_shedule
 
     MDNavigationDrawer:
+        orientation:"vertical"
         id: nav_drawer
+        state:'close'
+        MDBoxLayout:
+            orientation:'vertical'
+            size_hint_y:None
+            height:'250dp'
+            md_bg_color:0,0,0,.2
+            FloatLayout:
+                Image:
+                    source:'images/barbershop.png'
+                    pos_hint:{'center_x':.5, 'center_y':.5}
+                MDLabel:
+                    font_size:'30sp'
+                    bold:True
+                    text:'BarberShop'
+                    outline_width:'3dp'
+                    outline_color:1,1,1,1
+                    pos_hint:{'x':.05, 'center_y':.1}
+                MDLabel:
+                    font_size:'30sp'
+                    bold:True
+                    text:'299'
+                    outline_width:'3dp'
+                    outline_color:1,1,1,1
+                    pos_hint:{'x':.8, 'center_y':.1}
         MDBoxLayout:
             orientation:'vertical'
             spacing:'15dp'
-            padding:('15dp',0,'5dp',0)
-            Image:
-                source:'images/person.png'
+            padding:('10dp',0,'5dp',0)
             MDSeparator:
+                md_bg_color:0.53, 0.54, 0.56,1
             MDBoxLayout:
                 size_hint_y:None
-                height:'30dp'
+                height:'60dp'
                 Image:
                     size_hint_x:None
                     height:'20dp'
@@ -214,4 +293,19 @@
                     secound_text:'Bloqueado'
                     on_release:app.root.current = 'clientblocked'
             MDSeparator:
+                md_bg_color:0.53, 0.54, 0.56,1
+            MDCard:
+                size_hint_y:None
+                height:'60dp'
+                padding:('20dp',0,0,0)
+                ripple_behavior:True
+                MDIcon:
+                    size_hint_x:None
+                    width:'60dp'
+                    icon_size:'200dp'
+                    icon:'cash-register'
+                MDLabel:
+                    text:'Registro de caixa'
+                    font_size:'25sp'
+                    bold:True
             Widget:

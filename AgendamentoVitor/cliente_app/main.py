@@ -152,9 +152,11 @@ class HomePage(Screen):
 
     def creat_files(self):
         try:
-            open('select_works.json','r')
+            with open('select_works.json','r') as select:
+                json.load(select)
         except FileNotFoundError:
-            open('select_works.json','w')
+            with open('select_works.json','w') as select:
+                json.dump([],select)
 
         try:
             with open('info_schedule.json','r') as arquivo:
@@ -176,6 +178,13 @@ class HomePage(Screen):
         except:
             with open('info_user.json', 'w') as file:
                 json.dump([], file)
+
+        try:
+            with open('infoscheduleclient.json', 'r') as file_info:
+                json.load(file_info)
+        except:
+            with open('infoscheduleclient.json', 'w') as file_info:
+                json.dump('', file_info)
 
     def return_login(self):
 
@@ -494,7 +503,7 @@ class Table_shedule(MDBoxLayout):
         self.time_cancel = str(time_cancel)
 
 class TableInfo(MDBoxLayout):
-    def __init__(self,id_button='',id_schedule='',hours='',client='',hours2='', time_cancel='',**kwargs):
+    def __init__(self,id_button='',id_schedule='',hours='',client='',hours2='', time='', time_cancel='',**kwargs):
 
         super().__init__(**kwargs)
         self.id_button = id_button
@@ -502,6 +511,7 @@ class TableInfo(MDBoxLayout):
         self.hours = str(hours)
         self.client = str(client)
         self.hours_2 = hours2
+        self.time = time
         self.time_cancel = str(time_cancel)
 
 class Table_block(MDBoxLayout):
@@ -665,7 +675,7 @@ class ViewSchedule(Screen):
 
 
             time_c = self.info_manager['time_cancel']
-            time_cancel = f'[color=#6B0A00][b]"Atenção":[/b][/color] Você tem {time_c} /H para desmarcar apos agendamento!'
+            time_cancel = f'[color=#6B0A00][b]"Atenção":[/b][/color] Você tem [b]{time_c}[/b] [size=13]H/M[/size] para desmarcar apos agendamento!'
 
             # variable to show the first schedule if it is scheduled, is implemented in "for range", I do this to display the correct schedule table
             # variável para mostrar o primeiro agendamento se for agendado, está implementado no "for range", Eu faço isso para exibir a tabela de agendamento correta
@@ -689,176 +699,106 @@ class ViewSchedule(Screen):
             while entrada[:2] < saida[:2]:
                 # Aqui é para saber a quantidade de agenda marcadas ############################################################
                 for num, agenda in enumerate(lista_info):
-                    # try:
+                    try:
+                        ranger_init = 0
 
-                    ranger_init = 0
+                        # ---------------------------------------------------------------------CHANGE
+                        # entry_temp = datetime.strptime(entrada, '%H:%M')
+                        #
+                        # # ftemp = str(f'00:{tempo}').zfill(2)
+                        # fhours, fmin = map(int, tempo.split(':'))
+                        # delta = timedelta(hours=fhours, minutes=fmin)
+                        # soma = entry_temp + delta
+                        # format_soma = soma.strftime('%H:%M')
+                        #
+                        # if format_soma > lista_info[num]['id_horas']:
+                        #     block = True
+                        #     permition_to_sum = True
+                        # --------------------------------------------------------------------------/CHANGE
 
-                    # ---------------------------------------------------------------------CHANGE
-                    # entry_temp = datetime.strptime(entrada, '%H:%M')
-                    #
-                    # # ftemp = str(f'00:{tempo}').zfill(2)
-                    # fhours, fmin = map(int, tempo.split(':'))
-                    # delta = timedelta(hours=fhours, minutes=fmin)
-                    # soma = entry_temp + delta
-                    # format_soma = soma.strftime('%H:%M')
-                    #
-                    # if format_soma > lista_info[num]['id_horas']:
-                    #     block = True
-                    #     permition_to_sum = True
-                    # --------------------------------------------------------------------------/CHANGE
+                        # Aqui compara o horario na posição horas e compara com o orario marcado na lista
+                        if entrada[:2] == lista_info[0]['id_horas'][:2] :#or entrada[:2] == lista_info[0]['id_horas'][:2]: # --------------------------------------------- [0] [num]
+                            for mim in range(ranger_init, ranger_last): # -----------------------------------------------Change +1
 
-                    # Aqui compara o horario na posição horas e compara com o orario marcado na lista
-                    if entrada[:2] == lista_info[0]['id_horas'][:2] :#or entrada[:2] == lista_info[0]['id_horas'][:2]: # --------------------------------------------- [0] [num]
-                        for mim in range(ranger_init, ranger_last): # -----------------------------------------------Change +1
+                                # ---------------------------------------------------------------------CHANGE
 
-                            # ---------------------------------------------------------------------CHANGE
+                                entry_future = datetime.strptime(entrada,'%H:%M')
+                                fmim = str(f'00:{mim}').zfill(2)
+                                ft_hours, ft_min = map(int,fmim.split(':'))
+                                delta_minutes = timedelta(hours=ft_hours ,minutes=ft_min)
+                                soma_future = entry_future + delta_minutes
 
-                            entry_future = datetime.strptime(entrada,'%H:%M')
-                            fmim = str(f'00:{mim}').zfill(2)
-                            ft_hours, ft_min = map(int,fmim.split(':'))
-                            delta_minutes = timedelta(hours=ft_hours ,minutes=ft_min)
-                            soma_future = entry_future + delta_minutes
+                                try:
+                                    if soma_future.strftime("%H:%M") > lista_info[1]['id_horas']:
+                                        entrada = lista_info[num]['id_horas']
+                                        mim = lista_info[num]['id_horas'][3:]
+                                    else:
+                                        pass
+                                except:
+                                    if soma_future.strftime("%H:%M") > lista_info[0]['id_horas']:
+                                        entrada = lista_info[num]['id_horas']
+                                        mim = lista_info[num]['id_horas'][3:]
+                                    else:
+                                        pass
 
-                            try:
-                                if soma_future.strftime("%H:%M") > lista_info[1]['id_horas']:
-                                    entrada = lista_info[num]['id_horas']
-                                    mim = lista_info[num]['id_horas'][3:]
-                                else:
-                                    pass
-                            except:
-                                if soma_future.strftime("%H:%M") > lista_info[0]['id_horas']:
-                                    entrada = lista_info[num]['id_horas']
-                                    mim = lista_info[num]['id_horas'][3:]
-                                else:
-                                    pass
+                                # --------------------------------------------------------------------------/CHANGE
 
-                            # --------------------------------------------------------------------------/CHANGE
+                                # conparing the minutes ###################################################################################
+                                if str(mim).zfill(2) == lista_info[0]['id_horas'][3:]: # ------------------ [0] [num]
+                                    ent = int(str(entrada[:2]).zfill(2))
+                                    entrada = f'{str(ent).zfill(2)}:{str(mim).zfill(2)}'
 
-                            # conparing the minutes ###################################################################################
-                            if str(mim).zfill(2) == lista_info[0]['id_horas'][3:]: # ------------------ [0] [num]
-                                ent = int(str(entrada[:2]).zfill(2))
-                                entrada = f'{str(ent).zfill(2)}:{str(mim).zfill(2)}'
+                                    entry = datetime.strptime(entrada,'%H:%M')
+                                    # temp = lista_info[num]['tempo']
+                                    temp = lista_info[0]['tempo'] # ----------------------------------------[0][num]
+                                    hours, minute = map(int,temp.split(':'))
+                                    delta_temp = timedelta(hours=hours, minutes=minute)
+                                    soma_horas = entry + delta_temp
 
-                                entry = datetime.strptime(entrada,'%H:%M')
-                                # temp = lista_info[num]['tempo']
-                                temp = lista_info[0]['tempo'] # ----------------------------------------[0][num]
-                                hours, minute = map(int,temp.split(':'))
-                                delta_temp = timedelta(hours=hours, minutes=minute)
-                                soma_horas = entry + delta_temp
+                                    if user_id == lista_info[0]['id_user']: # -----------------------------[0]
+                                        # Insert table #####################################################################################
+                                        table = TableInfo(str(cont), lista_info[num]['id_user'], entrada, 'Você agendou esse horarion', f'{soma_horas.strftime("%H:%M")}', lista_info[num]['tempo'], time_cancel)
+                                        self.ids.grid_shedule.add_widget(table)
+                                        list_content.append(entrada)
+                                        entrada = soma_horas.strftime('%H:%M')
+                                        block = True
+                                        permition_to_sum = False
+                                        seletor_schedule = True
+                                        # Variable to not permiting the cliet make other schedule ###########################################
+                                        self.agenda_marcada = True
+                                        ranger_init = entrada[3:]
+                                        # del(lista_info[num])
+                                        del(lista_info[0]) # ------------------------------------------
+                                        cont += 1
+                                        break
+                                    else:
+                                        table = Table_block(str(cont), '', entrada, 'Agendado!', f'{soma_horas.strftime("%H:%M")}')
+                                        self.ids.grid_shedule.add_widget(table)
+                                        list_content.append(entrada)
+                                        entrada = soma_horas.strftime('%H:%M')
+                                        block = True
+                                        permition_to_sum = False
+                                        seletor_schedule = True
+                                        ranger_init = entrada[3:]
+                                        # del(lista_info[num])
+                                        del(lista_info[0]) # ----------------------------------------------------
+                                        cont += 1
+                                        break
 
-                                if user_id == lista_info[0]['id_user']: # -----------------------------[0]
-                                    # Insert table #####################################################################################
-                                    table = TableInfo(str(cont), '', entrada, 'Você agendou esse horarion', f'{soma_horas.strftime("%H:%M")}', time_cancel)
+                                # para não dá erro, de sumir o agendamento anterior
+                                elif str(int(mim) + 1).zfill(2) == tempo[3:] and soma_future.strftime('%H:%M') <= lista_info[0]['id_horas'] :
+
+                                    # elif str(mim).zfill(2) == tempo[3:] and seletor_schedule == True :
+                                    table = Table_shedule(str(cont), '', entrada, f'', '', time_cancel)
                                     self.ids.grid_shedule.add_widget(table)
-                                    list_content.append(entrada)
-                                    entrada = soma_horas.strftime('%H:%M')
+                                    list_content.append('')
                                     block = True
-                                    permition_to_sum = False
-                                    seletor_schedule = True
-                                    # Variable to not permiting the cliet make other schedule ###########################################
-                                    self.agenda_marcada = True
+                                    permition_to_sum = True
                                     ranger_init = entrada[3:]
-                                    # del(lista_info[num])
-                                    del(lista_info[0]) # ------------------------------------------
-
-                                    # Exemplo: conta por exemplo 07:30  e depois 08:00  para saber si já tem agenda marcada nesse horário para não ocultar agenda ############
-                                    # if ranger_init == 0:
-                                    #     # ranger_init = int(tempo[3:])
-                                    #     ranger_init = int(entrada[3:]) # -------------------------------Change
-                                    #     ranger_last = 60 # ------------------------------------------------Change 60
-                                    # elif ranger_init == int(tempo[3:]):
-                                    #     ranger_init = 0
-                                    #     ranger_last = int(tempo[3:]) + 1
                                     cont += 1
-                                    break
-                                else:
-                                    table = Table_block(str(cont), '', entrada, 'Agendado!', f'{soma_horas.strftime("%H:%M")}')
-                                    self.ids.grid_shedule.add_widget(table)
-                                    list_content.append(entrada)
-                                    entrada = soma_horas.strftime('%H:%M')
-                                    block = True
-                                    permition_to_sum = False
-                                    seletor_schedule = True
-                                    ranger_init = entrada[3:]
-                                    # del(lista_info[num])
-                                    del(lista_info[0]) # ----------------------------------------------------
 
-                                    # Exemplo: conta por exemplo 07:30  e depois 08:00  para saber si já tem agenda marcada nesse horário para não ocultar agenda ############
-                                    # if ranger_init == 0:
-                                    #     # ranger_init = int(tempo[3:])
-                                    #     ranger_init = int(entrada[3:]) #-------------------------------------Change
-                                    #     ranger_last = 60 # --------------------------------------------------Change 60
-                                    # elif ranger_init == int(tempo[3:]):
-                                    #     ranger_init = 0
-                                    #     ranger_last = int(tempo[3:]) + 1
-                                    cont += 1
-                                    break
-
-                            # para não dá erro, de sumir o agendamento anterior
-                            elif str(int(mim) + 1).zfill(2) == tempo[3:] and soma_future.strftime('%H:%M') <= lista_info[0]['id_horas'] :
-
-                                # elif str(mim).zfill(2) == tempo[3:] and seletor_schedule == True :
-                                table = Table_shedule(str(cont), '', entrada, f'first', '', time_cancel)
-                                self.ids.grid_shedule.add_widget(table)
-                                list_content.append('')
-                                block = True
-                                permition_to_sum = True
-                                ranger_init = entrada[3:]
-                                cont += 1
-                                # Exemplo: conta por exemplo 07:30  e depois 08:00  para saber si já tem agenda marcada nesse horário para não ocultar agenda ############
-                                # if ranger_init == 0:
-                                #     ranger_init = int(tempo[3:])
-                                #     ranger_last = 60
-                                # elif ranger_init == int(tempo[3:]):
-                                #     ranger_init = 0
-                                #     ranger_last = int(tempo[3:]) + 1
-
-                            # elif int(mim) + 1 == int(tempo[3:] ):
-                            #
-                            #     # try:
-                            #     #     if soma_future.strftime("%H:%M") > lista_info[num + 1]['id_horas']:
-                            #     #         entrada = lista_info[num]['id_horas']
-                            #     #         mim = lista_info[num]['id_horas'][3:]
-                            #     #     else:
-                            #     #         table = Table_shedule(str(cont), '', entrada, f'second', '', time_cancel)
-                            #     #         self.ids.grid_shedule.add_widget(table)
-                            #     #         list_content.append('')
-                            #     #         block = True
-                            #     #         permition_to_sum = True
-                            #     #         seletor_schedule = False
-                            #     #         ranger_init = entrada[3:]
-                            #     #         cont += 1
-                            #     # except:
-                            #     #     if soma_future.strftime("%H:%M") > lista_info[num]['id_horas']:
-                            #     #         entrada = lista_info[num]['id_horas']
-                            #     #         mim = lista_info[num]['id_horas'][3:]
-                            #     #     else:
-                            #     #         table = Table_shedule(str(cont), '', entrada, f'second', '', time_cancel)
-                            #     #         self.ids.grid_shedule.add_widget(table)
-                            #     #         list_content.append('')
-                            #     #         block = True
-                            #     #         permition_to_sum = True
-                            #     #         seletor_schedule = False
-                            #     #         ranger_init = entrada[3:]
-                            #     #         cont += 1
-                            #
-                            #     table = Table_shedule(str(cont), '', entrada, f'second', '', time_cancel)
-                            #     self.ids.grid_shedule.add_widget(table)
-                            #     list_content.append('')
-                            #     block = True
-                            #     permition_to_sum = True
-                            #     seletor_schedule = False
-                            #     cont += 1
-                            # Exemplo: conta por exemplo 07:30  e depois 08:00  para saber si já tem agenda marcada nesse horário para não ocultar agenda ############
-                            # if ranger_init == 0:
-                            #     ranger_init = int(tempo[3:])
-                            #     ranger_last = 60
-                            # elif ranger_init == int(tempo[3:]):
-                            #     ranger_init = 0
-                            #     ranger_last = int(tempo[3:]) + 1
-
-                    # except:
-                    #     print('Deu algum erro na função actualizar da class "ViewSchedule"')
+                    except:
+                        raise
 
                 # except:
                 #     print('Deu algum erro na função actualizar da class "ViewSchedule"')
@@ -879,7 +819,7 @@ class ViewSchedule(Screen):
 
                     try:
                         if soma_tempo.strftime('%H:%M') <= lista_info[0]['id_horas']:
-                            table = Table_shedule(str(cont), '', entrada, f'last', '', time_cancel)
+                            table = Table_shedule(str(cont), '', entrada, f'', '', time_cancel)
                             self.ids.grid_shedule.add_widget(table)
                             list_content.append('')
                             permition_to_sum = True
@@ -888,20 +828,12 @@ class ViewSchedule(Screen):
                         else:
                             permition_to_sum = True
                     except IndexError:
-                        table = Table_shedule(str(cont), '', entrada, f'last 2', '', time_cancel)
+                        table = Table_shedule(str(cont), '', entrada, f'', '', time_cancel)
                         self.ids.grid_shedule.add_widget(table)
                         list_content.append('')
                         permition_to_sum = True
                         ranger_init = entrada[3:]
                         cont += 1
-
-                    # Exemplo: conta por exemplo 07:30  e depois 08:00  para saber si já tem agenda marcada nesse horário para não ocultar agenda ############
-                    # if ranger_init == 0:
-                    #     ranger_init = int(tempo[3:])
-                    #     ranger_last = 60
-                    # elif ranger_init == int(tempo[3:]):
-                    #     ranger_init = 0
-                    #     ranger_last = int(tempo[3:]) + 1
                 block = False
 
                 if permition_to_sum == True:
@@ -921,7 +853,7 @@ class ViewSchedule(Screen):
                 json.dump(list_content, file_list)
         except:
             toast('Nenhuma agenda para hoje!')
-            # raise
+            raise
 
     # def actualizar(self, *args):
     #     try:
@@ -1112,7 +1044,8 @@ class ViewSchedule(Screen):
         self.add_widget(self.spiner)
         Clock.schedule_once(partial(self.popup_mark_off, id_button, hours),2)
 
-    def popup_mark_off(self,id_button,hours, *args, **kwargs):
+
+    def popup_mark_off(self,id_button='', id_schedule='', hours='', client='', hours_second='', time='', time_cancel='', *args, **kwargs):
         id_user = ''
         # info_schedule = self.info_entrace_salao()
         # for id in info_schedule:
@@ -1144,8 +1077,30 @@ class ViewSchedule(Screen):
 
         bt_sim.bind(on_release = partial(self.cancel_schedule, id_user["id_user"]))
         bt_nao.bind(on_release = self.popup.dismiss)
+        bt_view.bind(on_release=partial(self.call_info_schedule, id_button, id_schedule, hours, client, hours_second, time, time_cancel))
 
         self.popup.open()
+
+    def call_info_schedule(self,id_button,id_schedule,hours, client, hours_second, time, time_cancel, *args):
+        dic_info = {}
+
+        dic_info['id_button'] = id_button
+        dic_info['id_schedule'] = id_schedule
+        dic_info['hours'] = hours
+        dic_info['client'] = client
+        dic_info['hours_second'] = hours_second
+        dic_info['time'] = time
+        dic_info['time_cancel'] = time_cancel
+
+        with open('infoscheduleclient.json', 'w') as file:
+            json.dump(dic_info, file, indent=2)
+
+        MDApp.get_running_app().root.current = 'infoscheduleclient'
+
+        try:
+            self.popup.dismiss()
+        except:
+            pass
 
     def check_time_cancel(self,cancel, time):
 
@@ -1201,7 +1156,7 @@ class ViewSchedule(Screen):
 
             try:
                 if requisicao_dic['bloqueado'] == 'True':
-                    toast('Você foi bloqueado! Entre em contato com um proficional ')
+                    toast('Você foi bloqueado! Entre em contato com um proficional do salão! ')
                 elif requisicao_dic['bloqueado'] == 'False':
                     self.get_hours(id_button, hours)
             except:
@@ -1246,7 +1201,7 @@ class HoursSchedule(Screen):
         except FileNotFoundError:
             pass
 
-        self.ids.categorie.add_widget(MDSpinner(size_hint=(None,None,), size=('46dp','46dp'),pos_hint={'center_x':.5}))
+        self.ids.categorie.add_widget(MDSpinner(size_hint=(None,None,), size=('46dp','46dp'),color=(0,0,0,1),pos_hint={'center_x':.5,'center_y':.5}))
         Clock.schedule_once(self.get_works, 2)
         self.includ_color_select()
         self.soma_hours_values()
@@ -1340,16 +1295,16 @@ class HoursSchedule(Screen):
 
                 servico = works_dic['nome_servico']
                 tempo = works_dic['tempo']
-                valor = works_dic['valor']
+                valor = (works_dic['valor'])
 
 
                 for iten in lista_color:
                     lista_name.append(iten['servico'])
 
                 if servico in lista_name:
-                    self.ids.categorie.add_widget(MyBoxCategorie(str(servico), str(tempo), str(valor), md_bg_color=[0.13, 0.53, 0.95,.2]))
+                    self.ids.categorie.add_widget(MyBoxCategorie('',str(servico), str(tempo), str(float(valor)).replace('.',','), md_bg_color=[0.13, 0.53, 0.95,.2]))
                 else:
-                    self.ids.categorie.add_widget(MyBoxCategorie(str(servico), str(tempo), str(valor)))
+                    self.ids.categorie.add_widget(MyBoxCategorie('', str(servico), str(tempo), str(float(valor)).replace('.',',')))
         except:
             try:
                 if socio_or_manager:
@@ -1455,14 +1410,15 @@ class HoursSchedule(Screen):
 
         # Sum the values ##################################
         for v in list_info:
-            valor += float(v['valor'])
+
+            valor += float(str(v['valor']).replace(',','.'))
 
 
         # Geting the hours
         tempo = f'{str(hours).zfill(2)}:{str(minute).zfill(2)}'
 
         self.ids.time.text = str(tempo)
-        self.ids.valor.text = str(valor)
+        self.ids.valor.text = str(valor).replace('.',',')
 
         self.hours_limit(tempo)
 
@@ -1532,9 +1488,9 @@ class HoursSchedule(Screen):
     def disable_release(self,*args):
         toast('O gendamento excede o horario do proximo agendamento escolha outro horario ou outro cabeleleiro!')
 
-    def verification_if_schedule(self, *args):
-        link = f'{self.LINK_SALAO}/'
-
+    # def verification_if_schedule(self, *args):
+    #     link = f'{self.LINK_SALAO}/'
+    #
 
 
     def save_scheduleing(self, *args):
@@ -1644,6 +1600,250 @@ class HoursSchedule(Screen):
             json.dump([], file)
         MDApp.get_running_app().root.current = 'viewshedule'
 
+
+class InfoScheduleClient(Screen):
+
+    LINK_DATA_BASE = 'https://shedule-vitor-default-rtdb.firebaseio.com/salao'
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+        self.manager_main = self.id_manager()
+
+        self.day_actual = datetime.today().isoweekday()
+
+    def on_pre_enter(self):
+
+        self.inf_schedule_client()
+
+    def on_leave(self):
+        self.ids.img_block.source = ''
+        self.ids.label_block.text = ''
+
+
+    def id_manager(self):
+
+        manager = ''
+
+        link_work = self.LINK_DATA_BASE + '.json'
+        requisicao = requests.get(link_work)
+        requisicao_dic = requisicao.json()
+
+        for id in requisicao_dic:
+            manager = id
+        return manager
+
+    def inf_schedule_client(self):
+        dic_inf = {}
+        with open('infoscheduleclient.json', 'r') as file:
+            info_schedule = json.load(file)
+
+        id_client = info_schedule['id_schedule']
+
+        self.ids.nome.text = f'[size=20][color=#9B9894]Nome[/color][/size]\n[color=#6B0A00]{info_schedule["client"]}[/color]'
+        self.ids.hours.text = f'[b]Agendado as[/b] [color=#6B0A00]{info_schedule["hours"]}[/color] [size=20]hs[/size]'
+        self.ids.hours_second.text = f'[b]Termino do serviço[/b] [color=#6B0A00]{info_schedule["hours_second"]}[/color] [size=20]hs[/size]'
+        self.ids.time.text = f'[b]Tempo de serviço[/b] [color=#6B0A00]{info_schedule["time"]}[/color] [size=20]hs[/size]'
+
+        self.work(id_client)
+        self.info_cliente_and_cancel(id_client)
+
+    def info_cliente_and_cancel(self,id_client,*args):
+
+        link = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_client}.json'
+        requisicao = requests.get(link)
+        requisicao_dic = requisicao.json()
+
+        try:
+            self.ids.quant_cancelada.text = str(requisicao_dic['quant_cancelado'])
+
+            # Here change the color and the number of quant cancel #########################################################
+            if int(requisicao_dic['quant_cancelado']) == 0:
+                self.ids.color_quant.md_bg_color = [0,1,0,1]
+                self.ids.quant_cancelada.color = [0,1,0,1]
+            elif int(requisicao_dic['quant_cancelado']) == 1:
+                self.ids.color_quant.md_bg_color = 1.00, 0.65, 0.16,1
+                self.ids.quant_cancelada.color = 1.00, 0.65, 0.16,1
+            elif int(requisicao_dic['quant_cancelado']) == 2:
+                self.ids.color_quant.md_bg_color = 1.00, 0.33, 0.03,1
+                self.ids.quant_cancelada.color = 1.00, 0.33, 0.03,1
+            elif int(requisicao_dic['quant_cancelado']) >= 3:
+                self.ids.color_quant.md_bg_color = 1,0,0,1
+                self.ids.quant_cancelada.color = 1,0,0,1
+
+            # Get if go cancel or not ######################################################################################
+            if requisicao_dic['bloqueado'] == 'True':
+                self.ids.img_block.source = 'images/bloqueado.png'
+                self.ids.label_block.text = 'Cliente bloqueado!'
+            else:
+                self.ids.img_block.source = ''
+                self.ids.label_block.text = ''
+        except:
+            pass
+
+    def done(self):
+        try:
+            cancelada = int(self.ids.quant_cancelada.text)
+            cancelada  = 0
+
+            with open('infoscheduleclient.json', 'r') as file:
+                info_schedule = json.load(file)
+            id_client = info_schedule['id_schedule']
+
+
+            link = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_client}.json'
+
+            info = f'{{"quant_cancelado":"{cancelada}"}}'
+            requisicao = requests.patch(link, data=info)
+
+            self.ids.quant_cancelada.text = str(cancelada)
+
+            self.ids.color_quant.md_bg_color = [0, 1, 0, 1]
+            self.ids.quant_cancelada.color = [0, 1, 0, 1]
+
+        except:
+            pass
+
+
+    def client_missed(self):
+
+        try:
+            cancelada = int(self.ids.quant_cancelada.text)
+            cancelada += 1
+
+            with open('infoscheduleclient.json', 'r') as file:
+                info_schedule = json.load(file)
+            id_client = info_schedule['id_schedule']
+
+
+            link = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_client}.json'
+
+            info = f'{{"quant_cancelado":"{cancelada}"}}'
+            requisicao = requests.patch(link, data=info)
+
+            self.ids.quant_cancelada.text = str(cancelada)
+
+            if cancelada == 1:
+                self.ids.color_quant.md_bg_color = 1.00, 0.65, 0.16,1
+                self.ids.quant_cancelada.color = 1.00, 0.65, 0.16,1
+            elif cancelada == 2:
+                self.ids.color_quant.md_bg_color = 1.00, 0.33, 0.03,1
+                self.ids.quant_cancelada.color = 1.00, 0.33, 0.03,1
+            elif cancelada >= 3:
+                self.ids.color_quant.md_bg_color = 1,0,0,1
+                self.ids.quant_cancelada.color = 1,0,0,1
+        except:
+            pass
+
+    def block_client(self):
+        with open('infoscheduleclient.json', 'r') as file:
+            info_schedule = json.load(file)
+        id_client = info_schedule['id_schedule']
+
+
+        link = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_client}.json'
+
+        info = f'{{"bloqueado":"True"}}'
+        requisicao = requests.patch(link, data=info)
+
+        self.ids.img_block.source = 'images/bloqueado.png'
+        self.ids.label_block.text = 'Cliente bloqueado!'
+
+    def popup_leave(self, *args, **kwargs):
+
+        if self.ids.img_block.source != '':
+            box_content = MDBoxLayout(orientation='vertical',spacing='5')
+            box_bt = MDBoxLayout(spacing='10dp', padding='5dp')
+
+            pop = Popup(title='Liberar cliente?', size_hint=(None, None),
+                        size=('240dp', '200dp'), content=box_content)
+
+            bt_sim = Button(text='Sim!', background_color=(0.13, 0.53, 0.95,1),on_release=pop.dismiss)
+            bt_nao = Button(text='Não!',color=(0,0,0,1),background_color=(0.13, 0.53, 0.95,1), on_release=pop.dismiss)
+
+            box_bt.add_widget(bt_sim)
+            box_bt.add_widget(bt_nao)
+
+            image = Image(source='images/atencao.png')
+
+            box_content.add_widget(image)
+            box_content.add_widget(box_bt)
+
+            bt_sim.bind(on_press=self.leave_client)
+
+            pop.open()
+        else:
+            pass
+
+    def leave_client(self, *args):
+
+        with open('infoscheduleclient.json', 'r') as file:
+            info_schedule = json.load(file)
+        id_client = info_schedule['id_schedule']
+
+        link = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_client}.json'
+
+        info = f'{{"bloqueado":"False"}}'
+        requisicao = requests.patch(link, data=info)
+
+        self.ids.img_block.source = ''
+        self.ids.label_block.text = ''
+
+
+    def work(self, id_client):
+        self.ids.box_work.clear_widgets()
+
+        list_string = ''
+        list_work = []
+        valor = 0
+
+        with open('write_id_manager.json','r') as file:
+            id_worker = json.load(file)
+
+        if id_worker['manager'] == 'True':
+            link_work = self.LINK_DATA_BASE + f'/{id_worker["id_user"]}/agenda/{self.day_actual}/{id_client}/servicos.json'
+            requisicao = requests.get(link_work)
+            requisicao_dic = requisicao.json()
+
+            list_string = requisicao_dic
+
+        elif id_worker['manager'] == 'False':
+
+            manager_main = self.manager_main
+
+            link_work = self.LINK_DATA_BASE + f'/{manager_main}/socios/{id_worker["id_user"]}/agenda/{self.day_actual}/{id_client}/servicos.json'
+            requisicao = requests.get(link_work)
+            requisicao_dic = requisicao.json()
+
+            list_string = requisicao_dic
+        try:
+            # "eval" To transform str in dictionary ##################################################################
+            list_work = eval(list_string)
+
+            for enum, work in enumerate(list_work):
+                valor += float(work['valor'].replace(',','.'))
+                myboxcategorie = MyBoxCategorieLabel(work['servico'], work['tempo'], str(float(str(work['valor']).replace(',','.'))).replace('.',','))
+
+                myboxcategorie.bind(on_release=self.nada_pass)
+                self.ids.box_work.add_widget(myboxcategorie)
+        except TypeError:
+            pass
+
+        self.ids.id_valor.text = str(valor).replace('.',',') + ' [size=15][b]R$[/b][/size]'
+
+
+
+    def nada_pass(selfm, *args):
+        """
+        Function with not return none
+        :return:
+        """
+        pass
+
+    def return_schedule(self):
+        MDApp.get_running_app().root.current = 'viewshedule'
+
+
 class MyCardButton(MDCard):
 
     def __init__(self, socio_or_manager='', id_user='', nome='', **kwargs):
@@ -1663,11 +1863,12 @@ class MyCardButton(MDCard):
 
         MDApp.get_running_app().root.current = 'viewshedule'
 
+
 class MyBoxCategorie(MDCard):
 
-    def __init__(self, servico='', tempo='', valor='', **kwargs):
+    def __init__(self,id_work='', servico='', tempo='', valor='', **kwargs):
         super().__init__(**kwargs)
-
+        self.id_work = id_work
         self.servico = str(servico)
         self.tempo = str(tempo)
         self.valor = str(valor)

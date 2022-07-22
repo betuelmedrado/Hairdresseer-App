@@ -118,6 +118,7 @@
                     pos_hint:{'center_x':.4, 'center_y':.3}
                     MyButtonCard_2:
                         first_text:'Bloquear!'
+                        on_release:app.root.get_screen('viewshedule').blocked_schedule(root.id_button, root.id_schedule,root.hours, root.hours_second, root.client)
 
                     MyButtonCard_2:
                         first_text:'Agendar!'

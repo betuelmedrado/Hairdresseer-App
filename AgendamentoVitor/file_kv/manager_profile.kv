@@ -71,7 +71,10 @@
                     MDLabel:
                         size_hint_y:None
                         height:'5dp'
-                        font_size:'15dp'
+                        font_size:'16sp'
+                        bold:True
+                        color:0,0,0,.7
+                        halign:'center'
                         text:'Celecione os dias que vai receber o horário!'
                     Widget:
                         size_hint_y:None
@@ -348,6 +351,7 @@
                     color:0,0,0,.7
                 MDIconButton:
                     icon:'arrow-right-bold-circle'
+                    id:icon_release
                     on_release:carosel.load_next()
 
 # division *********************************
