@@ -14,6 +14,13 @@
             elevation:9
             left_action_items:[['arrow-left',lambda x: root.return_login()]]
         Widget:
+            size_hint_y:.1
+        Image:
+            size_hint_y:None
+            height:'230dp'
+            source:'images/barbershop.png'
+        Widget:
+            size_hint_y:.3
         MDCard:
             orientation:'vertical'
             size_hint:.8, None
@@ -27,26 +34,27 @@
                 color:0,0,0,.6
             MDTextFieldRect:
                 size_hint_y:None
-                height:'30dp'
+                height:'40dp'
                 hint_text:'Email'
                 id:email
 
         MDCard:
             orientation:'vertical'
             size_hint:.8,None
-            height:'40dp'
+            height:'60sp'
             pos_hint:{'center_x':.5}
             ripple_behavior:True
             md_bg_color:0.16, 0.50, 0.73,1
             radius:20,5,20,5
+            padding:'10sp'
             on_release:root.send_email()
             Label:
                 bold:True
-                font_size:'25dp'
+                font_size:'20sp'
                 text:'Enviar'
             Label:
                 size_hint_y:None
-                height:'10dp'
+                height:'13sp'
                 font_size:'10dp'
                 text:'Mensagen'
 

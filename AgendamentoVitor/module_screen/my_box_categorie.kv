@@ -1,5 +1,6 @@
 
 <MyBoxCategorie>:
+    orientation:'vertical'
     size_hint_y:None
     height:'23dp'
     id_work:''
@@ -8,20 +9,22 @@
     valor:''
     ripple_behavior:True
 #    on_release:app.root.get_screen('managerprofile').pop_alteration(self.id_work,self.servico, self.tempo, self.valor)
-    MDLabel:
-        size_hint_x:.40
-        font_size:'25sp'
-        bold:True
-        color:1,0,0,.9
-        underline:True
-        text:root.servico
-    MDLabel:
-        size_hint_x:.40
-        font_size:'25sp'
-        bold:True
-        text:root.tempo
-    MDLabel:
-        size_hint_x:.20
-        font_size:'25sp'
-        bold:True
-        text:root.valor
+    MDBoxLayout:
+        MDLabel:
+            size_hint_x:.40
+            font_size:'17sp'
+            bold:True
+            color:1,0,0,.9
+            underline:True
+            text:root.servico
+        MDLabel:
+            size_hint_x:.40
+            font_size:'17sp'
+            bold:True
+            text:root.tempo
+        MDLabel:
+            size_hint_x:.20
+            font_size:'17sp'
+            bold:True
+            text:root.valor
+    MDSeparator:

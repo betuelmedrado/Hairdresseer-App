@@ -53,88 +53,95 @@ class HomePage(Screen):
 
     def on_pre_enter(self, *args):
         self.creat_files()
-        toast('Aguarde estamos carregando as informações!...')
+        toast('Aguarde carregando as informações!...')
 
         Clock.schedule_once(self.get_info, 1)
 
     def get_local(self, *args):
-
-        link = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}.json'
-
-        requisicao = requests.get(link)
-        requisicao_dic = requisicao.json()
-
-        local = requisicao_dic['local']
-        number = requisicao_dic['numero']
-
         try:
-            self.ids.rua.text = str(local.title())
-            self.ids.num.text = str(number)
-        except KeyError:
-            pass
+            link = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}.json'
+
+            requisicao = requests.get(link)
+            requisicao_dic = requisicao.json()
+
+            local = requisicao_dic['local']
+            number = requisicao_dic['numero']
+
+            try:
+                self.ids.rua.text = str(local.title())
+                self.ids.num.text = str(number)
+            except KeyError:
+                pass
+        except requests.exceptions.ConnectionError:
+            toast('Você não esta conectado a internet!')
 
     def get_id_manager(self, *args):
-        id = ''
-        requisicao = requests.get(self.LINK_SALAO)
-        requisicao_dic = requisicao.json()
-        for ids in requisicao_dic:
-            id = ids
-        return id
+        try:
+            id = ''
+            requisicao = requests.get(self.LINK_SALAO)
+            requisicao_dic = requisicao.json()
+            for ids in requisicao_dic:
+                id = ids
+            return id
+        except requests.exceptions.ConnectionError:
+            toast('Você não esta conectado a internet!')
 
     def get_info(self,*args):
 
         self.ids.my_card_button.clear_widgets()
-
-        with open('info_user.json', 'r') as file:
-            id_user = json.load(file)
-
-        # lista = []
-
-        # verification if have schedule in manager ########################################################################
-        check_image_manager = self.check_manager_scheduling()
-
-        # verification if have schedule in socio ##########################################################################
-        check_socio = self.check_socio_scheduling()
-
-        # geting the id of manager
         try:
-            LINK_ID = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}.json'
-            requisicao_id = requests.get(LINK_ID)
-            requisicao_id_dic = requisicao_id.json()
+            with open('info_user.json', 'r') as file:
+                id_user = json.load(file)
 
-            if check_image_manager:
-                my_card_button = MyCardButton(requisicao_id_dic['manager'], self.id_manager, requisicao_id_dic['nome'])
-                my_card_button.ids.image_check.add_widget(Image(source='images/check.png'))
-                self.ids.my_card_button.add_widget(my_card_button)
-            else:
-                self.ids.my_card_button.add_widget(MyCardButton(requisicao_id_dic['manager'], self.id_manager, requisicao_id_dic['nome']))
+            # lista = []
 
-            # for id_socios in requisicao_id_dic['socios']:
-            #     lista.append(id_socios)
-        except:
-            pass
+            # verification if have schedule in manager ########################################################################
+            check_image_manager = self.check_manager_scheduling()
 
-        # getting ids of user which is schedule ############################################################################
-        # for enum, id in enumerate(lista):
-        for enum, id in enumerate(self.id_socios):
+            # verification if have schedule in socio ##########################################################################
+            check_socio = self.check_socio_scheduling()
+
+            # geting the id of manager
             try:
-                # Here getting socio to read of data ##############################################################################
-                LINK_ID = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{id}.json'
-                requisicao_to_socio = requests.get(LINK_ID)
-                requisicao_to_socio_dic = requisicao_to_socio.json()
+                LINK_ID = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}.json'
+                requisicao_id = requests.get(LINK_ID)
+                requisicao_id_dic = requisicao_id.json()
 
-                try:
-                    if check_socio[enum]:
-                        card_button = MyCardButton(requisicao_to_socio_dic['manager'], id, requisicao_to_socio_dic['nome'])
-                        card_button.ids.image_check.add_widget(Image(source='images/check.png'))
-                        self.ids.my_card_button.add_widget(card_button)
-                    else:
-                        self.ids.my_card_button.add_widget(MyCardButton(requisicao_to_socio_dic['manager'], id, requisicao_to_socio_dic['nome']))
-                except:
-                    self.ids.my_card_button.add_widget(
-                        MyCardButton(requisicao_to_socio_dic['manager'], id, requisicao_to_socio_dic['nome']))
+                if check_image_manager:
+                    my_card_button = MyCardButton(requisicao_id_dic['manager'], self.id_manager, requisicao_id_dic['nome'])
+                    my_card_button.ids.image_check.add_widget(Image(source='images/check.png'))
+                    self.ids.my_card_button.add_widget(my_card_button)
+                else:
+                    self.ids.my_card_button.add_widget(MyCardButton(requisicao_id_dic['manager'], self.id_manager, requisicao_id_dic['nome']))
+
+                # for id_socios in requisicao_id_dic['socios']:
+                #     lista.append(id_socios)
             except:
                 pass
+
+            # getting ids of user which is schedule ############################################################################
+            # for enum, id in enumerate(lista):
+            for enum, id in enumerate(self.id_socios):
+                try:
+                    # Here getting socio to read of data ##############################################################################
+                    LINK_ID = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{id}.json'
+                    requisicao_to_socio = requests.get(LINK_ID)
+                    requisicao_to_socio_dic = requisicao_to_socio.json()
+
+                    try:
+                        if check_socio[enum]:
+                            card_button = MyCardButton(requisicao_to_socio_dic['manager'], id, requisicao_to_socio_dic['nome'])
+                            card_button.ids.image_check.add_widget(Image(source='images/check.png'))
+                            self.ids.my_card_button.add_widget(card_button)
+                        else:
+                            self.ids.my_card_button.add_widget(MyCardButton(requisicao_to_socio_dic['manager'], id, requisicao_to_socio_dic['nome']))
+                    except:
+                        self.ids.my_card_button.add_widget(
+                            MyCardButton(requisicao_to_socio_dic['manager'], id, requisicao_to_socio_dic['nome']))
+                except:
+                    pass
+        except requests.exceptions.ConnectionError:
+            toast('Você não esta conectado a internet!')
 
     def get_id_socios(self, *args):
 
@@ -147,6 +154,8 @@ class HomePage(Screen):
             for id in requisicao_dic:
                 lista_id_socio.append(id)
             return lista_id_socio
+        except requests.exceptions.ConnectionError:
+            toast('Você não esta conectado a internet!')
         except:
             pass
 
@@ -213,6 +222,9 @@ class HomePage(Screen):
                 return True
             else:
                 return False
+        except requests.exceptions.ConnectionError:
+            toast('Você não esta conectado a internet!')
+            return False
         except:
             return False
 
@@ -222,27 +234,31 @@ class HomePage(Screen):
         with open('info_user.json', 'r') as file:
             id_user = json.load(file)
 
-        # try:
-        for idsocio in self.id_socios:
-            LINK = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{idsocio}/agenda/{self.day_semana}.json'
-            requisicao = requests.get(LINK)
-            requisicao_dic = requisicao.json()
+        try:
+            for idsocio in self.id_socios:
+                LINK = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{idsocio}/agenda/{self.day_semana}.json'
+                requisicao = requests.get(LINK)
+                requisicao_dic = requisicao.json()
 
-            try:
-                for id in requisicao_dic:
-                    # list_of_id.append(id)
-                    if id_user['id_user'] == id:
-                        list_of_id.append(True)
-                        break
-                    else:
-                        list_of_id.append(False)
-            except:
-                list_of_id.append(False)
+                try:
+                    for id in requisicao_dic:
+                        # list_of_id.append(id)
+                        if id_user['id_user'] == id:
+                            list_of_id.append(True)
+                            break
+                        else:
+                            list_of_id.append(False)
+                except:
+                    list_of_id.append(False)
 
-        return list_of_id
-        # except:
-        #     list_of_id.append(False)
-        #     return list_of_id
+            return list_of_id
+        except requests.exceptions.ConnectionError:
+            toast('Você não esta conectado a internet!')
+            list_of_id.append(False)
+            return list_of_id
+        except:
+            list_of_id.append(False)
+            return list_of_id
 
 class Register(Screen):
 
@@ -273,6 +289,8 @@ class Register(Screen):
             else:
                 pass
             return user_id
+        except requests.exceptions.ConnectionError:
+            toast('Você não esta conectado a internet!')
         except:
             pass
 
@@ -290,78 +308,82 @@ class Register(Screen):
     def not_can_client(self):
         lista_info_ids = []
         ID_MANAGER = ''
+        try:
+            # Geting id of manager #########################################################################################
+            LINK_MANAGER = 'https://shedule-vitor-default-rtdb.firebaseio.com/salao.json'
+            requisicao_manager = requests.get(LINK_MANAGER)
+            requisicao_manager_dic = requisicao_manager.json()
 
-        # Geting id of manager #########################################################################################
-        LINK_MANAGER = 'https://shedule-vitor-default-rtdb.firebaseio.com/salao.json'
-        requisicao_manager = requests.get(LINK_MANAGER)
-        requisicao_manager_dic = requisicao_manager.json()
+            for id in requisicao_manager_dic:
+                ID_MANAGER = id
 
-        for id in requisicao_manager_dic:
-            ID_MANAGER = id
+            # Geting ids of socios #########################################################################################
 
-        # Geting ids of socios #########################################################################################
+            LINK_SOCIOS = f'https://shedule-vitor-default-rtdb.firebaseio.com/client.json'
+            requisicao_socio = requests.get(LINK_SOCIOS)
+            requisicao_socio_dic = requisicao_socio.json()
 
-        LINK_SOCIOS = f'https://shedule-vitor-default-rtdb.firebaseio.com/client.json'
-        requisicao_socio = requests.get(LINK_SOCIOS)
-        requisicao_socio_dic = requisicao_socio.json()
+            for id_socio in requisicao_socio_dic:
+                lista_info_ids.append(id_socio)
 
-        for id_socio in requisicao_socio_dic:
-            lista_info_ids.append(id_socio)
-
-        return lista_info_ids
+            return lista_info_ids
+        except requests.exceptions.ConnectionError:
+            toast('Você não esta conectado a internet!')
+            return lista_info_ids
 
     def logar(self,*args):
 
-        lista_info_ids = self.not_can_client()
-        print('listaaa ',lista_info_ids)
-
-        LINK = f'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={self.API_KEY}'
-
-        email = self.ids.email.text
-        senha = self.ids.senha.text
-        id_user = ''
-        id_token = ''
-        refresh_token = ''
-
-        info = {"email":email,
-                "password":senha,
-                "returnSecureToken":True}
-        requisicao = requests.post(LINK, data=info)
-        requisicao_dic = requisicao.json()
-
         try:
-            # ID of user #################################
-            id_user = requisicao_dic['localId']
+            lista_info_ids = self.not_can_client()
 
-            # ID of authentication of user ###############
-            id_token = requisicao_dic['idToken']
+            LINK = f'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={self.API_KEY}'
 
-            # RefreshToken of user
-            refresh_token = requisicao_dic['refreshToken']
+            email = self.ids.email.text
+            senha = self.ids.senha.text
+            id_user = ''
+            id_token = ''
+            refresh_token = ''
 
-            # Saving info of user ########################
-            self.save_info_user(id_user, id_token)
-        except:
-            pass
+            info = {"email":email,
+                    "password":senha,
+                    "returnSecureToken":True}
+            requisicao = requests.post(LINK, data=info)
+            requisicao_dic = requisicao.json()
 
-        if requisicao.ok:
-            if requisicao_dic['localId'] in lista_info_ids:
-                self.save_refreshtoken(refresh_token)
-                MDApp.get_running_app().root.current = 'homepage'
+            try:
+                # ID of user #################################
+                id_user = requisicao_dic['localId']
+
+                # ID of authentication of user ###############
+                id_token = requisicao_dic['idToken']
+
+                # RefreshToken of user
+                refresh_token = requisicao_dic['refreshToken']
+
+                # Saving info of user ########################
+                self.save_info_user(id_user, id_token)
+            except:
+                pass
+
+            if requisicao.ok:
+                if requisicao_dic['localId'] in lista_info_ids:
+                    self.save_refreshtoken(refresh_token)
+                    MDApp.get_running_app().root.current = 'homepage'
+                else:
+                    self.ids.warning.text = 'Email ou senha [color=D40A00]Invalida[/color]'
             else:
-                self.ids.warning.text = 'Email ou senha [color=D40A00]Invalida[/color]'
-        else:
-            erro = str(requisicao_dic['error']['message'])
+                erro = str(requisicao_dic['error']['message'])
 
-            if erro == 'INVALID_EMAIL':
-                self.ids.warning.text = 'Email [color=D40A00]Invalido[/color]'
-            elif erro == 'MISSING_PASSWORD':
-                self.ids.warning.text = 'Sem informação de [color=D40A00]Senha[/color]'
-            elif erro == 'INVALID_PASSWORD':
-                self.ids.warning.text = 'Senha [color=D40A00]Invalido[/color]'
-            elif erro == 'EMAIL_NOT_FOUND':
-                self.ids.warning.text = 'Email não [color=D40A00]Encontrado[/color]'
-
+                if erro == 'INVALID_EMAIL':
+                    self.ids.warning.text = 'Email [color=D40A00]Invalido[/color]'
+                elif erro == 'MISSING_PASSWORD':
+                    self.ids.warning.text = 'Sem informação de [color=D40A00]Senha[/color]'
+                elif erro == 'INVALID_PASSWORD':
+                    self.ids.warning.text = 'Senha [color=D40A00]Invalido[/color]'
+                elif erro == 'EMAIL_NOT_FOUND':
+                    self.ids.warning.text = 'Email não [color=D40A00]Encontrado[/color]'
+        except requests.exceptions.ConnectionError:
+            toast('Você não esta conectado a internet!')
 
 class CreatBill(Screen):
     #idToken
@@ -387,19 +409,23 @@ class CreatBill(Screen):
         :param refreshtoken: for permanent login
         :return:
         """
-        LINK_FIREBASE = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{localid}.json'
 
-        with open('refreshtoken.json','w') as arquivo:
-            json.dump(refreshtoken, arquivo)
+        try:
+            LINK_FIREBASE = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{localid}.json'
 
-        nome = self.ids.nome.text
+            with open('refreshtoken.json','w') as arquivo:
+                json.dump(refreshtoken, arquivo)
 
-        # info_user = '{"avatar":"photos2.png", "equipe":"", "total_vendas":"0","vendas":""}'
-        info_user = f'{{"nome":"{nome}",' \
-                    f' "quant_cancelado":"0",' \
-                    f' "bloqueado":"False",' \
-                    f'"ids_agendado":""}}'
-        creat_user = requests.patch(LINK_FIREBASE, data=info_user)
+            nome = self.ids.nome.text
+
+            # info_user = '{"avatar":"photos2.png", "equipe":"", "total_vendas":"0","vendas":""}'
+            info_user = f'{{"nome":"{nome}",' \
+                        f' "quant_cancelado":"0",' \
+                        f' "bloqueado":"False",' \
+                        f'"ids_agendado":""}}'
+            creat_user = requests.patch(LINK_FIREBASE, data=info_user)
+        except requests.exceptions.ConnectionError:
+            toast('Você não esta conectado a internet!')
 
     def creat_bill(self, *args, **kwargs):
 
@@ -451,9 +477,10 @@ class CreatBill(Screen):
                     self.ids.warning.text = 'Esse [color=D40A00]Email[/color] já possue uma conta'
                 elif erro == 'WEAK_PASSWORD : Password should be at least 6 characters':
                     self.ids.warning.text = 'A [color=D40A00]senha[/color] deve ter pelo menos\n6 caracteres'
-                print(erro)
+            except requests.exceptions.ConnectionError:
+                toast('Você não esta conectado a internet!')
         else:
-            print('last')
+            pass
 
 class RedefinitionSenha(Screen):
     API_KEY = 'AIzaSyAue2_eYU5S5TsUc692vHNlyxIHrlBVZjk'
@@ -465,28 +492,31 @@ class RedefinitionSenha(Screen):
         :param args:
         :return:
         """
-        LINK_FOR_API = f'https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key={self.API_KEY}'
+        try:
+            LINK_FOR_API = f'https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key={self.API_KEY}'
 
-        email = self.ids.email.text
+            email = self.ids.email.text
 
-        info = {"requestType":"PASSWORD_RESET",
-               "email": email}
+            info = {"requestType":"PASSWORD_RESET",
+                   "email": email}
 
-        requisicao = requests.post(LINK_FOR_API, data=info)
-        requisicao_dic = requisicao.json()
+            requisicao = requests.post(LINK_FOR_API, data=info)
+            requisicao_dic = requisicao.json()
 
-        error = requisicao_dic['error']['message']
+            error = requisicao_dic['error']['message']
 
-        if requisicao.ok:
-            toast('Foi enviado uma mensagem no email informado para redefinir a senha!')
-        elif error == 'MISSING_EMAIL':
-            toast('Insira um e-mail valido!')
-        elif error == 'INVALID_EMAIL':
-            toast('Email invalido!')
-        elif error  == 'EMAIL_NOT_FOUND':
-            toast('Email não encontrado!')
-        else:
-            pass
+            if requisicao.ok:
+                toast('Foi enviado uma mensagem no email informado para redefinir a senha!')
+            elif error == 'MISSING_EMAIL':
+                toast('Insira um e-mail valido!')
+            elif error == 'INVALID_EMAIL':
+                toast('Email invalido!')
+            elif error  == 'EMAIL_NOT_FOUND':
+                toast('Email não encontrado!')
+            else:
+                pass
+        except requests.exceptions.ConnectionError:
+            toast('Você não esta conectado a internet!')
 
     def return_login(self):
         MDApp.get_running_app().root.current = 'register'
@@ -531,22 +561,33 @@ class ViewSchedule(Screen):
         # Geting day actual ##########################################################################
         self.dia_atual = datetime.today().isoweekday()
 
-        LINK_ID_MANAGER = requests.get('https://shedule-vitor-default-rtdb.firebaseio.com/salao.json')
-        for id in LINK_ID_MANAGER.json():
-            self.id_manager = id
+        Clock.schedule_once(self.call_init,4)
 
-        # Link of SALÃO ##############################################################################
-        self.LINK_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}'
+    def call_init(self, *args):
+        try:
+            LINK_ID_MANAGER = requests.get('https://shedule-vitor-default-rtdb.firebaseio.com/salao.json')
+            for id in LINK_ID_MANAGER.json():
+                self.id_manager = id
 
-        # Geting information of manager ##############################################################
-        self.info_manager = self._info_manager()
+            # Link of SALÃO ##############################################################################
+            self.LINK_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}'
+
+            # Geting information of manager ##############################################################
+            self.info_manager = self._info_manager()
+        except requests.exceptions.ConnectionError:
+            toast('Você não esta conectado a internet!')
 
     def _info_manager(self, *args):
-        link = f'{self.LINK_SALAO}.json'
-        requisicao = requests.get(link)
-        requisicao_dic = requisicao.json()
+        try:
+            link = f'{self.LINK_SALAO}.json'
+            requisicao = requests.get(link)
+            requisicao_dic = requisicao.json()
 
-        return requisicao_dic
+            return requisicao_dic
+        except requests.exceptions.ConnectionError:
+            toast('Você não esta conectado a internet!')
+        except:
+            pass
 
     def on_pre_enter(self, *args):
         Clock.schedule_once(self.actualizar, 1)
@@ -585,6 +626,8 @@ class ViewSchedule(Screen):
                 return user_id
             else:
                 pass
+        except requests.exceptions.ConnectionError:
+            toast('Você não esta conectado a internet!')
         except:
             pass
 
@@ -593,72 +636,74 @@ class ViewSchedule(Screen):
         lista_info = []
         lista_requisicao = []
 
-        # try:
-        # information socio ############################################################################################
-        if id_manager["manager"] == 'False':
-            # Here if not manager then get the socio #########################################################################
-            LINK_SALAO = f'{self.LINK_SALAO}/socios/{id_manager["id_user"]}.json'
-            requisicao = requests.get(LINK_SALAO)
-            requisicao_dic = requisicao.json()
+        try:
+            # information socio ############################################################################################
+            if id_manager["manager"] == 'False':
+                # Here if not manager then get the socio #########################################################################
+                LINK_SALAO = f'{self.LINK_SALAO}/socios/{id_manager["id_user"]}.json'
+                requisicao = requests.get(LINK_SALAO)
+                requisicao_dic = requisicao.json()
 
-            nome = requisicao_dic['nome']
-            self.ids.title_toobar.title = f'Agenda {str(nome)}'
+                nome = requisicao_dic['nome']
+                self.ids.title_toobar.title = f'Agenda {str(nome)}'
 
-            self.entrada = requisicao_dic[f'{self.dia_atual}']['entrada']
+                self.entrada = requisicao_dic[f'{self.dia_atual}']['entrada']
 
-            self.saida = requisicao_dic[f'{self.dia_atual}']['saida']
+                self.saida = requisicao_dic[f'{self.dia_atual}']['saida']
 
-            self.space_temp = requisicao_dic[f'{self.dia_atual}']['space_temp']
+                self.space_temp = requisicao_dic[f'{self.dia_atual}']['space_temp']
 
-            try:
-                # Estes "FOR" é porque esta dando erro as vêzes quer "self.dia_atual" STR ou INT #######################
                 try:
-                    for id_agenda in requisicao_dic['agenda'][int(self.dia_atual)]:
-                        lista_info.append(requisicao_dic['agenda'][int(self.dia_atual)][id_agenda])
+                    # Estes "FOR" é porque esta dando erro as vêzes quer "self.dia_atual" STR ou INT #######################
+                    try:
+                        for id_agenda in requisicao_dic['agenda'][int(self.dia_atual)]:
+                            lista_info.append(requisicao_dic['agenda'][int(self.dia_atual)][id_agenda])
+                    except:
+                        for id_agenda in requisicao_dic['agenda'][str(self.dia_atual)]:
+                            lista_info.append(requisicao_dic['agenda'][str(self.dia_atual)][id_agenda])
+                    return lista_info
                 except:
-                    for id_agenda in requisicao_dic['agenda'][str(self.dia_atual)]:
-                        lista_info.append(requisicao_dic['agenda'][str(self.dia_atual)][id_agenda])
-                return lista_info
-            except:
-                return lista_info
+                    return lista_info
 
-        elif id_manager["manager"] == 'True':
-            # Here to geting the id of manager to get schedule #######################################
-            requisicao = requests.get(self.LINK_SALAO + '.json')
-            requisicao_dic = requisicao.json()
+            elif id_manager["manager"] == 'True':
+                # Here to geting the id of manager to get schedule #######################################
+                requisicao = requests.get(self.LINK_SALAO + '.json')
+                requisicao_dic = requisicao.json()
 
-            nome = requisicao_dic['nome']
-            self.ids.title_toobar.title = f'Agenda {str(nome)}'
+                nome = requisicao_dic['nome']
+                self.ids.title_toobar.title = f'Agenda {str(nome)}'
 
-            self.entrada = requisicao_dic[f'{self.dia_atual}']['entrada']
+                self.entrada = requisicao_dic[f'{self.dia_atual}']['entrada']
 
-            self.saida = requisicao_dic[f'{self.dia_atual}']['saida']
+                self.saida = requisicao_dic[f'{self.dia_atual}']['saida']
 
-            self.space_temp = requisicao_dic[f'{self.dia_atual}']['space_temp']
+                self.space_temp = requisicao_dic[f'{self.dia_atual}']['space_temp']
 
-            # print(requisicao_dic['agenda'][self.dia_atual])
+                # print(requisicao_dic['agenda'][self.dia_atual])
 
-            # Here get the ids of schedule client ######################################################################
-            try:
-                # Estes "FOR" é porque esta dando erro as vêzes quer "self.dia_atual" STR ou INT #######################
+                # Here get the ids of schedule client ######################################################################
                 try:
-                    for id_agenda in requisicao_dic['agenda'][int(self.dia_atual)]:
-                        lista_info.append(requisicao_dic['agenda'][int(self.dia_atual)][id_agenda])
-                except:
-                    for id_agenda in requisicao_dic['agenda'][str(self.dia_atual)]:
-                        lista_info.append(requisicao_dic['agenda'][str(self.dia_atual)][id_agenda])
-                return lista_info
+                    # Estes "FOR" é porque esta dando erro as vêzes quer "self.dia_atual" STR ou INT #######################
+                    try:
+                        for id_agenda in requisicao_dic['agenda'][int(self.dia_atual)]:
+                            lista_info.append(requisicao_dic['agenda'][int(self.dia_atual)][id_agenda])
+                    except:
+                        for id_agenda in requisicao_dic['agenda'][str(self.dia_atual)]:
+                            lista_info.append(requisicao_dic['agenda'][str(self.dia_atual)][id_agenda])
+                    return lista_info
 
-            except:
-                return lista_info
+                except:
+                    return lista_info
         # else:
         #     self.entrada = '00:00'
         #     self.saida = '00:00'
         #     self.space_temp = '00:00'
         #     self.ids.title_toobar.title = f' Agenda {str(nome)}'
         #     return lista_info
-        # except:
-        #     pass
+        except requests.exceptions.ConnectionError:
+            toast('Você não esta conectado a internet!')
+        except:
+            pass
 
     def actualizar(self, *args):
         try:
@@ -851,196 +896,14 @@ class ViewSchedule(Screen):
             # using in class "HoursSchedule" function "hours_limit" ###########
             with open('list_content.json','w') as file_list:
                 json.dump(list_content, file_list)
+        except requests.exceptions.ConnectionError:
+            toast('Você não esta conectado a internet!')
         except:
             toast('Nenhuma agenda para hoje!')
             raise
 
-    # def actualizar(self, *args):
-    #     try:
-    #         # get user id ##################################################################################################
-    #         # Variaveis #############################
-    #         user_id = self.log_aut()
-    #         lista_info = self.info_entrace_salao()
-    #
-    #         self.agenda_marcada = False
-    #         list_content = []
-    #         entrada = self.entrada
-    #         saida = self.saida
-    #         tempo = self.space_temp
-    #         time_c = self.info_manager['time_cancel']
-    #         time_cancel = f'[color=#6B0A00][b]"Atenção":[/b][/color] Você tem {time_c} /H para desmarcar apos agendamento!'
-    #         pos_lista = 0
-    #
-    #         # variable to show the first schedule if it is scheduled, is implemented in "for range", I do this to display the correct schedule table
-    #         # variável para mostrar o primeiro agendamento se for agendado, está implementado no "for range", Eu faço isso para exibir a tabela de agendamento correta
-    #         ranger_init = 0
-    #         ranger_last = int(tempo[3:])
-    #
-    #         # lista = ['']
-    #         block = False
-    #         permition_to_sum = True
-    #
-    #         # To conting the position of schedule to verification of next schedule
-    #         cont = 00
-    #
-    #         self.ids.grid_shedule.clear_widgets()
-    #
-    #         # Here i am sorting the list "lista_info" in key "['id_horas']" #########################################################
-    #         ordem = sorted(lista_info, key=lambda valor: valor['id_horas'])
-    #         lista_info = ordem
-    #
-    #         # try:
-    #         while entrada[:2] < saida[:2]:
-    #             # Aqui é para saber a quantidade de agenda marcadas ############################################################
-    #             for num, agenda in enumerate(lista_info):
-    #                 pos_lista = num
-    #
-    #                 # try:
-    #                 # Aqui compara o horario na posição horas e compara com o orario marcado na lista
-    #                 if entrada[:2] == lista_info[num]['id_horas'][:2]:
-    #                     for mim in range(ranger_init,
-    #                                      ranger_last):  # -----------------------------------------------Change +1
-    #                         # ---------------------------------------------------------------------CHANGE
-    #                         entry_future = datetime.strptime(entrada, '%H:%M')
-    #
-    #                         fmim = str(f'00:{mim}').zfill(2)
-    #                         ft_hours, ft_min = map(int, fmim.split(':'))
-    #                         delta_minutes = timedelta(hours=ft_hours, minutes=ft_min)
-    #                         soma_future = entry_future + delta_minutes
-    #
-    #                         try:
-    #                             if soma_future.strftime("%H:%M") > lista_info[num + 1]['id_horas']:
-    #                                 entrada = lista_info[num]['id_horas']
-    #                                 mim = lista_info[num]['id_horas'][3:]
-    #                             else:
-    #                                 pass
-    #                         except:
-    #                             if soma_future.strftime("%H:%M") > lista_info[num]['id_horas']:
-    #                                 entrada = lista_info[num]['id_horas']
-    #                                 mim = lista_info[num]['id_horas'][3:]
-    #                             else:
-    #                                 pass
-    #
-    #                         # --------------------------------------------------------------------------/CHANGE
-    #
-    #                         # conparing the minutes ###################################################################################
-    #                         if str(mim).zfill(2) == lista_info[num]['id_horas'][3:]:
-    #                             ent = int(str(entrada[:2]).zfill(2))
-    #                             entrada = f'{str(ent).zfill(2)}:{str(mim).zfill(2)}'
-    #
-    #                             entry = datetime.strptime(entrada, '%H:%M')
-    #                             temp = lista_info[num]['tempo']
-    #                             hours, minute = map(int, temp.split(':'))
-    #                             delta_temp = timedelta(hours=hours, minutes=minute)
-    #                             soma_horas = entry + delta_temp
-    #
-    #                             if user_id == lista_info[num]['id_user']:
-    #                                 # Insert table #####################################################################################
-    #                                 table = TableInfo(str(cont), '', entrada, 'Você agendou esse horarion',
-    #                                                   f'{soma_horas.strftime("%H:%M")}', time_cancel)
-    #                                 self.ids.grid_shedule.add_widget(table)
-    #                                 entrada = soma_horas.strftime('%H:%M')
-    #                                 block = True
-    #                                 permition_to_sum = False
-    #                                 # Variable to not permiting the cliet make other schedule ###########################################
-    #                                 self.agenda_marcada = True
-    #                                 del (lista_info[num])
-    #
-    #                                 # Exemplo: conta por exemplo 07:30  e depois 08:00  para saber si já tem agenda marcada nesse horário para não ocultar agenda ############
-    #                                 if ranger_init == 0:
-    #                                     # ranger_init = int(tempo[3:])
-    #                                     ranger_init = int(entrada[3:])  # -------------------------------Change
-    #                                     ranger_last = 60  # ------------------------------------------------Change 60
-    #                                 elif ranger_init == int(tempo[3:]):
-    #                                     ranger_init = 0
-    #                                     ranger_last = int(tempo[3:]) + 1
-    #
-    #                                 break
-    #                             else:
-    #                                 table = Table_block(str(cont), '', entrada, 'Agendado!',
-    #                                                     f'{soma_horas.strftime("%H:%M")}')
-    #                                 self.ids.grid_shedule.add_widget(table)
-    #                                 list_content.append(entrada)
-    #                                 entrada = soma_horas.strftime('%H:%M')
-    #                                 block = True
-    #                                 permition_to_sum = False
-    #                                 del (lista_info[num])
-    #
-    #                                 # Exemplo: conta por exemplo 07:30  e depois 08:00  para saber si já tem agenda marcada nesse horário para não ocultar agenda ############
-    #                                 if ranger_init == 0:
-    #                                     # ranger_init = int(tempo[3:])
-    #                                     ranger_init = int(entrada[3:])  # -------------------------------------Change
-    #                                     ranger_last = 60  # --------------------------------------------------Change 60
-    #                                 elif ranger_init == int(tempo[3:]):
-    #                                     ranger_init = 0
-    #                                     ranger_last = int(tempo[3:]) + 1
-    #                                 break
-    #
-    #                         # para não dá erro, de sumir o agendamento anterior
-    #                         elif str(mim).zfill(2) == tempo[3:]:
-    #                             table = Table_shedule(str(cont), '', entrada, f'', '', time_cancel)
-    #                             self.ids.grid_shedule.add_widget(table)
-    #                             list_content.append('')
-    #                             block = True
-    #                             permition_to_sum = True
-    #
-    #                             # Exemplo: conta por exemplo 07:30  e depois 08:00  para saber si já tem agenda marcada nesse horário para não ocultar agenda ############
-    #                             if ranger_init == 0:
-    #                                 ranger_init = int(tempo[3:])
-    #                                 ranger_last = 60
-    #                             elif ranger_init == int(tempo[3:]):
-    #                                 ranger_init = 0
-    #                                 ranger_last = int(tempo[3:]) + 1
-    #
-    #                 # except:
-    #                 #     print('Deu algum erro na função actualizar da class "ViewSchedule"')
-    #
-    #             # except:
-    #             #     print('Deu algum erro na função actualizar da class "ViewSchedule"')
-    #
-    #             # Here block to not have repetition ########################################################################
-    #             # Aqui bloqueia para não ter repetições
-    #
-    #             # ranger_init = 30
-    #             # ranger_last = 60
-    #
-    #             if block == False:
-    #                 table = Table_shedule(str(cont), '', entrada, f'', '', time_cancel)
-    #                 self.ids.grid_shedule.add_widget(table)
-    #                 list_content.append('')
-    #                 permition_to_sum = True
-    #
-    #                 # Exemplo: conta por exemplo 07:30  e depois 08:00  para saber si já tem agenda marcada nesse horário para não ocultar agenda ############
-    #                 if ranger_init == 0:
-    #                     ranger_init = int(tempo[3:])
-    #                     ranger_last = 60
-    #                 elif ranger_init == int(tempo[3:]):
-    #                     ranger_init = 0
-    #                     ranger_last = int(tempo[3:]) + 1
-    #             block = False
-    #
-    #             if permition_to_sum == True:
-    #
-    #                 # adding up the hours ####################################
-    #                 # somando as horas ##
-    #                 inicio = datetime.strptime(entrada, '%H:%M')
-    #                 horas, minutos = map(int, tempo.split(':'))
-    #                 delta_tempo = timedelta(hours=horas, minutes=minutos)
-    #                 final = inicio + delta_tempo
-    #                 entrada = final.strftime('%H:%M')
-    #
-    #             cont += 1
-    #
-    #         # using in class "HoursSchedule" function "hours_limit" ###########
-    #         with open('list_content.json', 'w') as file:
-    #             json.dump(list_content, file)
-    #     except:
-    #         toast('Nenhuma agenda para hoje!')
-
-    # Open and inserting the hours in class HoursSchedule #######################################
-
     def spiner(self,id_button, hours, *args, **kwargs):
-        self.spiner = MDSpinner(size_hint=(None, None,), size=('46dp', '46dp'), pos_hint={'center_x': .5, 'center_y': .5})
+        self.spiner = MDSpinner(size_hint=(None, None,), size=('46dp', '46dp'), pos_hint={'center_x': .5, 'center_y': .1})
         self.add_widget(self.spiner)
         Clock.schedule_once(partial(self.popup_mark_off, id_button, hours),2)
 
@@ -1120,47 +983,54 @@ class ViewSchedule(Screen):
         return info
 
     def cancel_schedule(self, id_user, *args, **kwargs):
-        id_proficional = self.get_id_proficional()
-        time_cancel = self.info_manager['time_cancel']
 
-        link = ''
+        try:
+            id_proficional = self.get_id_proficional()
+            time_cancel = self.info_manager['time_cancel']
 
-        if id_proficional['manager'] == "False":
-            link = self.LINK_SALAO + f'/socios/{id_proficional["id_user"]}/agenda/{self.dia_atual}/{id_user}.json'
+            link = ''
 
-        elif id_proficional['manager'] == "True":
-            link = self.LINK_SALAO + f'/agenda/{self.dia_atual}/{id_user}.json'
+            if id_proficional['manager'] == "False":
+                link = self.LINK_SALAO + f'/socios/{id_proficional["id_user"]}/agenda/{self.dia_atual}/{id_user}.json'
 
-        requisicao = requests.get(link)
-        requisicao_dic = requisicao.json()
-
-        cancelar = self.check_time_cancel(str(time_cancel),requisicao_dic['horas_agendamento'])
-
-        if cancelar:
-            toast(f'O agendamento não pode ser cancelado\nPassou do tempo de {time_cancel} h/m!')
-        else:
-            requisicao = requests.delete(link)
-            self.actualizar()
-
-        self.popup.dismiss()
-
-    def if_blocked(self,id_button, hours):
-
-        if self.agenda_marcada:
-            toast('Você já tem um agendamento marcado aqui para fazer outro agendamento\nCancele o seu agendamento!')
-        else:
-            link = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{self.user_id}.json'
+            elif id_proficional['manager'] == "True":
+                link = self.LINK_SALAO + f'/agenda/{self.dia_atual}/{id_user}.json'
 
             requisicao = requests.get(link)
             requisicao_dic = requisicao.json()
 
-            try:
-                if requisicao_dic['bloqueado'] == 'True':
-                    toast('Você foi bloqueado! Entre em contato com um proficional do salão! ')
-                elif requisicao_dic['bloqueado'] == 'False':
-                    self.get_hours(id_button, hours)
-            except:
-                pass
+            cancelar = self.check_time_cancel(str(time_cancel),requisicao_dic['horas_agendamento'])
+
+            if cancelar:
+                toast(f'O agendamento não pode ser cancelado\nPassou do tempo de {time_cancel} h/m!')
+            else:
+                requisicao = requests.delete(link)
+                self.actualizar()
+
+            self.popup.dismiss()
+        except requests.exceptions.ConnectionError:
+            toast('Você não esta conectado a internet!')
+
+    def if_blocked(self,id_button, hours):
+
+        try:
+            if self.agenda_marcada:
+                toast('Você já tem um agendamento marcado aqui para fazer outro agendamento\nCancele o seu agendamento!')
+            else:
+                link = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{self.user_id}.json'
+
+                requisicao = requests.get(link)
+                requisicao_dic = requisicao.json()
+
+                try:
+                    if requisicao_dic['bloqueado'] == 'True':
+                        toast('Você foi bloqueado! Entre em contato com um proficional do salão! ')
+                    elif requisicao_dic['bloqueado'] == 'False':
+                        self.get_hours(id_button, hours)
+                except:
+                    pass
+        except requests.exceptions.ConnectionError:
+            toast('Você não esta conectado a internet!')
 
     def get_hours(self,id_button, hours):
         hours_dic = {}
@@ -1193,6 +1063,7 @@ class HoursSchedule(Screen):
         self.LINK_SALAO_ID_MANAGER = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}'
         self.info_manager = self._info_manager()
 
+
     def on_pre_enter(self, *args):
         try:
             with open('info_schedule.json', 'r') as arquivo:
@@ -1209,11 +1080,14 @@ class HoursSchedule(Screen):
         self.valid_button_save()
 
     def _info_manager(self, *args):
-        link = f'{self.LINK_SALAO_ID_MANAGER}.json'
-        requisicao = requests.get(link)
-        requisicao_dic = requisicao.json()
+        try:
+            link = f'{self.LINK_SALAO_ID_MANAGER}.json'
+            requisicao = requests.get(link)
+            requisicao_dic = requisicao.json()
 
-        return requisicao_dic
+            return requisicao_dic
+        except requests.exceptions.ConnectionError:
+            toast('Você não esta conectado a internet!')
 
     def valid_button_save(self):
         with open('select_works.json', 'r') as arquivo:
@@ -1238,10 +1112,13 @@ class HoursSchedule(Screen):
         self.ids.categorie.clear_widgets()
 
     def get_manager(self, *args):
-        requisicao = requests.get(self.LINK_SALAO + '.json')
-        requisicao_dic = requisicao.json()
-        for id in requisicao_dic:
-            return id
+        try:
+            requisicao = requests.get(self.LINK_SALAO + '.json')
+            requisicao_dic = requisicao.json()
+            for id in requisicao_dic:
+                return id
+        except requests.exceptions.ConnectionError:
+            toast('Você não esta conectado a internet!')
 
     def get_id_diverse(self):
         if_manager = {}
@@ -1253,66 +1130,71 @@ class HoursSchedule(Screen):
     def get_works(self,*args):
         self.ids.categorie.clear_widgets()
 
-        lista = []
-        lista_name = []
-        lista_color = []
-        socio_or_manager = False
-        self.id_diverse = self.get_id_diverse()
-        link = ''
-
-        # LINK DATA BASE
-        if self.id_diverse['manager'] == "False":
-            link = self.LINK_SALAO + '/' + self.id_manager + '/socios/' + self.id_diverse["id_user"] + '.json'
-            socio_or_manager = True
-        elif self.id_diverse['manager'] == "True":
-            link = self.LINK_SALAO + '/' + self.id_manager + '.json'
-            socio_or_manager = False
-
-        requisicao = requests.get(link)
-
         try:
-            requisicao_dic = requisicao.json()
+            lista = []
+            lista_name = []
+            lista_color = []
+            socio_or_manager = False
+            self.id_diverse = self.get_id_diverse()
+            link = ''
 
-            for get_id_work in requisicao_dic['servicos']:
-                lista.append(get_id_work)
+            # LINK DATA BASE
+            if self.id_diverse['manager'] == "False":
+                link = self.LINK_SALAO + '/' + self.id_manager + '/socios/' + self.id_diverse["id_user"] + '.json'
+                socio_or_manager = True
+            elif self.id_diverse['manager'] == "True":
+                link = self.LINK_SALAO + '/' + self.id_manager + '.json'
+                socio_or_manager = False
+
+            requisicao = requests.get(link)
 
             try:
-                with open('select_works.json','r') as arquivo_color:
-                    lista_color = json.load(arquivo_color)
+                requisicao_dic = requisicao.json()
+
+                for get_id_work in requisicao_dic['servicos']:
+                    lista.append(get_id_work)
+
+                try:
+                    with open('select_works.json','r') as arquivo_color:
+                        lista_color = json.load(arquivo_color)
+                except:
+                    pass
+
+            # LINK DATA BASE
+                for num, id_work in enumerate(lista):
+
+                    if socio_or_manager:
+                        link_id = self.LINK_SALAO + '/' + self.id_manager + '/socios/' + self.id_diverse["id_user"] + '/servicos/' + id_work + '.json'
+                    else:
+                        link_id = self.LINK_SALAO + '/' + self.id_manager + '/' + 'servicos' + '/' + id_work + '.json'
+
+                    works = requests.get(link_id)
+                    works_dic = works.json()
+
+                    servico = works_dic['nome_servico']
+                    tempo = works_dic['tempo']
+                    valor = (works_dic['valor'])
+
+
+                    for iten in lista_color:
+                        lista_name.append(iten['servico'])
+
+                    if servico in lista_name:
+                        self.ids.categorie.add_widget(MyBoxCategorie('',str(servico), str(tempo), str(float(valor)).replace('.',','), md_bg_color=[0.13, 0.53, 0.95,.2]))
+                    else:
+                        self.ids.categorie.add_widget(MyBoxCategorie('', str(servico), str(tempo), str(float(valor)).replace('.',',')))
             except:
-                pass
-
-        # LINK DATA BASE
-            for num, id_work in enumerate(lista):
-
-                if socio_or_manager:
-                    link_id = self.LINK_SALAO + '/' + self.id_manager + '/socios/' + self.id_diverse["id_user"] + '/servicos/' + id_work + '.json'
-                else:
-                    link_id = self.LINK_SALAO + '/' + self.id_manager + '/' + 'servicos' + '/' + id_work + '.json'
-
-                works = requests.get(link_id)
-                works_dic = works.json()
-
-                servico = works_dic['nome_servico']
-                tempo = works_dic['tempo']
-                valor = (works_dic['valor'])
-
-
-                for iten in lista_color:
-                    lista_name.append(iten['servico'])
-
-                if servico in lista_name:
-                    self.ids.categorie.add_widget(MyBoxCategorie('',str(servico), str(tempo), str(float(valor)).replace('.',','), md_bg_color=[0.13, 0.53, 0.95,.2]))
-                else:
-                    self.ids.categorie.add_widget(MyBoxCategorie('', str(servico), str(tempo), str(float(valor)).replace('.',',')))
+                try:
+                    if socio_or_manager:
+                        work_socio = self.LINK_SALAO + '/' + self.id_manager + '/socios/' + self.id_diverse["id_user"] + '/' + id_work + '.json'
+                    else:
+                        work_socio = self.LINK_SALAO + '/' + self.id_manager + '/socios/' + id_work + '.json'
+                except:
+                    pass
+        except requests.exceptions.ConnectionError:
+            toast('Você não esta conectado a internet!')
         except:
-            try:
-                if socio_or_manager:
-                    work_socio = self.LINK_SALAO + '/' + self.id_manager + '/socios/' + self.id_diverse["id_user"] + '/' + id_work + '.json'
-                else:
-                    work_socio = self.LINK_SALAO + '/' + self.id_manager + '/socios/' + id_work + '.json'
-            except:
-                pass
+            pass
 
     def changer_color(self,eu,servico,*args):
         color = eu.md_bg_color
@@ -1476,11 +1358,16 @@ class HoursSchedule(Screen):
         pass
 
     def get_name_user(self, id_user, *args):
-        LINK_DATA_NAME = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_user}.json'
-        name = requests.get(LINK_DATA_NAME)
-        name_dic = name.json()
+        try:
+            LINK_DATA_NAME = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_user}.json'
+            name = requests.get(LINK_DATA_NAME)
+            name_dic = name.json()
 
-        return name_dic['nome']
+            return name_dic['nome']
+        except requests.exceptions.ConnectionError:
+            toast('Você não esta conectado a internet!')
+        except:
+            pass
 
     def nada(self,*args):
         toast('Selecione o tipo de serviço!')
@@ -1550,6 +1437,8 @@ class HoursSchedule(Screen):
             free = horas in list_comparate_hours
         except TypeError:
             pass
+        except requests.exceptions.ConnectionError:
+            toast('Você não esta conectado a internet!')
 
 
         if if_manager['manager'] == "False":
@@ -1569,9 +1458,11 @@ class HoursSchedule(Screen):
         if free:
             toast('Desculpe mais alguem acabou de agendar esse horário!')
         else:
-            requisicao = requests.patch(link, data=info)
-            toast(f'Agendamento Marcado! Você tem {time_cancel} H/m para cancelar!')
-
+            try:
+                requisicao = requests.patch(link, data=info)
+                toast(f'Agendamento Marcado! Você tem {time_cancel} H/m para cancelar!')
+            except requests.exceptions.ConnectionError:
+                toast('Você não esta conectado a internet!')
 
         # if if_manager['manager'] == "False":
         #     # getting ids that are already scheduled ###########################################################################
@@ -1622,16 +1513,18 @@ class InfoScheduleClient(Screen):
 
 
     def id_manager(self):
+        try:
+            manager = ''
 
-        manager = ''
+            link_work = self.LINK_DATA_BASE + '.json'
+            requisicao = requests.get(link_work)
+            requisicao_dic = requisicao.json()
 
-        link_work = self.LINK_DATA_BASE + '.json'
-        requisicao = requests.get(link_work)
-        requisicao_dic = requisicao.json()
-
-        for id in requisicao_dic:
-            manager = id
-        return manager
+            for id in requisicao_dic:
+                manager = id
+            return manager
+        except requests.exceptions.ConnectionError:
+            toast('Você não esta conectado a internet!')
 
     def inf_schedule_client(self):
         dic_inf = {}
@@ -1649,10 +1542,12 @@ class InfoScheduleClient(Screen):
         self.info_cliente_and_cancel(id_client)
 
     def info_cliente_and_cancel(self,id_client,*args):
-
-        link = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_client}.json'
-        requisicao = requests.get(link)
-        requisicao_dic = requisicao.json()
+        try:
+            link = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_client}.json'
+            requisicao = requests.get(link)
+            requisicao_dic = requisicao.json()
+        except requests.exceptions.ConnectionError:
+            toast('Você não esta conectado a internet!')
 
         try:
             self.ids.quant_cancelada.text = str(requisicao_dic['quant_cancelado'])
@@ -1678,6 +1573,8 @@ class InfoScheduleClient(Screen):
             else:
                 self.ids.img_block.source = ''
                 self.ids.label_block.text = ''
+        except requests.exceptions.ConnectionError:
+            toast('Você não esta conectado a internet!')
         except:
             pass
 
@@ -1700,7 +1597,8 @@ class InfoScheduleClient(Screen):
 
             self.ids.color_quant.md_bg_color = [0, 1, 0, 1]
             self.ids.quant_cancelada.color = [0, 1, 0, 1]
-
+        except requests.exceptions.ConnectionError:
+            toast('Você não esta conectado a internet!')
         except:
             pass
 
@@ -1732,6 +1630,8 @@ class InfoScheduleClient(Screen):
             elif cancelada >= 3:
                 self.ids.color_quant.md_bg_color = 1,0,0,1
                 self.ids.quant_cancelada.color = 1,0,0,1
+        except requests.exceptions.ConnectionError:
+            toast('Você não esta conectado a internet!')
         except:
             pass
 
@@ -1740,14 +1640,16 @@ class InfoScheduleClient(Screen):
             info_schedule = json.load(file)
         id_client = info_schedule['id_schedule']
 
+        try:
+            link = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_client}.json'
 
-        link = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_client}.json'
+            info = f'{{"bloqueado":"True"}}'
+            requisicao = requests.patch(link, data=info)
 
-        info = f'{{"bloqueado":"True"}}'
-        requisicao = requests.patch(link, data=info)
-
-        self.ids.img_block.source = 'images/bloqueado.png'
-        self.ids.label_block.text = 'Cliente bloqueado!'
+            self.ids.img_block.source = 'images/bloqueado.png'
+            self.ids.label_block.text = 'Cliente bloqueado!'
+        except requests.exceptions.ConnectionError:
+            toast('Você não esta conectado a internet!')
 
     def popup_leave(self, *args, **kwargs):
 
@@ -1780,15 +1682,18 @@ class InfoScheduleClient(Screen):
         with open('infoscheduleclient.json', 'r') as file:
             info_schedule = json.load(file)
         id_client = info_schedule['id_schedule']
+        try:
+            link = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_client}.json'
 
-        link = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_client}.json'
+            info = f'{{"bloqueado":"False"}}'
+            requisicao = requests.patch(link, data=info)
 
-        info = f'{{"bloqueado":"False"}}'
-        requisicao = requests.patch(link, data=info)
-
-        self.ids.img_block.source = ''
-        self.ids.label_block.text = ''
-
+            self.ids.img_block.source = ''
+            self.ids.label_block.text = ''
+        except requests.exceptions.ConnectionError:
+            toast('Você não esta conectado a internet!')
+        except:
+            pass
 
     def work(self, id_client):
         self.ids.box_work.clear_widgets()
@@ -1799,38 +1704,41 @@ class InfoScheduleClient(Screen):
 
         with open('write_id_manager.json','r') as file:
             id_worker = json.load(file)
-
-        if id_worker['manager'] == 'True':
-            link_work = self.LINK_DATA_BASE + f'/{id_worker["id_user"]}/agenda/{self.day_actual}/{id_client}/servicos.json'
-            requisicao = requests.get(link_work)
-            requisicao_dic = requisicao.json()
-
-            list_string = requisicao_dic
-
-        elif id_worker['manager'] == 'False':
-
-            manager_main = self.manager_main
-
-            link_work = self.LINK_DATA_BASE + f'/{manager_main}/socios/{id_worker["id_user"]}/agenda/{self.day_actual}/{id_client}/servicos.json'
-            requisicao = requests.get(link_work)
-            requisicao_dic = requisicao.json()
-
-            list_string = requisicao_dic
         try:
-            # "eval" To transform str in dictionary ##################################################################
-            list_work = eval(list_string)
+            if id_worker['manager'] == 'True':
+                link_work = self.LINK_DATA_BASE + f'/{id_worker["id_user"]}/agenda/{self.day_actual}/{id_client}/servicos.json'
+                requisicao = requests.get(link_work)
+                requisicao_dic = requisicao.json()
 
-            for enum, work in enumerate(list_work):
-                valor += float(work['valor'].replace(',','.'))
-                myboxcategorie = MyBoxCategorieLabel(work['servico'], work['tempo'], str(float(str(work['valor']).replace(',','.'))).replace('.',','))
+                list_string = requisicao_dic
 
-                myboxcategorie.bind(on_release=self.nada_pass)
-                self.ids.box_work.add_widget(myboxcategorie)
-        except TypeError:
+            elif id_worker['manager'] == 'False':
+
+                manager_main = self.manager_main
+
+                link_work = self.LINK_DATA_BASE + f'/{manager_main}/socios/{id_worker["id_user"]}/agenda/{self.day_actual}/{id_client}/servicos.json'
+                requisicao = requests.get(link_work)
+                requisicao_dic = requisicao.json()
+
+                list_string = requisicao_dic
+            try:
+                # "eval" To transform str in dictionary ##################################################################
+                list_work = eval(list_string)
+
+                for enum, work in enumerate(list_work):
+                    valor += float(work['valor'].replace(',','.'))
+                    myboxcategorie = MyBoxCategorieLabel(work['servico'], work['tempo'], str(float(str(work['valor']).replace(',','.'))).replace('.',','))
+
+                    myboxcategorie.bind(on_release=self.nada_pass)
+                    self.ids.box_work.add_widget(myboxcategorie)
+            except TypeError:
+                pass
+
+            self.ids.id_valor.text = str(valor).replace('.',',') + ' [size=15][b]R$[/b][/size]'
+        except requests.exceptions.ConnectionError:
+            toast('Você não esta conectado a internet!')
+        except:
             pass
-
-        self.ids.id_valor.text = str(valor).replace('.',',') + ' [size=15][b]R$[/b][/size]'
-
 
 
     def nada_pass(selfm, *args):

@@ -354,7 +354,7 @@
                     id:icon_release
                     on_release:carosel.load_next()
 
-# division *********************************
+# division *********** Serviços **********************
 
         MDBoxLayout:
             orientation:'vertical'
@@ -378,12 +378,11 @@
                 MDIconButton:
                     icon:'refresh'
                     on_release:root.infill()
-
             Widget:
             Widget:
             MDBoxLayout:
                 orientation:'vertical'
-                size_hint:.7,None
+                size_hint:.8,None
                 height:'270dp'
                 spacing:'10dp'
                 pos_hint:{'center_x':.5,'center_y':.3}
@@ -392,14 +391,17 @@
                     height:'30dp'
                     halign:'center'
                     bold:True
-                    font_size:'15dp'
+                    font_size:'15sp'
                     markup:True
-                    text:'Adicione seus tipo de serviços\n[size=18]Adicione quanto serviços for nessesario[/size]'
+                    text:'Adicione seus tipo de serviços\n[size=25]Adicione quanto serviços for nessesario[/size]'
+                Widget:
+                    size_hint_y:None
+                    height:'12dp'
                 MDBoxLayout:
                     orientation:'vertical'
                     size_hint_y:None
-                    height:'100dp'
-                    spacing:'10dp'#
+                    height:'130dp'
+
                     MDTextField:
                         size_hint_y:None
                         height:'30dp'
@@ -413,13 +415,14 @@
                             orientation:'vertical'
                             spacing:'4dp'
                             MDLabel:
-                                text:'Tempo'
+                                text:'Tempo:'
                                 bold:True
-                                font_size:'10dp'
+                                font_size:'15sp'
                             TextInput:
                                 size_hint_y:None
                                 height:'35dp'
                                 hint_text:'00:00'
+                                font_size:'15sp'
                                 multiline:False
                                 on_text:root.on_text_temp()
                                 on_focus:root.un_focus()
@@ -429,20 +432,16 @@
                             spacing:'4dp'
                             MDLabel:
                                 bold:True
-                                font_size:'10dp'
+                                font_size:'15sp'
                                 text:'Valor:'
                             TextInput:
                                 size_hint_y:None
                                 height:'35dp'
                                 hint_text:'R$:'
+                                font_size:'15sp'
                                 multiline:False
                                 on_focus:root.on_valor()
                                 id:valor
-                MyButtonCard:
-                    first_text:'Adicionar'
-                    secound_text:'serviço'
-                    on_release:app.root.get_screen('managerprofile').save_servicos()
-
                 MDCard:
                     size_hint_y:None
                     height:'250dp'
@@ -484,6 +483,14 @@
                                     size_hint_y:None
                                     height:self.minimum_height
                                     id:categorie
+                Widget:
+                    size_hint_y:None
+                    height:'10dp'
+                MyButtonCard:
+                    first_text:'Adicionar'
+                    secound_text:'serviço'
+                    on_release:app.root.get_screen('managerprofile').save_servicos()
+
             Widget:
             MDBoxLayout:
                 size_hint_y:None
@@ -501,7 +508,7 @@
                     icon:'arrow-right-bold-circle'
                     on_release:carosel.load_next()
 
-# Division ***********************
+# Division ********* Local **************
         MDBoxLayout:
             orientation:'vertical'
             MDBoxLayout:
@@ -578,7 +585,8 @@
                 MDIconButton:
                     icon:'arrow-right-bold-circle'
                     on_release:carosel.load_next()
-# Division ***********************
+
+# Division ********** Socios*************
         MDBoxLayout:
             orientation:'vertical'
             MDBoxLayout:

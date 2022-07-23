@@ -8,11 +8,16 @@
             size:root.size
             source:'images/degrade.jpg'
     FloatLayout:
+        Image:
+            size_hint_y:None
+            height:'230dp'
+            source:'images/barbershop.png'
+            pos_hint:{'center_x':.5,'center_y':.85}
         MDBoxLayout:
             orientation:'vertical'
             size_hint:.8, None
             height:'150dp'
-            pos_hint:{'center_x':.5, 'center_y':.6}
+            pos_hint:{'center_x':.5, 'center_y':.55}
             spacing:'20dp'
             MDLabel:
                 font_size:'15dp'
@@ -21,6 +26,7 @@
             MDTextFieldRect:
                 size_hint_y:None
                 height:'40dp'
+                font_size:'17sp'
                 multiline:False
                 hint_text:'Email'
                 id:email
@@ -31,7 +37,7 @@
             MDTextFieldRect:
                 size_hint_y:None
                 height:'40dp'
-                font_size:'20dp'
+                font_size:'18sp'
                 multiline:False
                 bold:True
                 hint_text:'******'
@@ -58,13 +64,13 @@
             on_release:root.login()
             Label:
                 size_hint_y:None
-                height:'10dp'
+                height:'13sp'
                 text:'Faser'
             Label:
                 size_hint_y:None
                 height:'25dp'
                 bold:True
-                font_size:'20dp'
+                font_size:'20sp'
                 text:'Login'
         MDCard:
             orientation:'vertical'
@@ -78,12 +84,12 @@
             on_release:app.root.current = 'creatprofile'
             Label:
                 bold:True
-                font_size:'25dp'
+                font_size:'20sp'
                 text:'Criar'
             Label:
                 size_hint_y:None
                 height:'10dp'
-                font_size:'10dp'
+                font_size:'13sp'
                 text:'Conta'
 
         MDTextButton:
