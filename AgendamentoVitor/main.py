@@ -9,6 +9,7 @@ from kivymd.uix.card import MDCard
 from kivymd.uix.label import MDLabel
 from kivymd.uix.spinner import MDSpinner
 from kivymd.uix.navigationdrawer import  MDNavigationDrawer
+from kivymd.uix.dialog import  MDDialog
 
 
 from kivy.uix.screenmanager import ScreenManager, Screen
@@ -1851,6 +1852,17 @@ class ViewSchedule(Screen):
         except requests.exceptions.ConnectionError:
             toast('Você não esta conectado a internet!')
 
+    def sum_hours_end_time(self,hours, time, *args):
+
+        id_hours = datetime.strptime(hours,'%H:%M')
+
+        horas , min = map(int, time.split(':'))
+        delta = timedelta(hours=horas, minutes=min)
+
+        soma = delta + id_hours
+
+        return soma.strftime('%H:%M')
+
     def blocked_schedule(self,id_button, id_schedule, hours, hours_second, client, *args):
         try:
             # id_manager_id_button = self.id_manager + f'{id_button}'
@@ -1864,7 +1876,9 @@ class ViewSchedule(Screen):
             list_id_marked = []
             link_info = ''
             free = ''
+            second_free = ''
             list_comparate_hours = []
+            list_second_hours = []
 
             # geting the id of Manager ##############################
             # name_id = self.get_id_diverse()
@@ -1898,9 +1912,18 @@ class ViewSchedule(Screen):
                 for id_marked in list_id_marked:
                     list_comparate_hours.append(if_scheduled[id_marked]['id_horas'])
 
+                    time_marked = self.sum_hours_end_time(if_scheduled[id_marked]['id_horas'],
+                                                          if_scheduled[id_marked]['tempo'])
+                    list_second_hours.append(time_marked)
+
+                    if if_scheduled[id_marked]['id_horas'] < horas and time_marked > horas:
+                        second_free = True
+                        break
                 free = horas in list_comparate_hours
             except TypeError:
                 pass
+            except requests.exceptions.ConnectionError:
+                toast('Você não esta conectado a internet!')
             # ######################################################################################
 
 
@@ -1919,8 +1942,15 @@ class ViewSchedule(Screen):
                    f'"horas_agendamento": "{horas_hoje}",'\
                    f'"servicos":"{[]}"}}'
 
-            if free:
-                toast('Desculpe mais alguem acabou de agendar esse horário!')
+            if free or second_free:
+                # toast('Desculpe mais alguem acabou de agendar esse horário!')
+                bt = MDFlatButton(text='OK')
+                dialog = MDDialog(title='"Aviso!"',
+                                  text=f'Desculpe mais outra pessoa acabou de agendar esse horário! das {horas} até as {time_marked}',
+                                  radius=[20, 7, 20, 7], buttons=[bt])
+
+                bt.bind(on_release=dialog.dismiss)
+                dialog.open()
             else:
                 requisicao = requests.patch(link, data=info)
                 toast(f'Hora reservada!')
@@ -2041,6 +2071,7 @@ class HoursSchedule(Screen):
             self.ids.card_save.bind(on_release=self.nada)
         else:
             pass
+        self.ids.card_save.unbind(on_release=self.nada)
 
     def time_now(self):
         h = datetime.today().hour
@@ -2122,9 +2153,9 @@ class HoursSchedule(Screen):
                         lista_name.append(iten['servico'])
 
                     if servico in lista_name:
-                        self.ids.categorie.add_widget(CategoriesWork(str(servico), str(tempo), str(valor), md_bg_color=[0.13, 0.53, 0.95,.2]))
+                        self.ids.categorie.add_widget(CategoriesWork(str(servico), str(tempo), str(float(valor)).replace('.',','), md_bg_color=[0.13, 0.53, 0.95,.2]))
                     else:
-                        self.ids.categorie.add_widget(CategoriesWork(str(servico), str(tempo), str(valor)))
+                        self.ids.categorie.add_widget(CategoriesWork(str(servico), str(tempo), str(float(valor)).replace('.',',')))
             except:
                 try:
                     if socio_or_manager:
@@ -2232,14 +2263,14 @@ class HoursSchedule(Screen):
 
         # Sum the values ##################################
         for v in list_info:
-            valor += float(v['valor'])
+            valor += float(str(v['valor']).replace(',','.'))
 
 
         # Geting the hours
         tempo = f'{str(hours).zfill(2)}:{str(minute).zfill(2)}'
 
         self.ids.time.text = str(tempo)
-        self.ids.valor.text = str(valor)
+        self.ids.valor.text = str(valor).replace('.',',')
 
         self.hours_limit(tempo)
 
@@ -2329,6 +2360,18 @@ class HoursSchedule(Screen):
     def disable_release(self,*args):
         toast('Excedeu o horário do proximo agendamento escolha outro horário ou outro Proficional!', length_long=False)
 
+    def sum_hours_end_time(self,hours, time, *args):
+
+        id_hours = datetime.strptime(hours,'%H:%M')
+
+        horas , min = map(int, time.split(':'))
+        delta = timedelta(hours=horas, minutes=min)
+
+        soma = delta + id_hours
+
+        print(soma.strftime('%H:%M'))
+        return soma.strftime('%H:%M')
+
     def save_scheduleing(self, *args):
         try:
             horas_hoje = self.time_now()
@@ -2339,8 +2382,10 @@ class HoursSchedule(Screen):
             # variable to infomation of schedule ######################
             list_id_marked = []
             link_info = ''
+            second_free = ''
             free = ''
             list_comparate_hours = []
+            list_second_hours = []
 
             # geting the id of Manager ##############################
             # name_id = self.get_id_diverse()
@@ -2381,6 +2426,13 @@ class HoursSchedule(Screen):
                 for id_marked in list_id_marked:
                     list_comparate_hours.append(if_scheduled[id_marked]['id_horas'])
 
+                    time_marked = self.sum_hours_end_time(if_scheduled[id_marked]['id_horas'],
+                                                          if_scheduled[id_marked]['tempo'])
+                    list_second_hours.append(time_marked)
+
+                    if if_scheduled[id_marked]['id_horas'] < horas and time_marked > horas:
+                        second_free = True
+                        break
                 free = horas in list_comparate_hours
             except requests.exceptions.ConnectionError:
                 toast('Você não esta conectado a internet!')
@@ -2404,8 +2456,15 @@ class HoursSchedule(Screen):
                    f'"horas_agendamento": "{horas_hoje}",'\
                    f'"servicos":"{list_works}"}}'
 
-            if free:
-                toast('Desculpe mais alguem acabou de agendar esse horário!')
+            if free or second_free:
+                # toast('Desculpe mais alguem acabou de agendar esse horário!')
+                bt = MDFlatButton(text='OK')
+                dialog = MDDialog(title='"Aviso!"',
+                                  text=f'Desculpe mais outra pessoa acabou de agendar esse horário! das {horas} até as {time_marked}',
+                                  radius=[20, 7, 20, 7], buttons=[bt])
+
+                bt.bind(on_release=dialog.dismiss)
+                dialog.open()
             else:
                 requisicao = requests.patch(link, data=info)
                 toast(f'Agendamento Marcado!')

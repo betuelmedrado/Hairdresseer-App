@@ -1,1 +1,7 @@
-[]
+[
+  {
+    "servico": "PINTURA",
+    "tempo": "01:30",
+    "valor": "120,0"
+  }
+]

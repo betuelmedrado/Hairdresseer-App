@@ -8,6 +8,7 @@ from kivymd.uix.card import MDCard
 from kivymd.uix.button import MDTextButton, MDFlatButton
 from kivymd.uix.spinner import MDSpinner
 from kivymd.uix.label import MDLabel
+from kivymd.uix.dialog import MDDialog
 
 
 # kivy ###
@@ -1379,6 +1380,16 @@ class HoursSchedule(Screen):
     #     link = f'{self.LINK_SALAO}/'
     #
 
+    def sum_hours_end_time(self,hours, time, *args):
+
+        id_hours = datetime.strptime(hours,'%H:%M')
+
+        horas , min = map(int, time.split(':'))
+        delta = timedelta(hours=horas, minutes=min)
+
+        soma = delta + id_hours
+
+        return soma.strftime('%H:%M')
 
     def save_scheduleing(self, *args):
         time_cancel = self.info_manager['time_cancel']
@@ -1390,7 +1401,9 @@ class HoursSchedule(Screen):
         list_id_marked = []
         link = ''
         free = ''
+        second_free = ''
         list_comparate_hours = []
+        list_second_hours = []
 
         # geting the id of Manager ##############################
         # name_id = self.get_id_diverse()
@@ -1432,8 +1445,13 @@ class HoursSchedule(Screen):
             # Here getting the hours of marked ###
             for id_marked in list_id_marked:
                 list_comparate_hours.append(if_scheduled[id_marked]['id_horas'])
-                print(list_comparate_hours)
 
+                time_marked = self.sum_hours_end_time(if_scheduled[id_marked]['id_horas'],if_scheduled[id_marked]['tempo'])
+                list_second_hours.append(time_marked)
+
+                if if_scheduled[id_marked]['id_horas'] < horas and time_marked > horas:
+                    second_free = True
+                    break
             free = horas in list_comparate_hours
         except TypeError:
             pass
@@ -1455,8 +1473,13 @@ class HoursSchedule(Screen):
                f'"horas_agendamento": "{horas_hoje}",'\
                f'"servicos":"{list_works}"}}'
 
-        if free:
-            toast('Desculpe mais alguem acabou de agendar esse horário!')
+        if free or second_free:
+            # toast('Desculpe mais alguem acabou de agendar esse horário!')
+            bt = MDFlatButton(text='OK')
+            dialog = MDDialog(title='"Aviso!"',text=f'Desculpe mais outra pessoa acabou de agendar esse horário! das {horas} até as {time_marked}',radius=[20, 7, 20, 7],buttons=[bt])
+
+            bt.bind(on_release=dialog.dismiss)
+            dialog.open()
         else:
             try:
                 requisicao = requests.patch(link, data=info)
