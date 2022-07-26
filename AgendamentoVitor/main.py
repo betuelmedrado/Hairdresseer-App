@@ -1,6 +1,7 @@
 
 # requeriment python 3.8
 
+# Imports kivymd
 from kivymd.app import MDApp
 from kivymd.uix.boxlayout import MDBoxLayout
 from kivymd.uix.button import MDTextButton, MDFlatButton, MDRaisedButton
@@ -11,7 +12,9 @@ from kivymd.uix.spinner import MDSpinner
 from kivymd.uix.navigationdrawer import  MDNavigationDrawer
 from kivymd.uix.dialog import  MDDialog
 
+# from kivymd_extension.akivymd.uix.loader import AKLabelLoader, AKImageLoader
 
+#imports kivy
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.uix.label import Label
 from kivy.uix.textinput import TextInput
@@ -22,6 +25,8 @@ from kivy.uix.widget import Widget
 from kivy.uix.button import Button
 from kivy.uix.image import Image
 from kivy.core.window import Window
+from kivy.properties import NumericProperty
+
 
 # importando firebase
 import requests
@@ -1491,8 +1496,9 @@ class ScreenChoiceSchedule(Screen):
 
 class ViewSchedule(Screen):
     API_KEY = "AIzaSyAue2_eYU5S5TsUc692vHNlyxIHrlBVZjk"
-    x = 0
-    y = 15
+    x = NumericProperty(0)
+    y = NumericProperty(15)
+
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
 
