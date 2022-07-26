@@ -1,4 +1,7 @@
 
+#:import FadeTransition kivy.uix.screenmanager.FadeTransition
+#:import RiseInTransition kivy.uix.screenmanager.RiseInTransition
+
 # The table of hours
 <Table_shedule>:
     id_button:''
@@ -18,6 +21,7 @@
         id:card
 #        on_release: app.root.get_screen('viewshedule').get_hours(root.id_button, root.hours)
         on_release: app.root.get_screen('viewshedule').if_blocked(root.id_button, root.hours)
+        on_press: app.root.transition = RiseInTransition()
         MDBoxLayout:
             MDBoxLayout:
                 orientation:'vertical'

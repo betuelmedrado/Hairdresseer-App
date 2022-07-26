@@ -239,7 +239,10 @@
             size_hint:1,.7
             md_bg_color:0,0,0,.4
             pos_hint:{'center_x':.5}
-            ScrollView:
+            MDScrollViewRefreshLayout:
+                id:refresh_id
+                refresh_callback: root.refresh_callback
+                root_layout: root
                 MDBoxLayout:
                     orientation:'vertical'
                     size_hint_y:None

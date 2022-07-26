@@ -237,8 +237,12 @@ class LoginManager(Screen):
             with open('info_login.json', 'w') as file_login:
                 json.dump('', file_login) 
 
+    def spiner(self, *args):
+        self.ids.float_home.add_widget(
+            MDSpinner(size_hint=(None, None,), size=('46dp', '46dp'), pos_hint={'center_x': .5, 'center_y': .5}))
 
     def on_pre_enter(self, *args):
+        Clock.schedule_once(self.spiner,1)
         self.creat_files()
         self.load_refresh()
 
@@ -613,6 +617,7 @@ class ManagerProfile(Screen):
         # print('dia ',self.dia_atual)
         Clock.schedule_once(self.call_init,2)
 
+    # function that init with 'init'
     def call_init(self, *args):
         self.id_manager = self.get_id_manager()
         self.state_focus = None
@@ -833,12 +838,12 @@ class ManagerProfile(Screen):
         self.ids.hours.clear_widgets()
         for hours, min in enumerate(range(24)):
             h = f'{str(hours).zfill(2)}:00'
-            bt = MDTextButton(text=str(h),bold=True ,pos_hint=({'center_x':.5}), md_bg_color=(0.13, 0.53, 0.95,.1))
+            bt = MDTextButton(text=str(h),font_style='Body2',bold=True ,pos_hint=({'center_x':.5}), md_bg_color=(0.13, 0.53, 0.95,.1))
             self.ids.hours.add_widget(bt)
             bt.bind(on_release=self.insert)
 
             h2 = f'{str(hours).zfill(2)}:30'
-            bt = MDTextButton(text=str(h2), bold=True ,pos_hint=({'center_x':.5}),md_bg_color=(0.13, 0.53, 0.95,.3))
+            bt = MDTextButton(text=str(h2),font_style='Body2', bold=True ,pos_hint=({'center_x':.5}),md_bg_color=(0.13, 0.53, 0.95,.3))
             self.ids.hours.add_widget(bt)
 
             bt.bind(on_release=self.insert)
@@ -1486,7 +1491,8 @@ class ScreenChoiceSchedule(Screen):
 
 class ViewSchedule(Screen):
     API_KEY = "AIzaSyAue2_eYU5S5TsUc692vHNlyxIHrlBVZjk"
-
+    x = 0
+    y = 15
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
 
@@ -1799,9 +1805,26 @@ class ViewSchedule(Screen):
         except requests.exceptions.ConnectionError:
             toast('Você não esta conectado a internet!')
         except:
-            toast('Nenhuma agenda para hoje!')
+            toast('Nenhuma Horário para hoje!')
 
         # Clock.schedule_once(self.loop_actualizar, 3)
+
+    def refresh_callback(self, *args):
+        '''A method that updates the state of your application
+        while the spinner remains on the screen.'''
+
+        def refresh_callback(interval):
+            self.ids.grid_shedule.clear_widgets()
+            if self.x == 0:
+                self.x, self.y = 15, 30
+            else:
+                self.x, self.y = 0, 15
+
+            self.actualizar()
+            self.ids.refresh_id.refresh_done()
+
+
+        Clock.schedule_once(refresh_callback, 1)
 
     def popup_mark_off(self,id_button, id_schedule, hours, hours_second, time, client, *args, **kwargs):
         id_user = ''
@@ -1845,6 +1868,7 @@ class ViewSchedule(Screen):
                 link = self.LINK_SALAO + f'/{id_manager}/socios/{id_user}/agenda/{self.dia_atual}/{info_login["id_login"]}.json'
             elif id_proficional['manager'] == "True":
                 link = self.LINK_SALAO + f'/{id_manager}/agenda/{self.dia_atual}/{info_login["id_login"]}.json'
+
 
             requisicao = requests.delete(link)
             self.actualizar()

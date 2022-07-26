@@ -3,6 +3,9 @@
 #:include module_screen/redefinition_senha.kv
 #:include module_screen/info_schedule_client.kv
 
+#:import FadeTransition kivy.uix.screenmanager.FadeTransition
+#:import RiseInTransition kivy.uix.screenmanager.RiseInTransition
+
 <Manager>:
 
     Register:
@@ -34,8 +37,17 @@
             title:'Sejam bem vindos'
             specific_text_color:0,0,0,1
             left_action_items:[['account-arrow-left-outline', lambda x: root.return_login()]]
-        Widget:
-            size_hint_y:.10
+#        Widget:
+#            size_hint_y:.10
+        MDLabel:
+            size_hint_y:.12
+            text:'Escolha o proficional de sua preferencia!'
+            outline_width:1
+            outline_color:0,0,0,1
+            color:0.13, 0.59, 0.95,1
+            bold:True
+            halign:'center'
+            font_size:'20sp'
         ScrollView:
 #            FloatLayout:
             MDBoxLayout:
@@ -95,7 +107,10 @@
             size_hint:1,.7
             md_bg_color:0,0,0,.4
             pos_hint:{'center_x':.5}
-            ScrollView:
+            MDScrollViewRefreshLayout:
+                id:refresh_id
+                refresh_callback: root.refresh_callback
+                root_layout: root
                 MDBoxLayout:
                     orientation:'vertical'
                     size_hint_y:None
@@ -125,6 +140,7 @@
                     theme_icon_color: "Custom"
                     color:1,0,0,1
                     on_release:app.root.current = 'viewshedule'
+                    on_press: app.root.transition = FadeTransition()
                 MDLabel:
                     font_size:'30dp'
                     halign:'center'

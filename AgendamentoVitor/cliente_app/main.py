@@ -54,9 +54,11 @@ class HomePage(Screen):
 
     def on_pre_enter(self, *args):
         self.creat_files()
+
         toast('Aguarde carregando as informações!...')
 
         Clock.schedule_once(self.get_info, 1)
+
 
     def get_local(self, *args):
         try:
@@ -556,6 +558,8 @@ class Table_block(MDBoxLayout):
 
 class ViewSchedule(Screen):
     API_KEY = "AIzaSyAue2_eYU5S5TsUc692vHNlyxIHrlBVZjk"
+    x = 0
+    y = 0
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
 
@@ -593,6 +597,15 @@ class ViewSchedule(Screen):
     def on_pre_enter(self, *args):
         Clock.schedule_once(self.actualizar, 1)
         self.user_id = self.log_aut()
+        Window.unbind(on_keyboard=self.call_back)
+        Window.bind(on_keyboard=self.call_back)
+
+    def call_back(self,windown, key, *args):
+        if key == 27:
+            MDApp.get_running_app().root.current = 'homepage'
+            return True
+        else:
+            pass
 
     def time_now(self):
         h = datetime.today().hour
@@ -707,6 +720,7 @@ class ViewSchedule(Screen):
             pass
 
     def actualizar(self, *args):
+
         try:
             # get user id ##################################################################################################
             # Variaveis #############################
@@ -737,6 +751,7 @@ class ViewSchedule(Screen):
 
             self.ids.grid_shedule.clear_widgets()
 
+
             # Here i am sorting the list "lista_info" in key "['id_horas']" #########################################################
             ordem = sorted(lista_info, key=lambda valor: valor['id_horas'])
             lista_info = ordem
@@ -745,8 +760,8 @@ class ViewSchedule(Screen):
             while entrada[:2] < saida[:2]:
                 # Aqui é para saber a quantidade de agenda marcadas ############################################################
                 for num, agenda in enumerate(lista_info):
+                    ranger_init = 0
                     try:
-                        ranger_init = 0
 
                         # ---------------------------------------------------------------------CHANGE
                         # entry_temp = datetime.strptime(entrada, '%H:%M')
@@ -901,7 +916,23 @@ class ViewSchedule(Screen):
             toast('Você não esta conectado a internet!')
         except:
             toast('Nenhuma agenda para hoje!')
-            raise
+
+
+    def refresh_callback(self, *args):
+        '''A method that updates the state of your application
+        while the spinner remains on the screen.'''
+
+        def refresh_callback(interval):
+            self.ids.grid_shedule.clear_widgets()
+            if self.x == 0:
+                self.x, self.y = 15, 30
+            else:
+                self.x, self.y = 0, 15
+
+            self.actualizar()
+            self.ids.refresh_id.refresh_done()
+
+        Clock.schedule_once(refresh_callback, 1)
 
     def spiner(self,id_button, hours, *args, **kwargs):
         self.spiner = MDSpinner(size_hint=(None, None,), size=('46dp', '46dp'), pos_hint={'center_x': .5, 'center_y': .1})
@@ -1046,6 +1077,7 @@ class ViewSchedule(Screen):
 
     def on_leave(self, *args):
         self.ids.grid_shedule.clear_widgets()
+        Window.unbind(on_keyboard=self.call_back)
 
     def return_homepage(self):
         MDApp.get_running_app().root.current = 'homepage'
@@ -1066,6 +1098,9 @@ class HoursSchedule(Screen):
 
 
     def on_pre_enter(self, *args):
+
+        Window.bind(on_keyboard=self.call_back)
+
         try:
             with open('info_schedule.json', 'r') as arquivo:
                 horas = json.load(arquivo)
@@ -1079,6 +1114,13 @@ class HoursSchedule(Screen):
         self.soma_hours_values()
 
         self.valid_button_save()
+
+    def call_back(self, windown, key, *args):
+        if key == 27:
+            MDApp.get_running_app().root.current = 'viewshedule'
+        else:
+            pass
+        return True
 
     def _info_manager(self, *args):
         try:
@@ -1110,6 +1152,7 @@ class HoursSchedule(Screen):
         return horas
 
     def on_leave(self, *args):
+        Window.unbind(on_keyboard=self.call_back)
         self.ids.categorie.clear_widgets()
 
     def get_manager(self, *args):
@@ -1484,6 +1527,15 @@ class HoursSchedule(Screen):
             try:
                 requisicao = requests.patch(link, data=info)
                 toast(f'Agendamento Marcado! Você tem {time_cancel} H/m para cancelar!')
+
+                bt = MDFlatButton(text='OK')
+                dialog2 = MDDialog(title='"Aviso!"',
+                                  text=f'Agendamento Marcado! Você tem {time_cancel} para cancelar!',
+                                  radius=[20, 7, 20, 7], buttons=[bt])
+
+                bt.bind(on_release=dialog2.dismiss)
+                dialog2.open()
+
             except requests.exceptions.ConnectionError:
                 toast('Você não esta conectado a internet!')
 
@@ -1527,8 +1579,16 @@ class InfoScheduleClient(Screen):
         self.day_actual = datetime.today().isoweekday()
 
     def on_pre_enter(self):
-
         self.inf_schedule_client()
+        Window.bind(on_keyboard=self.call_back)
+
+    def call_back(self, windown, key, *args):
+
+        if key == 27:
+            MDApp.get_running_app().root.current = 'viewshedule'
+            return True
+        else:
+            pass
 
     def on_leave(self):
         self.ids.img_block.source = ''
