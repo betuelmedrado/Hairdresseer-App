@@ -1,0 +1,36 @@
+
+<MsgToApp>:
+    MDBoxLayout:
+        orientation:'vertical'
+        MDToolbar:
+            title:'Mensagem'
+        MDBoxLayout:
+            FloatLayout:
+                MDCard:
+                    orientation:'vertical'
+                    size_hint:.8,None
+                    height:'400dp'
+                    padding:'5dp'
+                    pos_hint:{'center_x':.5,'top':.9}
+                    MDLabel:
+                        size_hint_y:None
+                        height:'30dp'
+                        text:'"Aviso importante!"'
+                        color:0,0,0,.4
+                        id:warning
+                    MDSeparator:
+                    ScrollView:
+                        MDLabel:
+                            id:msg
+                            markup:True
+                            color:0,0,0,1
+                    MDTextButton:
+                        size_hint_y:None
+                        height:'30dp'
+                        id:link
+                        color:0,0,0,1
+
+                MDRaisedButton:
+                    text:'OK'
+                    pos_hint:{'center_x':.5,'center_y':.3}
+                    on_release:root.set_msg()

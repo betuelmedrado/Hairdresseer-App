@@ -1,0 +1,54 @@
+<RedefinitionSenha>:
+    canvas:
+        Color:
+            rgba:1,1,1,.7
+        Rectangle:
+            pos:root.pos
+            size:root.size
+            source:'images/degrade.jpg'
+    MDBoxLayout:
+        orientation:'vertical'
+        spacing:'20dp'
+        MDToolbar:
+            title:'Redefinir senha!'
+            elevation:9
+            left_action_items:[['arrow-left',lambda x: root.return_login()]]
+        Widget:
+        MDCard:
+            orientation:'vertical'
+            size_hint:.8, None
+            height:'100dp'
+            spacing:'20dp'
+            padding:'5dp'
+            pos_hint:{'center_x':.5}
+            radius:8,8,8,8
+            MDLabel:
+                text:'Insira o email registrado aqui!'
+                color:0,0,0,.6
+            MDTextFieldRect:
+                size_hint_y:None
+                height:'40dp'
+                hint_text:'Email'
+                font_size:'20sp'
+                id:email
+
+        MDCard:
+            orientation:'vertical'
+            size_hint:.8,None
+            height:'60sp'
+            pos_hint:{'center_x':.5}
+            ripple_behavior:True
+            md_bg_color:0.16, 0.50, 0.73,1
+            radius:20,5,20,5
+            padding:'10sp'
+            on_release:root.send_email()
+            Label:
+                bold:True
+                font_size:'20sp'
+                text:'Enviar'
+            Label:
+                size_hint_y:None
+                height:'13sp'
+                font_size:'10dp'
+                text:'Mensagen'
+        Widget:

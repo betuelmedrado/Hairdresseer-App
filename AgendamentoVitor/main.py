@@ -1497,7 +1497,7 @@ class ScreenChoiceSchedule(Screen):
 class ViewSchedule(Screen):
     API_KEY = "AIzaSyAue2_eYU5S5TsUc692vHNlyxIHrlBVZjk"
     x = NumericProperty(0)
-    y = NumericProperty(15)
+    y = NumericProperty(0)
 
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
@@ -1821,10 +1821,8 @@ class ViewSchedule(Screen):
 
         def refresh_callback(interval):
             self.ids.grid_shedule.clear_widgets()
-            if self.x == 0:
-                self.x, self.y = 15, 30
-            else:
-                self.x, self.y = 0, 15
+            self.x = 0
+            self.y = 0
 
             self.actualizar()
             self.ids.refresh_id.refresh_done()
@@ -2776,6 +2774,8 @@ class InfoScheduleClient(Screen):
     def return_schedule(self):
         MDApp.get_running_app().root.current = 'viewshedule'
 
+class RegisterOfBox(Screen):
+    pass
 
 class AgendamentoApp(MDApp):
 

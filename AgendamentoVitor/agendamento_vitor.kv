@@ -6,6 +6,7 @@
 #:include file_kv/hours_schedule.kv
 #:include file_kv/client_blocked.kv
 #:include file_kv/redefinition_senha.kv
+#:include file_kv/register_of_box.kv
 
 #:include module_screen/table_schedule_m.kv
 #:include module_screen/card_button_proficional.kv
@@ -48,6 +49,8 @@
         name:'hoursschedule'
     InfoScheduleClient:
         name:'infoscheduleclient'
+    RegisterOfBox:
+        name:'registerofbox'
 
 #(list) Application requirements
 #comma separated e.g requirements = sqlite3, kivy
@@ -210,11 +213,13 @@
                 height:'60dp'
                 padding:('20dp',0,0,0)
                 ripple_behavior:True
+                on_release:app.root.current = 'registerofbox'
                 MDIcon:
                     size_hint_x:None
                     width:'60dp'
                     icon_size:'200dp'
                     icon:'cash-register'
+                    pos_hint:{'center_y':.5}
                 MDLabel:
                     text:'Registro de caixa'
                     font_size:'25sp'
@@ -239,6 +244,7 @@
             size_hint:1,.7
             md_bg_color:0,0,0,.4
             pos_hint:{'center_x':.5}
+
             MDScrollViewRefreshLayout:
                 id:refresh_id
                 refresh_callback: root.refresh_callback
@@ -302,11 +308,13 @@
                 height:'60dp'
                 padding:('20dp',0,0,0)
                 ripple_behavior:True
+                on_release:app.root.current = 'registerofbox'
                 MDIcon:
                     size_hint_x:None
                     width:'60dp'
                     icon_size:'200dp'
                     icon:'cash-register'
+                    pos_hint:{'center_y':.5}
                 MDLabel:
                     text:'Registro de caixa'
                     font_size:'25sp'

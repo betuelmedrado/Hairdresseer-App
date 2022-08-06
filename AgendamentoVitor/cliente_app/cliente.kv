@@ -1,7 +1,11 @@
 
-#:include register_client.kv
-#:include module_screen/redefinition_senha.kv
-#:include module_screen/info_schedule_client.kv
+
+
+#:include file_kv/register_client.kv
+#:include file_kv/redefinition_senha.kv
+#:include file_kv/info_schedule_client.kv
+#:include file_kv/msg_to_app.kv
+#:include file_kv/perfil.kv
 
 #:import FadeTransition kivy.uix.screenmanager.FadeTransition
 #:import RiseInTransition kivy.uix.screenmanager.RiseInTransition
@@ -14,6 +18,8 @@
         name:'creatbill'
     RedefinitionSenha:
         name:'redefinitionsenha'
+    MsgToApp:
+        name:'msgtoapp'
     HomePage:
         name:'homepage'
     ViewSchedule:
@@ -22,6 +28,10 @@
         name:'hoursschedule'
     InfoScheduleClient:
         name:'infoscheduleclient'
+    DrawerInfoSchedule:
+        name:'drawerinfoschedule'
+    Perfil:
+        name:'perfil'
 
 
 <HomePage>:
@@ -37,17 +47,20 @@
             title:'Sejam bem vindos'
             specific_text_color:0,0,0,1
             left_action_items:[['account-arrow-left-outline', lambda x: root.return_login()]]
+            right_action_items:[['menu', lambda x:nav_drawer.set_state('open')]]
 #        Widget:
 #            size_hint_y:.10
-        MDLabel:
+        MDBoxLayout:
             size_hint_y:.12
-            text:'Escolha o proficional de sua preferencia!'
-            outline_width:1
-            outline_color:0,0,0,1
-            color:0.13, 0.59, 0.95,1
-            bold:True
-            halign:'center'
-            font_size:'20sp'
+            md_bg_color:1,1,1,.2
+            MDLabel:
+                text:'Escolha o proficional de sua preferencia!'
+                outline_width:1
+                outline_color:0,0,0,1
+                color:0.13, 0.59, 0.95,1
+                bold:True
+                halign:'center'
+                font_size:'20sp'
         ScrollView:
 #            FloatLayout:
             MDBoxLayout:
@@ -81,6 +94,96 @@
             font_size:'11dp'
             color:1,1,1,1
             id:num
+
+    MDNavigationDrawer:
+        orientation:"vertical"
+        id: nav_drawer
+        state:'close'
+        MDBoxLayout:
+            orientation:'vertical'
+            size_hint_y:None
+            height:'250dp'
+            md_bg_color:0,0,0,.2
+            FloatLayout:
+                Image:
+                    source:'images/barbershop.png'
+                    pos_hint:{'center_x':.5, 'center_y':.5}
+                MDLabel:
+                    font_size:'30sp'
+                    bold:True
+                    text:'BarberShop'
+                    outline_width:'3dp'
+                    outline_color:1,1,1,1
+                    pos_hint:{'x':.05, 'center_y':.1}
+                MDLabel:
+                    font_size:'30sp'
+                    bold:True
+                    text:'299'
+                    outline_width:'3dp'
+                    outline_color:1,1,1,1
+                    pos_hint:{'x':.8, 'center_y':.1}
+        MDBoxLayout:
+            orientation:'vertical'
+            spacing:'15dp'
+            padding:('10dp',0,'5dp',0)
+            MDSeparator:
+                md_bg_color:0.53, 0.54, 0.56,1
+            MDBoxLayout:
+                size_hint_y:None
+                height:'60dp'
+                Image:
+                    size_hint_x:None
+                    height:'20dp'
+                    source:'images/block.png'
+            MDSeparator:
+                md_bg_color:0.53, 0.54, 0.56,1
+
+            MDCard:
+                size_hint_y:None
+                height:'60dp'
+                padding:('20dp',0,0,0)
+                ripple_behavior:True
+                on_release:app.root.current = 'perfil'
+#                on_press:nav_drawer.set_state('close')
+                MDIcon:
+                    size_hint_x:None
+                    width:'60dp'
+                    icon_size:'200dp'
+                    icon:'account'
+                    pos_hint:{'center_y':.5}
+                MDLabel:
+                    text:'Perfil'
+                    font_size:'25sp'
+            MDCard:
+                size_hint_y:None
+                height:'60dp'
+                padding:('20dp',0,0,0)
+                ripple_behavior:True
+                on_release:app.root.current = 'drawerinfoschedule'
+
+                MDIcon:
+                    size_hint_x:None
+                    width:'60dp'
+                    icon_size:'200dp'
+                    icon:'information'
+                    pos_hint:{'center_y':.5}
+                MDLabel:
+                    text:'informação do agendamento!'
+
+            Widget:
+            MDLabel:
+                size_hint_y:None
+                height:'0dp'
+                text:'Developer: Betuel M. Araujo'
+                color:0,0,0,.5
+            MDLabel:
+                size_hint_y:None
+                height:'2dp'
+                text:'Email: betobmx360@gmail.com'
+                color:0,0,0,.5
+            Widget:
+                size_hint_y:None
+                height:'5dp'
 
 
 <ViewSchedule>:

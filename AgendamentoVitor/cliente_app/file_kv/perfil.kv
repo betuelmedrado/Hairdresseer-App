@@ -1,0 +1,78 @@
+
+<Perfil>:
+    MDBoxLayout:
+        orientation:'vertical'
+        MDToolbar:
+            title:'Perfil'
+            left_action_items:[['arrow-left', lambda x: root.return_home()]]
+
+        MDCard:
+            size_hint_y:None
+            height:'300dp'
+            orientation:'vertical'
+            padding:'10dp'
+            radius:(0,0,20,20)
+            md_bg_color:0.13, 0.59, 0.95,1
+            MDCard:
+                orientation:'vertical'
+                size_hint_y:None
+                height:'100dp'
+                radius:10,10,10,10
+                padding:'5dp'
+                md_bg_color:1,1,1,.3
+                ripple_behavior:True
+                MDBoxLayout:
+                    MDLabel:
+                        size_hint_x:None
+                        width:60
+                        text:'Nome:'
+                        color:0,0,0,.4
+                    MDLabel:
+                        font_size:'20sp'
+                        text:'Betuel M. Araujo'
+                MDBoxLayout:
+                    MDLabel:
+                        size_hint_x:None
+                        width:60
+                        text:'CPF:'
+                        color:0,0,0,.4
+                    MDLabel:
+                        font_size:'20sp'
+                        text:'310.779.2888-2'
+                MDBoxLayout:
+                    MDLabel:
+                        size_hint_x:None
+                        width:60
+                        text:'Email:'
+                        color:0,0,0,.4
+                    MDLabel:
+                        font_size:'20sp'
+                        text:'betobmx360@gmail.com'
+
+            MDBoxLayout:
+                MDLabel:
+#                    size_hint_x:None
+#                    width:100
+                    text:'Bloqueado:'
+                    color:0,0,0,.4
+                MDLabel:
+                    font_size:'20sp'
+                    text:'Nãõ'
+
+            MDSeparator:
+                size_hint_x:.8
+                pos_hint:{'center_x':.5}
+
+            MDBoxLayout:
+                MDLabel:
+#                    size_hint_x:None
+#                    width:100
+                    text:'Quantidades Canceladas!:'
+                    color:0,0,0,.4
+                MDLabel:
+                    font_size:'20sp'
+                    text:'0'
+
+
+            Widget:
+        Widget:
