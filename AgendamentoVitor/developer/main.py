@@ -7,7 +7,7 @@ APP_MANAGER = 'https://shedule-vitor-default-rtdb.firebaseio.com/msg_to_app/msg_
 APP_CLIENT = 'https://shedule-vitor-default-rtdb.firebaseio.com/msg_to_app/msg_client.json'
 
 msg_client = ('Faça a actualização do app! importante actualizacao do app!')
-link = 'https://link'
+link = 'https://play.google.com/store/apps'
 
 info = f'{{"msg_actualiza":"{msg_client}", ' \
        f'"link":"{link}",' \

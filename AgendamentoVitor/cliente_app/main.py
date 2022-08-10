@@ -9,6 +9,7 @@ from kivymd.uix.button import MDTextButton, MDFlatButton, MDRaisedButton
 from kivymd.uix.spinner import MDSpinner
 from kivymd.uix.label import MDLabel
 from kivymd.uix.dialog import MDDialog
+from kivymd.toast import toast
 
 
 # kivy ###
@@ -26,12 +27,12 @@ import requests
 import os
 import certifi
 import json
-from kivymd.toast import toast
 
 from functools import partial
 from datetime import datetime, timedelta
 
 from random import randint
+import webbrowser
 
 # from datetime import datetime
 
@@ -43,7 +44,7 @@ class Manager(ScreenManager):
     pass
 
 class HomePage(Screen):
-    LINK_SALAO = 'https://shedule-vitor-default-rtdb.firebaseio.com/salao.json'
+    LINK_SALAO = 'https://shedule-vitor-default-rtdb.firebaseio.com'
     lista_id_user = []
 
     def __init__(self,**kwargs):
@@ -52,19 +53,56 @@ class HomePage(Screen):
 
         self.id_manager = self.get_id_manager()
         self.id_socios = self.get_id_socios()
-        # Clock.schedule_once(self.get_info, 1)
-        Clock.schedule_once(self.get_local, 2)
+        Clock.schedule_once(self.get_client_data, 1)
+        Clock.schedule_once(self.get_info, 2)
+        Clock.schedule_once(self.get_local, 3)
+
 
     def on_pre_enter(self, *args):
         self.creat_files()
 
-        toast('Aguarde carregando as informações!...')
+        with open('load_home.json','r') as load_h:
+            load_home = json.load(load_h)
 
-        Clock.schedule_once(self.get_info, 1)
+        # Permition to load scree home ###################################
+        if load_home['load_home']:
+            toast('Aguarde carregando as informações!...')
+            Clock.schedule_once(self.get_info, 1)
+
+            load = {}
+            load['load_home'] = False
+            with open('load_home.json', 'w') as load_home:
+                json.dump(load, load_home, indent=2)
+        else:
+            pass
+
+
+    def get_client_data(self, *args):
+        try:
+            with open('info_user.json','r') as file:
+                info = json.load(file)
+
+            link = f'{self.LINK_SALAO}/client/{info["id_user"]}.json'
+
+            requisicao = requests.get(link)
+            requisicao_dic = requisicao.json()
+
+            data_dic = {}
+
+            data_dic["nome"] = requisicao_dic["nome"]
+            data_dic["cpf"] = requisicao_dic["cpf"]
+            data_dic["email"] = requisicao_dic["email"]
+            data_dic["bloqueado"] = requisicao_dic["bloqueado"]
+            data_dic["quant_cancelado"] = requisicao_dic["quant_cancelado"]
+
+            with open('get_client_data.json','w', encoding='utf-8') as file_data:
+                json.dump(data_dic, file_data, indent=2)
+        except:
+            pass
+
 
     def get_inf_schedule(self, *args):
         pass
-
 
     def get_local(self, *args):
         try:
@@ -86,8 +124,9 @@ class HomePage(Screen):
 
     def get_id_manager(self, *args):
         try:
+            link = f'{self.LINK_SALAO}/salao.json'
             id = ''
-            requisicao = requests.get(self.LINK_SALAO)
+            requisicao = requests.get(link)
             requisicao_dic = requisicao.json()
             for ids in requisicao_dic:
                 id = ids
@@ -210,6 +249,22 @@ class HomePage(Screen):
         except:
             with open('inf_to_infoschedule_drawer.json', 'w') as file_info:
                 json.dump('', file_info)
+
+        try:
+            with open('get_client_data.json', 'r') as file_data:
+                json.load(file_data)
+        except:
+            with open('get_client_data.json', 'w') as file_data:
+                json.dump('', file_data)
+
+        try:
+            with open('load_home.json', 'r') as load_home:
+                json.load(load_home)
+        except:
+            load = {}
+            load['load_home'] = False
+            with open('load_home.json', 'w') as load_home:
+                json.dump(load, load_home, indent=2)
 
     def return_login(self):
 
@@ -1185,6 +1240,12 @@ class ViewSchedule(Screen):
                     json.dump(read, file, indent=2)
                 self.actualizar()
 
+                # Allow loading ##########################################
+                load = {}
+                load['load_home'] = True
+                with open('load_home.json', 'w') as load_home:
+                    json.dump(load, load_home, indent=2)
+
             self.popup.dismiss()
         except requests.exceptions.ConnectionError:
             toast('Você não esta conectado a internet!')
@@ -1609,18 +1670,21 @@ class HoursSchedule(Screen):
         # name_id = self.get_id_diverse()
         if_manager = self.get_id_diverse()
 
-        # geting the info of work ###############################
-        with open('select_works.json','r') as select_work:
-            list_works = json.load(select_work)
+        try:
+            # geting the info of work ###############################
+            with open('select_works.json','r') as select_work:
+                list_works = json.load(select_work)
 
-        with open('info_user.json','r') as arquivo:
-            info_user = json.load(arquivo)
+            with open('info_user.json','r') as arquivo:
+                info_user = json.load(arquivo)
 
-        with open('info_schedule.json', 'r') as file_info:
-            id_pos = json.load(file_info)
+            with open('info_schedule.json', 'r') as file_info:
+                id_pos = json.load(file_info)
 
-        with open('inf_to_infoschedule_drawer.json','r') as get_to_save:
-            file_save = json.load(get_to_save)
+            with open('inf_to_infoschedule_drawer.json','r') as get_to_save:
+                file_save = json.load(get_to_save)
+        except:
+            pass
 
         for iten in file_save:
             list_of_schedule.append(iten)
@@ -1728,6 +1792,11 @@ class HoursSchedule(Screen):
 
                 bt.bind(on_release=dialog2.dismiss)
                 dialog2.open()
+
+                load = {}
+                load['load_home'] = True
+                with open('load_home.json', 'w') as load_home:
+                    json.dump(load, load_home, indent=2)
 
             except requests.exceptions.ConnectionError:
                 toast('Você não esta conectado a internet!')
@@ -2132,7 +2201,10 @@ class DrawerInfoSchedule(InfoScheduleClient):
         number_pos = 0
         self.ids.scroll_bt.clear_widgets()
 
-        cpf = str(info_schedule[number_pos]["cpf"])
+        try:
+            cpf = str(info_schedule[number_pos]["cpf"])
+        except:
+            pass
 
         for number_pos, items in enumerate(info_schedule):
             bt_pos = MDRaisedButton(text=f'{number_pos + 1}º',font_size=('15sp'), md_bg_color=(0.25, 0.53, 0.67,1))
@@ -2160,8 +2232,37 @@ class DrawerInfoSchedule(InfoScheduleClient):
 
 class Perfil(Screen):
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def on_pre_enter(self, *args):
+        self.get_client_data()
+
     def return_home(self):
         MDApp.get_running_app().root.current = 'homepage'
+
+    def get_client_data(self):
+        is_bloqued = ''
+
+        try:
+            with open('get_client_data.json','r') as data:
+                data_client = json.load(data)
+
+            if data_client["bloqueado"] == "False":
+                is_bloqued = 'Não'
+            elif data_client["bloqueado"] == 'True':
+                is_bloqued = 'Bloqueado!'
+
+            set_cpf = f'{data_client["cpf"][:3]}.{data_client["cpf"][3:6]}.{data_client["cpf"][6:9]}-{data_client["cpf"][9:]}'
+
+            self.ids.nome.text = str(data_client["nome"])
+            self.ids.cpf.text = str(set_cpf)
+            self.ids.email.text = str(data_client["email"])
+            self.ids.bloqueio.text = str(is_bloqued)
+            self.ids.quant_cancel.text = str(data_client["quant_cancelado"])
+        except:
+            pass
+
 
 class MyCardButton(MDCard):
 
@@ -2206,12 +2307,14 @@ class MsgToApp(Screen):
     link = f'https://shedule-vitor-default-rtdb.firebaseio.com'
 
 
-
     def set_msg(self, *args):
+        # webbrowser.open("https://play.google.com/store/apps/details?id=com.dominio.app")
 
         # Geting the number of valid to sum ######
         with open('msg_to_app.json','r') as file:
             msg = json.load(file)
+
+        link = msg['link']
 
         soma_msg = msg['valid']
         soma_msg += 1
@@ -2219,12 +2322,13 @@ class MsgToApp(Screen):
         with open('info_user.json', 'r') as file:
             id_user = json.load(file)
 
-        link = f'{self.link}/client/{id_user["id_user"]}.json'
+        link_client = f'{self.link}/client/{id_user["id_user"]}.json'
 
         info = f'{{"msg":{soma_msg} }}'
 
-        requisicao = requests.patch(link, data=info)
+        requisicao = requests.patch(link_client, data=info)
 
+        webbrowser.open(link)
         MDApp.get_running_app().root.current = 'homepage'
 
 

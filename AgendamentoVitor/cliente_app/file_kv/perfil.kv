@@ -5,14 +5,16 @@
         MDToolbar:
             title:'Perfil'
             left_action_items:[['arrow-left', lambda x: root.return_home()]]
-
+            md_bg_color:app.theme_cls.primary_color
+            elevation:0
         MDCard:
             size_hint_y:None
             height:'300dp'
             orientation:'vertical'
             padding:'10dp'
             radius:(0,0,20,20)
-            md_bg_color:0.13, 0.59, 0.95,1
+#            md_bg_color:0.13, 0.59, 0.95,1
+            md_bg_color:app.theme_cls.primary_color
             MDCard:
                 orientation:'vertical'
                 size_hint_y:None
@@ -29,7 +31,7 @@
                         color:0,0,0,.4
                     MDLabel:
                         font_size:'20sp'
-                        text:'Betuel M. Araujo'
+                        id:nome
                 MDBoxLayout:
                     MDLabel:
                         size_hint_x:None
@@ -38,7 +40,7 @@
                         color:0,0,0,.4
                     MDLabel:
                         font_size:'20sp'
-                        text:'310.779.2888-2'
+                        id:cpf
                 MDBoxLayout:
                     MDLabel:
                         size_hint_x:None
@@ -47,7 +49,7 @@
                         color:0,0,0,.4
                     MDLabel:
                         font_size:'20sp'
-                        text:'betobmx360@gmail.com'
+                        id:email
 
             MDBoxLayout:
                 MDLabel:
@@ -57,7 +59,7 @@
                     color:0,0,0,.4
                 MDLabel:
                     font_size:'20sp'
-                    text:'Nãõ'
+                    id:bloqueio
 
             MDSeparator:
                 size_hint_x:.8
@@ -71,7 +73,7 @@
                     color:0,0,0,.4
                 MDLabel:
                     font_size:'20sp'
-                    text:'0'
+                    id:quant_cancel
 
 
             Widget:

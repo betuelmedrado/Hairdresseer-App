@@ -539,7 +539,7 @@ class HomePage(Screen):
             lista_id = self.get_ids_socios()
 
             # Manager Here to delet three day before #################################################
-            for dia in range(2):
+            for dia in range(5):
                 # link = f'{self.LINK_SALAO}/{id_login["id_login"]}/agenda/{day}.json'
                 link = f'{self.LINK_SALAO}/{self.id_manager}/agenda/{day}.json'
                 requisicao_manager = requests.delete(link)
