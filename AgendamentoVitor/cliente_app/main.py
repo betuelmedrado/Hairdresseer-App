@@ -61,6 +61,11 @@ class HomePage(Screen):
     def on_pre_enter(self, *args):
         self.creat_files()
 
+        # Here to when entry or exit of Viwshcedule exclud content of file
+        with open('select_works.json','w') as exclud_content:
+            json.dump([],exclud_content)
+
+
         with open('load_home.json','r') as load_h:
             load_home = json.load(load_h)
 
@@ -84,7 +89,7 @@ class HomePage(Screen):
 
             link = f'{self.LINK_SALAO}/client/{info["id_user"]}.json'
 
-            requisicao = requests.get(link)
+            requisicao = requests.get(link).json()
             requisicao_dic = requisicao.json()
 
             data_dic = {}

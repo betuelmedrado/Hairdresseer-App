@@ -1659,6 +1659,7 @@ class ViewSchedule(Screen):
             # get user id ##################################################################################################
             user_id = self.log_aut()
             lista_info = self.info_entrace_salao()
+            print(lista_info)
 
             list_content = []
 
