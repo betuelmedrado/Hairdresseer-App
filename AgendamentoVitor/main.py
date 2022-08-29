@@ -2776,7 +2776,10 @@ class InfoScheduleClient(Screen):
         MDApp.get_running_app().root.current = 'viewshedule'
 
 class RegisterOfBox(Screen):
-    pass
+
+    def return_home(self):
+        MDApp.get_running_app().root.current = 'homepage'
+
 
 class AgendamentoApp(MDApp):
 
