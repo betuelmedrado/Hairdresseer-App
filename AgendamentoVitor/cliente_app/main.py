@@ -1,5 +1,5 @@
 
-#requere python 3.9
+#requere python 3.8
 
 # kivymd ###
 from kivymd.app import MDApp
