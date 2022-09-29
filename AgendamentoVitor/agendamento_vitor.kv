@@ -59,12 +59,10 @@
 <HomePage>:
     MDBoxLayout:
         orientation:'vertical'
-        MDToolbar:
+        MDTopAppBar:
             title:'Home Page'
             left_action_items:[['account-arrow-left-outline',lambda x:root.return_login()]]
             right_action_items:[['menu', lambda x: nav_drawer.set_state('open')]]
-
-
         FloatLayout:
 
             MDBoxLayout:
@@ -235,7 +233,7 @@
             source:'images/wallp_schedule.jpg'
     MDBoxLayout:
         orientation:'vertical'
-        MDToolbar:
+        MDTopAppBar:
             elevation:10
             id:title_toobar
             right_action_items:[['refresh',lambda x: root.actualizar()],['menu', lambda x:nav_drawer.set_state('open')]]

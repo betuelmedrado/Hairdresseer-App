@@ -604,6 +604,8 @@ class CreatBill(Screen):
             creat_user = requests.patch(LINK_FIREBASE, data=info_user)
 
             info_user_dic = {}
+            print(info_user['id_user'])
+
             info_user['id_user'] = localid
             info_user['id_token'] = idtoken
 
@@ -1703,9 +1705,9 @@ class HoursSchedule(Screen):
         horas = self.ids.hours.text
         tempo = self.ids.time.text
         valor = self.ids.valor.text
-        cpf = get_data['cpf']
-        email = get_data['email']
         link_info = ''
+        email = get_data['email']
+        cpf = get_data['cpf']
 
         # Here is to know is have schedule marked ##############################################
         if if_manager['manager'] == "False":
