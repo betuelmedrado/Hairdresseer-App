@@ -5,7 +5,7 @@
         orientation:'vertical'
         MDTopAppBar:
             title:'Informações do agendamento'
-            elevation:'10dp'
+#            elevation:10
             left_action_items:[['arrow-left',lambda x:root.return_schedule()]]
         MDBoxLayout:
             size_hint_y:None
@@ -82,7 +82,7 @@
                                 height:'85dp'
                                 MDCard:
                                     orientation:'vertical'
-                                    elevation:0
+#                                    elevation:0
                                     on_release:root.popup_leave()
                                     Image:
                                         source:''

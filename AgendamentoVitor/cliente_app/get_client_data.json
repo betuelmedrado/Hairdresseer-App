@@ -1,7 +1,7 @@
 {
-  "nome": "joaotest1",
-  "cpf": "31077928882",
-  "email": "joaotes1@gmail.com",
+  "nome": "joao",
+  "cpf": 31077928882,
+  "email": "joao@gmail.com",
   "bloqueado": "False",
   "quant_cancelado": "0"
 }
