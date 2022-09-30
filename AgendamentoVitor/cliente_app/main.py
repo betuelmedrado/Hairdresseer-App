@@ -81,7 +81,6 @@ class HomePage(Screen):
         else:
             pass
 
-
     def get_client_data(self, *args):
         try:
             with open('info_user.json','r') as file:
@@ -89,7 +88,7 @@ class HomePage(Screen):
 
             link = f'{self.LINK_SALAO}/client/{info["id_user"]}.json'
 
-            requisicao = requests.get(link).json()
+            requisicao = requests.get(link)
             requisicao_dic = requisicao.json()
 
             data_dic = {}
@@ -104,7 +103,6 @@ class HomePage(Screen):
                 json.dump(data_dic, file_data, indent=2)
         except:
             pass
-
 
     def get_inf_schedule(self, *args):
         pass
@@ -359,9 +357,22 @@ class Register(Screen):
         # requisicao = requests.get(link)
         # requisicao_dic = requisicao.json()
 
-        with open('msg_to_app.json', 'r') as file_msg:
-            msg = json.load(file_msg)
+        try:
+            with open('msg_to_app.json', 'r') as file_msg:
+                msg = json.load(file_msg)
+        except FileNotFoundError:
 
+            link = f'{self.link}/msg_to_app.json'
+
+            requisicao = requests.get(link)
+            requisicao_dic = requisicao.json()
+            msg = requisicao_dic['msg_client']
+
+            with open('msg_to_app.json', 'w') as file_msg:
+                json.dump(msg,file_msg, indent=2)
+
+            with open('msg_to_app.json', 'r') as file_msg:
+                msg = json.load(file_msg)
 
         return msg
 
