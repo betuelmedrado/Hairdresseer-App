@@ -51,15 +51,17 @@ class HomePage(Screen):
         super().__init__(**kwargs)
         self.day_semana = datetime.today().isoweekday()
 
+        # Creating the files go then open app
+        Clock.schedule_once(self.creat_files, 1)
+
         self.id_manager = self.get_id_manager()
         self.id_socios = self.get_id_socios()
-        Clock.schedule_once(self.get_client_data, 1)
-        Clock.schedule_once(self.get_info, 2)
+        Clock.schedule_once(self.get_client_data, 2)
+        Clock.schedule_once(self.get_info, 3)
         Clock.schedule_once(self.get_local, 3)
 
 
     def on_pre_enter(self, *args):
-        self.creat_files()
 
         # Here to when entry or exit of Viwshcedule exclud content of file
         with open('select_works.json','w') as exclud_content:
@@ -210,7 +212,7 @@ class HomePage(Screen):
         except:
             pass
 
-    def creat_files(self):
+    def creat_files(self, *args):
         try:
             with open('select_works.json','r') as select:
                 json.load(select)
