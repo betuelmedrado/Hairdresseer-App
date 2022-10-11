@@ -242,12 +242,12 @@ class LoginManager(Screen):
             with open('info_login.json', 'w') as file_login:
                 json.dump('', file_login) 
 
-    def spiner(self, *args):
-        self.ids.float_home.add_widget(
-            MDSpinner(size_hint=(None, None,), size=('46dp', '46dp'), pos_hint={'center_x': .5, 'center_y': .5}))
+    # def spiner(self, *args):
+    #     self.ids.float_home.add_widget(
+    #         MDSpinner(size_hint=(None, None,), size=('46dp', '46dp'), pos_hint={'center_x': .5, 'center_y': .5}))
 
     def on_pre_enter(self, *args):
-        Clock.schedule_once(self.spiner,1)
+        # Clock.schedule_once(self.spiner,1)
         self.creat_files()
         self.load_refresh()
 
@@ -669,7 +669,6 @@ class ManagerProfile(Screen):
                 self.state_focus = True
                 self.ids.tempo.text = f'{str(first).zfill(2)}:{str(last).zfill(2)}'
 
-
     def on_text_temp(self,*args):
         text_temp = ''
         tamanho = self.ids.tempo.text
@@ -843,12 +842,16 @@ class ManagerProfile(Screen):
         self.ids.hours.clear_widgets()
         for hours, min in enumerate(range(24)):
             h = f'{str(hours).zfill(2)}:00'
-            bt = MDTextButton(text=str(h),font_style='Body2',bold=True ,pos_hint=({'center_x':.5}), md_bg_color=(0.13, 0.53, 0.95,.1))
+            bt = MDTextButton(text=str(h),font_style='Body2',bold=True ,pos_hint=({'center_x':.5}))
+            bt.md_bg_color=(0.13, 0.53, 0.95,.1)
+            bt.font_size='25sp'
             self.ids.hours.add_widget(bt)
             bt.bind(on_release=self.insert)
 
             h2 = f'{str(hours).zfill(2)}:30'
-            bt = MDTextButton(text=str(h2),font_style='Body2', bold=True ,pos_hint=({'center_x':.5}),md_bg_color=(0.13, 0.53, 0.95,.3))
+            bt = MDTextButton(text=str(h2),font_style='Body2', bold=True ,pos_hint=({'center_x':.5})) # ,md_bg_color=(0.13, 0.53, 0.95,.3)
+            bt.md_bg_color=(0.13, 0.53, 0.95,.3)
+            bt.font_size='20sp'
             self.ids.hours.add_widget(bt)
 
             bt.bind(on_release=self.insert)
@@ -1659,7 +1662,6 @@ class ViewSchedule(Screen):
             # get user id ##################################################################################################
             user_id = self.log_aut()
             lista_info = self.info_entrace_salao()
-            print(lista_info)
 
             list_content = []
 

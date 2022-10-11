@@ -3,7 +3,8 @@
     MDBoxLayout:
         orientation:'vertical'
         MDTopAppBar:
-            title:'Perfil'
+            title:'Meu Cadastro!'
+            halign:'center'
             left_action_items:[['arrow-left', lambda x: root.return_home()]]
             md_bg_color:app.theme_cls.primary_color
 #            elevation:0
@@ -26,7 +27,7 @@
                 MDBoxLayout:
                     MDLabel:
                         size_hint_x:None
-                        width:60
+                        width:'60dp'
                         text:'Nome:'
                         color:0,0,0,.4
                     MDLabel:
@@ -35,7 +36,7 @@
                 MDBoxLayout:
                     MDLabel:
                         size_hint_x:None
-                        width:60
+                        width:'60dp'
                         text:'CPF:'
                         color:0,0,0,.4
                     MDLabel:
@@ -44,7 +45,7 @@
                 MDBoxLayout:
                     MDLabel:
                         size_hint_x:None
-                        width:60
+                        width:'60dp'
                         text:'Email:'
                         color:0,0,0,.4
                     MDLabel:

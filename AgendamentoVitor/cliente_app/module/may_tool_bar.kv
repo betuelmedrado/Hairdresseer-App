@@ -1,0 +1,16 @@
+<MyToolBar>:
+    size_hint_y:None
+    height:'60dp'
+    my_color:0.00, 1.00, 0.00,1
+    my_left_icon:''
+    left_button:None
+    MDCard:
+        radius:0,0,0,0
+        elevation:5
+        md_bg_color:root.my_color
+        MDFloatLayout:
+            MDIconButton:
+                pos_hint:{'center_y':.5}
+                icon:root.my_left_icon
+                on_press:root.left_button
+

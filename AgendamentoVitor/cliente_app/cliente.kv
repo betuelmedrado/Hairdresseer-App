@@ -6,6 +6,7 @@
 #:include file_kv/info_schedule_client.kv
 #:include file_kv/msg_to_app.kv
 #:include file_kv/perfil.kv
+#:include module/may_tool_bar.kv
 
 #:import FadeTransition kivy.uix.screenmanager.FadeTransition
 #:import RiseInTransition kivy.uix.screenmanager.RiseInTransition
@@ -46,7 +47,8 @@
             title:'Sejam bem vindos'
             specific_text_color:0,0,0,1
             left_action_items:[['account-arrow-left-outline', lambda x: root.return_login()]]
-            right_action_items:[['menu', lambda x:nav_drawer.set_state('open')]]
+            right_action_items:[['help-circle', lambda x: root.help()], ['menu', lambda x:nav_drawer.set_state('open')]]
+
 #        Widget:
 #            size_hint_y:.10
         MDBoxLayout:
@@ -230,11 +232,18 @@
             height:self.minimum_height
             spacing:'20dp'
             orientation:'vertical'
-            md_bg_color:0.53, 0.54, 0.56, .4
+            md_bg_color:1,1,1,.8
+            canvas:
+                Color:
+                    rgba:.5,.5,.5,.1
+                Rectangle:
+                    size:self.size
+                    pos:self.pos
+                    source:'images/wallpaper.png'
             MDCard:
                 size_hint_y:None
                 height:'60dp'
-                md_bg_color:0,1,1,1
+                md_bg_color:0.55, 0.57, 0.63,1
                 MDIconButton:
                     icon:'arrow-left'
                     theme_icon_color: "Custom"
@@ -254,7 +263,8 @@
                 MDLabel:
                     font_size:'25dp'
                     markup:True
-                    text:'Escolha\nOs tipos de serviços'
+                    halign:'center'
+                    text:'Tipos de serviços'
                     bold:True
                     color:0,0,0,1
 #                font_size:'30dp'
@@ -265,7 +275,7 @@
                 size_hint:.8,None
                 height:'200dp'
 #                md_bg_color:0.78, 0.80, 0.83,1
-                md_bg_color:1,1,1,1
+                md_bg_color:0.55, 0.57, 0.63,1
                 radius:8,8,8,8
                 pos_hint:{'center_x':.5}
                 MDCard:
@@ -318,7 +328,12 @@
                     size_hint_y:None
                     height:'20dp'
                     font_size:'25sp'
+                    bold:True
+                    halign:'center'
                     text:'Serviços escolhidos!'
+                Widget:
+                    size_hint_y:None
+                    height:'5dp'
                 MDCard:
                     md_bg_color:0.78, 0.80, 0.83,1
                     radius:8,8,8,8

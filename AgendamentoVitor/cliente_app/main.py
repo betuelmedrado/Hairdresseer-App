@@ -60,8 +60,26 @@ class HomePage(Screen):
         Clock.schedule_once(self.get_info, 3)
         Clock.schedule_once(self.get_local, 3)
 
+    def call_back(self):
+        pass
+
+    def help(self):
+
+        infohelp = ''
+        with open('infohelp.txt', 'r', encoding='utf-8') as help:
+            infohelp = help.read()
+
+        button_ok = MDFlatButton(text='OK')
+
+        dialog = MDDialog(title='Menssagen importante!',text=str(infohelp), buttons=[button_ok])
+
+        button_ok.bind(on_release=dialog.dismiss)
+
+        dialog.open()
 
     def on_pre_enter(self, *args):
+
+        Window.unbind(on_keyboard=self.call_back)
 
         # Here to when entry or exit of Viwshcedule exclud content of file
         with open('select_works.json','w') as exclud_content:
@@ -364,17 +382,19 @@ class Register(Screen):
                 msg = json.load(file_msg)
         except FileNotFoundError:
 
-            link = f'{self.link}/msg_to_app.json'
+            msg = ''
 
-            requisicao = requests.get(link)
-            requisicao_dic = requisicao.json()
-            msg = requisicao_dic['msg_client']
+            # link = f'{self.link}/msg_to_app.json'
+            #
+            # requisicao = requests.get(link)
+            # requisicao_dic = requisicao.json()
+            # msg = requisicao_dic['msg_client']
 
-            with open('msg_to_app.json', 'w') as file_msg:
-                json.dump(msg,file_msg, indent=2)
-
-            with open('msg_to_app.json', 'r') as file_msg:
-                msg = json.load(file_msg)
+            # with open('msg_to_app.json', 'w') as file_msg:
+            #     json.dump(msg, file_msg, indent=2)
+            #
+            # with open('msg_to_app.json', 'r') as file_msg:
+            #     msg = json.load(file_msg)
 
         return msg
 
@@ -393,8 +413,8 @@ class Register(Screen):
             msg = requisicao_dic['msg_client']
 
             if int(info_msg_user['valid']) < int(msg['valid']):
-                with open('msg_to_app.json','w',encoding='utf-8') as file:
-                    json.dump(msg, file, indent=2)
+                # with open('msg_to_app.json','w',encoding='utf-8') as file:
+                #     json.dump(msg, file, indent=2)
 
                 self.show_msg_to_app()
             else:
@@ -761,8 +781,11 @@ class Table_block(MDBoxLayout):
 
 class ViewSchedule(Screen):
     API_KEY = "AIzaSyAue2_eYU5S5TsUc692vHNlyxIHrlBVZjk"
+
+    # Variable to loading the screen again "X" e "Y"
     x = NumericProperty(0)
     y = NumericProperty(0)
+
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
 
@@ -938,6 +961,8 @@ class ViewSchedule(Screen):
 
 
             time_c = self.info_manager['time_cancel']
+
+            # Time Mensage of cancel ot schedule #############################
             time_cancel = f'[color=#6B0A00][b]"Atenção":[/b][/color] Você tem [b]{time_c}[/b] [size=13]H/M[/size] para desmarcar apos agendamento!'
 
             # variable to show the first schedule if it is scheduled, is implemented in "for range", I do this to display the correct schedule table
@@ -1340,7 +1365,7 @@ class HoursSchedule(Screen):
         except FileNotFoundError:
             pass
 
-        self.ids.categorie.add_widget(MDSpinner(size_hint=(None,None,), size=('46dp','46dp'),color=(0,0,0,1),pos_hint={'center_x':.5,'center_y':.5}))
+        self.ids.categorie.add_widget(MDSpinner(size_hint=(None,None,), size=('46dp','46dp'),color=(0,0,0,1),pos_hint={'center_x':.5,'center_y':.2}))
         Clock.schedule_once(self.get_works, 2)
         self.includ_color_select()
         self.soma_hours_values()
@@ -1719,8 +1744,12 @@ class HoursSchedule(Screen):
         tempo = self.ids.time.text
         valor = self.ids.valor.text
         link_info = ''
-        email = get_data['email']
-        cpf = get_data['cpf']
+        try:
+            email = get_data['email']
+            cpf = get_data['cpf']
+        except:
+            email = ''
+            cpf = ''
 
         # Here is to know is have schedule marked ##############################################
         if if_manager['manager'] == "False":
@@ -1759,13 +1788,15 @@ class HoursSchedule(Screen):
         elif if_manager['manager'] == "True":
             link = f'{self.LINK_SALAO}/{self.id_manager}/agenda/{self.semana}/{id_user}.json'
 
+        print('nom ',nome['nome'])
+
         # information of date base #########################
         info = f'{{"id_posicao":"{id_pos["id_posicao"]}",' \
                f'"id_horas":"{horas}",' \
                f'"id_user":"{id_user}",' \
                f'"tempo":"{tempo}",' \
                f'"valor":"{valor}",' \
-               f'"nome":"{nome}",'\
+               f'"nome":"{nome["nome"]}",'\
                f'"horas_agendamento": "{horas_hoje}",'\
                f'"servicos":"{list_works}",' \
                f'"cpf":"{cpf}",' \
@@ -1899,6 +1930,8 @@ class InfoScheduleClient(Screen):
 
     def inf_schedule_client(self):
         dic_inf = {}
+        cpf = ''
+        e_mail = ''
 
         id_diverse = self.get_id_diverse()
 
@@ -1911,7 +1944,14 @@ class InfoScheduleClient(Screen):
 
         id_proficional = self.get_id_diverse()
 
-        cpf = str(cpf_email[0]["cpf"])
+        try:
+            cpf = str(cpf_email[0]["cpf"])
+            e_meil = str(cpf_email[0]["email"])
+        except:
+            with open('get_client_data.json', 'r') as date:
+                date_client = json.load(date)
+                cpf  = date_client['cpf']
+                e_mail = date_client['email']
 
         # for info_schedule in info_schedules:
 
@@ -1924,12 +1964,12 @@ class InfoScheduleClient(Screen):
             id_client = info_schedule['id_schedule']
             self.ids.scheduling.text = info_schedule['hours_of_schedule']
 
-            self.ids.nome.text = f'[size=20][color=#9B9894]Nome[/color][/size]\n[color=#6B0A00]{info_schedule["client"]}[/color]'
+            self.ids.nome.text = f'[color=#6B0A00]{info_schedule["client"]}[/color]'
             self.ids.hours.text = f'[b]Agendado as[/b] [color=#6B0A00]{info_schedule["hours"]}[/color] [size=20]hs[/size]'
             self.ids.hours_second.text = f'[b]Termino do serviço[/b] [color=#6B0A00]{info_schedule["hours_second"]}[/color] [size=20]hs[/size]'
             self.ids.time.text = f'[b]Tempo de serviço[/b] [color=#6B0A00]{info_schedule["time"]}[/color] [size=20]hs[/size]'
             self.ids.cpf.text = f'{cpf[:3]}.{cpf[3:6]}.{cpf[6:9]}-{cpf[9:]}'
-            self.ids.email.text = str(cpf_email[0]["email"])
+            self.ids.email.text = str(e_mail)
 
             self.work(id_client, id_proficional)
             self.info_cliente_and_cancel(id_client)
@@ -2323,6 +2363,13 @@ class MyBoxCategorieLabel(MDCard):
         self.valor = str(valor)
 
 
+class MyToolBar(MDBoxLayout):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(**kwargs)
+
+        pass
+
 class MsgToApp(Screen):
     link = f'https://shedule-vitor-default-rtdb.firebaseio.com'
 
@@ -2349,15 +2396,30 @@ class MsgToApp(Screen):
         requisicao = requests.patch(link_client, data=info)
 
         webbrowser.open(link)
-        MDApp.get_running_app().root.current = 'homepage'
 
 
     def on_pre_enter(self, *args):
-        with open('msg_to_app.json','r') as file:
-            msg = json.load(file)
+        # with open('msg_to_app.json','r') as file:
+        #     msg = json.load(file)
+        #
+        # self.ids.msg.text = msg['msg_actualiza']
+        # self.ids.link.text = msg['link']
+        self.dialog_msg()
 
-        self.ids.msg.text = msg['msg_actualiza']
-        self.ids.link.text = msg['link']
+
+    def dialog_msg(self,*args, **kwargs):
+        with open('msg_to_app.json', 'r') as file:
+            msg_file = json.load(file)
+
+        msg = msg_file['msg_actualiza']
+        # msg = msg_file['link']
+
+        button_ok = MDFlatButton(text='OK')
+
+        dialog = MDDialog(title='Atualização necessária', text=str(msg), buttons=[button_ok])
+
+        button_ok.bind(on_release=self.set_msg)
+        dialog.open()
 
 
 class AgendamentoApp(MDApp):
