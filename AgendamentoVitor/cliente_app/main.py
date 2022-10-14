@@ -113,41 +113,40 @@ class HomePage(Screen):
             pass
 
     def get_client_data(self, *args):
-        # try:
-        with open('info_user.json','r') as file:
-            info = json.load(file)
-
-        link = f'{self.LINK_SALAO}/client/{info["id_user"]}.json'
-
-        requisicao = requests.get(link)
-        requisicao_dic = requisicao.json()
-
-        data_dic = {}
-
-        data_dic["nome"] = requisicao_dic["nome"]
-
-        # Here is to insert a cpf valid! ##################################
         try:
-            data_dic["cpf"] = requisicao_dic["cpf"]
+            with open('info_user.json','r') as file:
+                info = json.load(file)
+
+            link = f'{self.LINK_SALAO}/client/{info["id_user"]}.json'
+
+            requisicao = requests.get(link)
+            requisicao_dic = requisicao.json()
+
+            data_dic = {}
+
+            data_dic["nome"] = requisicao_dic["nome"]
+
+            # Here is to insert a cpf valid! ##################################
+            try:
+                data_dic["cpf"] = requisicao_dic["cpf"]
+            except:
+                data_dic["cpf"] = str("11111111111")
+                self.insert_cpf('Insira o ceu CPF!')
+
+            #  Here insert the e-mail if it is not e-mail ######################
+            try:
+                data_dic["email"] = requisicao_dic["email"]
+            except:
+                data_dic["email"] = ''
+                self.insert_cpf('Insira o ceu e-mail!')
+
+            data_dic["bloqueado"] = requisicao_dic["bloqueado"]
+            data_dic["quant_cancelado"] = requisicao_dic["quant_cancelado"]
+
+            with open('get_client_data.json','w', encoding='utf-8') as file_data:
+                json.dump(data_dic, file_data, indent=2)
         except:
-            data_dic["cpf"] = '00000000000'
-            self.insert_cpf('Insira o ceu CPF!')
-
-        #  Here insert the e-mail if it is not e-mail ######################
-        try:
-            data_dic["email"] = requisicao_dic["email"]
-        except:
-            data_dic["email"] = ''
-            self.insert_cpf('Insira o ceu e-mail!')
-
-
-        data_dic["bloqueado"] = requisicao_dic["bloqueado"]
-        data_dic["quant_cancelado"] = requisicao_dic["quant_cancelado"]
-
-        with open('get_client_data.json','w', encoding='utf-8') as file_data:
-            json.dump(data_dic, file_data, indent=2)
-        # except KeyError:
-        #     self.insert_cpf()
+            pass
 
     def insert_cpf(self,msg):
         dialog = MDDialog(title=str(msg))
