@@ -65,9 +65,20 @@ class HomePage(Screen):
 
     def help(self):
 
+        help_text = '"Atenção!" antes de fazer seu agendamento certifique-se que ira comparecer ao estábelecimento. ' \
+                    'O não compacecimento no horárion pode ser cobrado uma taxa pelo salão!' \
+                    'Você tem a opção de cancelar o agendamento dentro do tempo estabecido pelo salão!'
+
         infohelp = ''
-        with open('infohelp.txt', 'r', encoding='utf-8') as help:
-            infohelp = help.read()
+        try:
+            with open('infohelp.txt', 'r', encoding='utf-8') as help:
+                infohelp = help.read()
+        except:
+            with open('infohelp.txt', 'w', encoding='utf-8') as help:
+                infohelp = help.write(help_text)
+
+            with open('infohelp.txt', 'r', encoding='utf-8') as help:
+                infohelp = help.read()
 
         button_ok = MDFlatButton(text='OK')
 
@@ -102,27 +113,45 @@ class HomePage(Screen):
             pass
 
     def get_client_data(self, *args):
+        # try:
+        with open('info_user.json','r') as file:
+            info = json.load(file)
+
+        link = f'{self.LINK_SALAO}/client/{info["id_user"]}.json'
+
+        requisicao = requests.get(link)
+        requisicao_dic = requisicao.json()
+
+        data_dic = {}
+
+        data_dic["nome"] = requisicao_dic["nome"]
+
+        # Here is to insert a cpf valid! ##################################
         try:
-            with open('info_user.json','r') as file:
-                info = json.load(file)
-
-            link = f'{self.LINK_SALAO}/client/{info["id_user"]}.json'
-
-            requisicao = requests.get(link)
-            requisicao_dic = requisicao.json()
-
-            data_dic = {}
-
-            data_dic["nome"] = requisicao_dic["nome"]
             data_dic["cpf"] = requisicao_dic["cpf"]
-            data_dic["email"] = requisicao_dic["email"]
-            data_dic["bloqueado"] = requisicao_dic["bloqueado"]
-            data_dic["quant_cancelado"] = requisicao_dic["quant_cancelado"]
-
-            with open('get_client_data.json','w', encoding='utf-8') as file_data:
-                json.dump(data_dic, file_data, indent=2)
         except:
-            pass
+            data_dic["cpf"] = '00000000000'
+            self.insert_cpf('Insira o ceu CPF!')
+
+        #  Here insert the e-mail if it is not e-mail ######################
+        try:
+            data_dic["email"] = requisicao_dic["email"]
+        except:
+            data_dic["email"] = ''
+            self.insert_cpf('Insira o ceu e-mail!')
+
+
+        data_dic["bloqueado"] = requisicao_dic["bloqueado"]
+        data_dic["quant_cancelado"] = requisicao_dic["quant_cancelado"]
+
+        with open('get_client_data.json','w', encoding='utf-8') as file_data:
+            json.dump(data_dic, file_data, indent=2)
+        # except KeyError:
+        #     self.insert_cpf()
+
+    def insert_cpf(self,msg):
+        dialog = MDDialog(title=str(msg))
+        dialog.open()
 
     def get_inf_schedule(self, *args):
         pass
@@ -637,7 +666,6 @@ class CreatBill(Screen):
             creat_user = requests.patch(LINK_FIREBASE, data=info_user)
 
             info_user_dic = {}
-            print(info_user['id_user'])
 
             info_user['id_user'] = localid
             info_user['id_token'] = idtoken
@@ -1365,7 +1393,7 @@ class HoursSchedule(Screen):
         except FileNotFoundError:
             pass
 
-        self.ids.categorie.add_widget(MDSpinner(size_hint=(None,None,), size=('46dp','46dp'),color=(0,0,0,1),pos_hint={'center_x':.5,'center_y':.2}))
+        self.ids.categorie.add_widget(MDSpinner(size_hint=(None,None,), size=('46dp','46dp'),color=(0,0,0,1),pos_hint={'center_x':.5,'center_y':.1}))
         Clock.schedule_once(self.get_works, 2)
         self.includ_color_select()
         self.soma_hours_values()
@@ -1395,6 +1423,7 @@ class HoursSchedule(Screen):
 
         if my_select == []:
             self.ids.card_save.md_bg_color = 1, 0, 0, .1
+            self.ids.color_card_fundo.md_bg_color = 0.55, 0.57, 0.63, 1
             self.ids.card_save.unbind(on_release=self.save_scheduleing)
             self.ids.card_save.bind(on_release=self.nada)
         else:
@@ -1550,6 +1579,7 @@ class HoursSchedule(Screen):
 
         if self.ids.work_select.children == []:
             self.ids.card_save.md_bg_color = 1, 0, 0, .1
+            self.ids.color_card_fundo.md_bg_color = 0.55, 0.57, 0.63,1
             self.ids.card_save.unbind(on_release=self.save_scheduleing)
             self.ids.card_save.bind(on_release=self.nada)
 
@@ -1647,12 +1677,16 @@ class HoursSchedule(Screen):
 
         if boolian:
             self.ids.card_save.md_bg_color = 1,0,0,.1
+            self.ids.color_card_fundo.md_bg_color = 0.55, 0.57, 0.63,1
             self.ids.card_save.unbind(on_release = self.save_scheduleing)
             self.ids.card_save.bind(on_release = self.disable_release)
-            toast('O gendamento excede o horario do proximo agendamento escolha outro horario ou outro cabeleleiro!')
+
+            self.disable_release()
+
         elif boolian == False:
             self.ids.card_save.unbind(on_release = self.disable_release)
             self.ids.card_save.md_bg_color = 0.13, 0.53, 0.95,1
+            self.ids.color_card_fundo.md_bg_color = 0.13, 0.53, 0.95,1
             self.ids.card_save.bind(on_release = self.save_scheduleing)
 
     def check_time(self, *args):
@@ -1674,10 +1708,10 @@ class HoursSchedule(Screen):
         toast('Selecione o tipo de serviço!')
 
     def disable_release(self,*args):
-        bt = MDFlatButton(text='OK')
+        bt = MDFlatButton(text='OK!')
         dialog = MDDialog(title='"Aviso!"',
-                          text='O gendamento excede o horario do proximo agendamento escolha outro horario ou outro cabeleleiro!',
-                          radius=[40, 7, 40, 7], buttons=[bt])
+                          text='O gendamento excede o horario do proximo agendamento escolha outro horário ou outro barbeiro!',
+                           buttons=[bt])
         bt.bind(on_release=dialog.dismiss)
         dialog.open()
 
@@ -2361,14 +2395,6 @@ class MyBoxCategorieLabel(MDCard):
         self.servico = str(servico)
         self.tempo = str(tempo)
         self.valor = str(valor)
-
-
-class MyToolBar(MDBoxLayout):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(**kwargs)
-
-        pass
 
 class MsgToApp(Screen):
     link = f'https://shedule-vitor-default-rtdb.firebaseio.com'
