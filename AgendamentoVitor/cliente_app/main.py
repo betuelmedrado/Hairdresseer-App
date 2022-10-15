@@ -185,7 +185,7 @@ class HomePage(Screen):
         except requests.exceptions.ConnectionError:
             toast('Você não esta conectado a internet!')
 
-    def get_info(self,*args):
+    def get_info(self,*args, **kwargs):
 
         self.ids.my_card_button.clear_widgets()
         try:
@@ -220,23 +220,25 @@ class HomePage(Screen):
 
             # getting ids of user which is schedule ############################################################################
             # for enum, id in enumerate(lista):
-            for enum, id in enumerate(self.id_socios):
+
+            for enum, id in enumerate(self.id_socios[0]):
                 try:
                     # Here getting socio to read of data ##############################################################################
-                    LINK_ID = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{id}.json'
-                    requisicao_to_socio = requests.get(LINK_ID)
-                    requisicao_to_socio_dic = requisicao_to_socio.json()
+                    # LINK_ID = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{id}.json'
+                    # requisicao_to_socio = requests.get(LINK_ID)
+                    # requisicao_to_socio_dic = requisicao_to_socio.json()
+                    requisicao_to_socio_dic = self.get_id_socios()
 
                     try:
                         if check_socio[enum]:
-                            card_button = MyCardButton(requisicao_to_socio_dic['manager'], id, requisicao_to_socio_dic['nome'])
+                            card_button = MyCardButton(requisicao_to_socio_dic[1][id]['manager'], id, requisicao_to_socio_dic[1][id]['nome'])
                             card_button.ids.image_check.add_widget(Image(source='images/check.png'))
                             self.ids.my_card_button.add_widget(card_button)
                         else:
-                            self.ids.my_card_button.add_widget(MyCardButton(requisicao_to_socio_dic['manager'], id, requisicao_to_socio_dic['nome']))
+                            self.ids.my_card_button.add_widget(MyCardButton(requisicao_to_socio_dic[1][id]['manager'], id, requisicao_to_socio_dic[1][id]['nome']))
                     except:
                         self.ids.my_card_button.add_widget(
-                            MyCardButton(requisicao_to_socio_dic['manager'], id, requisicao_to_socio_dic['nome']))
+                            MyCardButton(requisicao_to_socio_dic[1][id]['manager'], id, requisicao_to_socio_dic[1][id]['nome']))
                 except:
                     pass
         except requests.exceptions.ConnectionError:
@@ -250,9 +252,14 @@ class HomePage(Screen):
             requisicao = requests.get(LINK_SOCIOS)
             requisicao_dic = requisicao.json()
 
+            data_dic = requisicao_dic
+
             for id in requisicao_dic:
                 lista_id_socio.append(id)
-            return lista_id_socio
+
+            # passing a lista of ids and a list of data ####
+            return lista_id_socio, data_dic
+
         except requests.exceptions.ConnectionError:
             toast('Você não esta conectado a internet!')
         except:
@@ -351,16 +358,22 @@ class HomePage(Screen):
             return False
 
     def check_socio_scheduling(self, *args):
+        """
+        function to insert image ok in button of barber
+        :param args:
+        :return: list_of_id whith true or false
+        """
         list_of_id = []
 
         with open('info_user.json', 'r') as file:
             id_user = json.load(file)
 
         try:
-            for idsocio in self.id_socios:
+            for enum, idsocio in enumerate(self.id_socios[0]):
                 LINK = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{idsocio}/agenda/{self.day_semana}.json'
                 requisicao = requests.get(LINK)
                 requisicao_dic = requisicao.json()
+
 
                 try:
                     for id in requisicao_dic:
@@ -369,7 +382,8 @@ class HomePage(Screen):
                             list_of_id.append(True)
                             break
                         else:
-                            list_of_id.append(False)
+                            pass
+                            # list_of_id.append(False)
                 except:
                     list_of_id.append(False)
 
@@ -381,6 +395,7 @@ class HomePage(Screen):
         except:
             list_of_id.append(False)
             return list_of_id
+
 
 
 class Register(Screen):
