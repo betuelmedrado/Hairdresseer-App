@@ -111,6 +111,7 @@ class HomePage(Screen):
                 json.dump(load, load_home, indent=2)
         else:
             pass
+        return True
 
     def get_client_data(self, *args):
         try:
@@ -397,7 +398,6 @@ class HomePage(Screen):
             return list_of_id
 
 
-
 class Register(Screen):
 
     API_KEY = "AIzaSyAue2_eYU5S5TsUc692vHNlyxIHrlBVZjk"
@@ -406,10 +406,11 @@ class Register(Screen):
         super().__init__(**kwargs)
 
         # Verify if have msg to the app ####
-        Clock.schedule_once( self.get_msg_to_app, 1)
 
-    # def on_pre_enter(self, *args):
-    #     Clock.schedule_once(self.log_aut,1)
+
+    def on_pre_enter(self, *args):
+        Clock.schedule_once( self.get_msg_to_app, 1)
+#     Clock.schedule_once(self.log_aut,1)
 
     def info_msg_user(self, *args):
         # with open('info_user.json', 'r') as file:
