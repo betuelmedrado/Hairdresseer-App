@@ -56,9 +56,9 @@ class HomePage(Screen):
 
         self.id_manager = self.get_id_manager()
         self.id_socios = self.get_id_socios()
-        Clock.schedule_once(self.get_client_data, 2)
-        Clock.schedule_once(self.get_info, 3)
-        Clock.schedule_once(self.get_local, 3)
+        # Clock.schedule_once(self.get_client_data, 2)
+        Clock.schedule_once(self.get_info, 1)
+        Clock.schedule_once(self.get_local, 1)
 
     def call_back(self):
         pass
@@ -113,45 +113,39 @@ class HomePage(Screen):
             pass
         return True
 
-    def get_client_data(self, *args):
-        try:
-            with open('info_user.json','r') as file:
-                info = json.load(file)
-
-            link = f'{self.LINK_SALAO}/client/{info["id_user"]}.json'
-
-            requisicao = requests.get(link)
-            requisicao_dic = requisicao.json()
-
-            data_dic = {}
-
-            data_dic["nome"] = requisicao_dic["nome"]
-
-            # Here is to insert a cpf valid! ##################################
-            try:
-                data_dic["cpf"] = requisicao_dic["cpf"]
-            except:
-                data_dic["cpf"] = str("11111111111")
-                self.insert_cpf('Insira o ceu CPF!')
-
-            #  Here insert the e-mail if it is not e-mail ######################
-            try:
-                data_dic["email"] = requisicao_dic["email"]
-            except:
-                data_dic["email"] = ''
-                self.insert_cpf('Insira o ceu e-mail!')
-
-            data_dic["bloqueado"] = requisicao_dic["bloqueado"]
-            data_dic["quant_cancelado"] = requisicao_dic["quant_cancelado"]
-
-            with open('get_client_data.json','w', encoding='utf-8') as file_data:
-                json.dump(data_dic, file_data, indent=2)
-        except:
-            pass
-
-    def insert_cpf(self,msg):
-        dialog = MDDialog(title=str(msg))
-        dialog.open()
+    # def get_client_data(self, *args):
+    #     try:
+    #         with open('info_user.json','r') as file:
+    #             info = json.load(file)
+    #
+    #         link = f'{self.LINK_SALAO}/client/{info["id_user"]}.json'
+    #
+    #         requisicao = requests.get(link)
+    #         requisicao_dic = requisicao.json()
+    #
+    #         data_dic = {}
+    #
+    #         data_dic["nome"] = requisicao_dic["nome"]
+    #
+    #         # Here is to insert a cpf valid! ##################################
+    #         try:
+    #             data_dic["cpf"] = requisicao_dic["cpf"]
+    #         except:
+    #             data_dic["cpf"] = str("00000000000")
+    #
+    #         #  Here insert the e-mail if it is not e-mail ######################
+    #         try:
+    #             data_dic["email"] = requisicao_dic["email"]
+    #         except:
+    #             data_dic["email"] = ''
+    #
+    #         data_dic["bloqueado"] = requisicao_dic["bloqueado"]
+    #         data_dic["quant_cancelado"] = requisicao_dic["quant_cancelado"]
+    #
+    #         with open('get_client_data.json','w', encoding='utf-8') as file_data:
+    #             json.dump(data_dic, file_data, indent=2)
+    #     except:
+    #         pass
 
     def get_inf_schedule(self, *args):
         pass
@@ -425,20 +419,17 @@ class Register(Screen):
             with open('msg_to_app.json', 'r') as file_msg:
                 msg = json.load(file_msg)
         except FileNotFoundError:
+            link = f'{self.link}/msg_to_app.json'
 
-            msg = ''
+            requisicao = requests.get(link)
+            requisicao_dic = requisicao.json()
+            msg = requisicao_dic['msg_client']
 
-            # link = f'{self.link}/msg_to_app.json'
-            #
-            # requisicao = requests.get(link)
-            # requisicao_dic = requisicao.json()
-            # msg = requisicao_dic['msg_client']
+            with open('msg_to_app.json', 'w') as file_msg:
+                json.dump(msg, file_msg, indent=2)
 
-            # with open('msg_to_app.json', 'w') as file_msg:
-            #     json.dump(msg, file_msg, indent=2)
-            #
-            # with open('msg_to_app.json', 'r') as file_msg:
-            #     msg = json.load(file_msg)
+            with open('msg_to_app.json', 'r') as file_msg:
+                msg = json.load(file_msg)
 
         return msg
 
@@ -533,6 +524,41 @@ class Register(Screen):
             toast('Você não esta conectado a internet!')
             return lista_info_ids
 
+    def get_client_data(self, *args):
+        try:
+            with open('info_user.json','r') as file:
+                info = json.load(file)
+
+            link = f'{self.link}/client/{info["id_user"]}.json'
+
+            requisicao = requests.get(link)
+            requisicao_dic = requisicao.json()
+
+            data_dic = {}
+
+            data_dic["nome"] = requisicao_dic["nome"]
+
+            # Here is to insert a cpf valid! ##################################
+            try:
+                data_dic["cpf"] = requisicao_dic["cpf"]
+            except:
+                data_dic["cpf"] = str("00000000000")
+
+
+            #  Here insert the e-mail if it is not e-mail ######################
+            try:
+                data_dic["email"] = requisicao_dic["email"]
+            except:
+                data_dic["email"] = ''
+
+            data_dic["bloqueado"] = requisicao_dic["bloqueado"]
+            data_dic["quant_cancelado"] = requisicao_dic["quant_cancelado"]
+
+            with open('get_client_data.json','w', encoding='utf-8') as file_data:
+                json.dump(data_dic, file_data, indent=2)
+        except:
+            pass
+
     def logar(self,*args):
 
         try:
@@ -570,6 +596,11 @@ class Register(Screen):
             if requisicao.ok:
                 if requisicao_dic['localId'] in lista_info_ids:
                     self.save_refreshtoken(refresh_token)
+
+                    # Call the function that read the costomer data ######################
+                    # função de chamada que lê os dados do cliente
+                    self.get_client_data()
+
                     MDApp.get_running_app().root.current = 'homepage'
                 else:
                     self.ids.warning.text = 'Email ou senha [color=D40A00]Invalida[/color]'
@@ -623,7 +654,6 @@ class CreatBill(Screen):
             return True
         except:
             return False
-
 
     def valid_field(self):
 
@@ -835,7 +865,7 @@ class ViewSchedule(Screen):
         # Geting day actual ##########################################################################
         self.dia_atual = datetime.today().isoweekday()
 
-        Clock.schedule_once(self.call_init,4)
+        Clock.schedule_once(self.call_init,2)
 
     def call_init(self, *args):
         try:
@@ -1836,8 +1866,6 @@ class HoursSchedule(Screen):
             link = f'{self.LINK_SALAO}/{self.id_manager}/socios/{if_manager["id_user"]}/agenda/{self.semana}/{id_user}.json'
         elif if_manager['manager'] == "True":
             link = f'{self.LINK_SALAO}/{self.id_manager}/agenda/{self.semana}/{id_user}.json'
-
-        print('nom ',nome['nome'])
 
         # information of date base #########################
         info = f'{{"id_posicao":"{id_pos["id_posicao"]}",' \
