@@ -11,7 +11,7 @@ link = 'https://play.google.com/store/apps'
 
 info = f'{{"msg_actualiza":"{msg_client}", ' \
        f'"link":"{link}",' \
-       f'"valid":{6} }}'
+       f'"valid":{2} }}'
 info_cidificado = info.encode('utf-8')
 
 requisicao_manager = requests.patch(APP_CLIENT, data=info_cidificado)

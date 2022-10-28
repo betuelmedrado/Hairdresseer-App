@@ -14,6 +14,8 @@
                 pos_hint:{'center_x':.5}
                 hint_text:'Pesquisar!'
                 icon_right:'magnify'
+                on_text: root.search_client_blocked()
+                id:text_search
             ScrollView:
                 MDBoxLayout:
                     orientation:'vertical'

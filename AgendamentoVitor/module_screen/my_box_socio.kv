@@ -3,7 +3,10 @@
     size_hint_y:None
     height:'30dp'
     nome:''
+    id_socio:''
+    id_manager:''
     ripple_behavior:True
+    on_release:self.dialog_delet(self.id_socio, self.id_manager)
     MDLabel:
         size_hint_x:.40
         font_size:'18sp'

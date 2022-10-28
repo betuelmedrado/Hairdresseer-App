@@ -53,7 +53,7 @@
 #            size_hint_y:.10
         MDBoxLayout:
             size_hint_y:.12
-            md_bg_color:1,1,1,.2
+            md_bg_color:0,0,0,.5
             MDLabel:
                 text:'Escolha o proficional de sua preferencia!'
                 outline_width:1
@@ -64,9 +64,10 @@
                 font_size:'20sp'
         Widget:
             size_hint_y:None
-            height:'10dp'
+            height:'60dp'
         ScrollView:
 #            FloatLayout:
+            spacing:'20dp'
             MDBoxLayout:
                 pos_hint:{'center_x':.5,'center_y':.5}
                 spacing:'15dp'

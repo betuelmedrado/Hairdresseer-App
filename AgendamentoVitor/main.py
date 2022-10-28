@@ -462,12 +462,12 @@ class HomePage(Screen):
         super().__init__(**kwargs)
         self.day_semana = datetime.today().isoweekday()
 
-        Clock.schedule_once(self.call_init,4)
+        Clock.schedule_once(self.call_init,2)
 
     def call_init(self, *args):
         self.id_manager = self.get_id_manager()
 
-        Clock.schedule_once(self.delet_day,2)
+        Clock.schedule_once(self.delet_day,1)
 
     def return_login(self):
         with open('refreshtoken.json','w') as file:
@@ -476,7 +476,7 @@ class HomePage(Screen):
         MDApp.get_running_app().root.current = 'loginmanager'
 
     def on_pre_enter(self):
-        Clock.schedule_once(self.get_local, 5)
+        Clock.schedule_once(self.get_local, 2)
 
     def get_id_manager(self, *args):
         try:
@@ -568,15 +568,24 @@ class ClientBlocked(Screen):
 
     LINK_DATA = 'https://shedule-vitor-default-rtdb.firebaseio.com'
 
+    # In use in function "search_client_blocked" first
+     # List to geting the clients e filter the blockeds
+    LIST_DATA_CLIENT = []
+
+    # In use in function "insert_box" first
+     # Here geting all clients
+    LIST_ID_CLIENT = []
+
     def on_pre_enter(self):
         self.insert_box()
 
     def return_home(self):
         MDApp.get_running_app().root.current = 'homepage'
 
-
     def insert_box(self,*args):
         self.ids.scrool_blocked.clear_widgets()
+        self.LIST_DATA_CLIENT.clear()
+
         try:
             LINK = f'{self.LINK_DATA}/client.json'
 
@@ -593,21 +602,57 @@ class ClientBlocked(Screen):
             for data_id in list_id:
                 try:
                     if requisicao_dic[data_id]["bloqueado"] == "True":
+
+                        self.LIST_DATA_CLIENT.append({"nome":requisicao_dic[data_id]["nome"],"quant_cancelado":requisicao_dic[data_id]["quant_cancelado"],"cpf":str(requisicao_dic[data_id]["cpf"]),"email":requisicao_dic[data_id]["email"], "id_client":data_id})
+
                         if int(requisicao_dic[data_id]["quant_cancelado"]) <= 1:
                             # self.ids.color_card.md_bg_color = (0.75, 0.86, 0.44, .4)
-                            self.ids.scrool_blocked.add_widget(BoxBlocked(requisicao_dic[data_id]["nome"],requisicao_dic[data_id]["quant_cancelado"],'3212344-2','93223-3223', data_id))
+                            self.ids.scrool_blocked.add_widget(BoxBlocked(requisicao_dic[data_id]["nome"],requisicao_dic[data_id]["quant_cancelado"],str(requisicao_dic[data_id]["cpf"]),requisicao_dic[data_id]["email"], data_id))
                         elif int(requisicao_dic[data_id]["quant_cancelado"]) == 2:
                             # self.ids.color_card.md_bg_color = (1.00, 0.61, 0.44, .4)
-                            self.ids.scrool_blocked.add_widget(BoxBlocked(requisicao_dic[data_id]["nome"],requisicao_dic[data_id]["quant_cancelado"],'3212344-2','93223-3223', data_id))
+                            self.ids.scrool_blocked.add_widget(BoxBlocked(requisicao_dic[data_id]["nome"],requisicao_dic[data_id]["quant_cancelado"],str(requisicao_dic[data_id]["cpf"]),requisicao_dic[data_id]["email"], data_id))
                         elif int(requisicao_dic[data_id]["quant_cancelado"]) >= 3:
                             # self.ids.color_card.md_bg_color = (0.48, 0.04, 0.00, .4)
-                            self.ids.scrool_blocked.add_widget(BoxBlocked(requisicao_dic[data_id]["nome"],requisicao_dic[data_id]["quant_cancelado"],'3212344-2','93223-3223', data_id))
+                            self.ids.scrool_blocked.add_widget(BoxBlocked(requisicao_dic[data_id]["nome"],requisicao_dic[data_id]["quant_cancelado"],str(requisicao_dic[data_id]["cpf"]),requisicao_dic[data_id]["email"], data_id))
                     else:
                         pass
                 except:
                     pass
         except requests.exceptions.ConnectionError:
             toast('Você não esta conectado a internet!')
+
+    def search_client_blocked(self):
+        self.ids.scrool_blocked.clear_widgets()
+
+        search_text = self.ids.text_search.text
+
+        for index, data in enumerate(self.LIST_DATA_CLIENT):
+            # print(data)
+            # try:
+            if search_text in data["nome"]:
+                if int(data["quant_cancelado"]) <= 1:
+                    # self.ids.color_card.md_bg_color = (0.75, 0.86, 0.44, .4)
+                    self.ids.scrool_blocked.add_widget(
+                        BoxBlocked(data["nome"],data["quant_cancelado"],
+                                   data["cpf"], data["email"], data["id_client"]))
+
+                elif int(data["quant_cancelado"]) == 2:
+                    # self.ids.color_card.md_bg_color = (1.00, 0.61, 0.44, .4)
+                    self.ids.scrool_blocked.add_widget(
+                        BoxBlocked(data["nome"], data["quant_cancelado"],
+                                   data["cpf"], data["email"], data["id_client"]))
+
+                elif int(data["quant_cancelado"]) >= 3:
+                    # self.ids.color_card.md_bg_color = (0.48, 0.04, 0.00, .4)
+                    self.ids.scrool_blocked.add_widget(
+                        BoxBlocked(data["nome"], data["quant_cancelado"],
+                                   data["cpf"], data["email"], data["id_client"]))
+
+                elif search_text == ' ':
+                    pass
+            # except:
+            #     pass
+
 
 class ManagerProfile(Screen):
     API_KEY = 'AIzaSyAue2_eYU5S5TsUc692vHNlyxIHrlBVZjk'
@@ -1114,6 +1159,11 @@ class ManagerProfile(Screen):
 
         self.ids.box_socio.clear_widgets()
 
+        # geting the id of manager to send in class MyBoxSocio
+        id_manager = self.get_id_manager()
+
+        print('id__', id_manager)
+
         lista = []
 
         try:
@@ -1125,7 +1175,7 @@ class ManagerProfile(Screen):
                 for id_socio in socio_dic:
                     nome = socio_dic[id_socio]
                     nome_dic = nome
-                    self.ids.box_socio.add_widget(MyBoxSocio(str(nome_dic['nome'])))
+                    self.ids.box_socio.add_widget(MyBoxSocio(str(nome_dic['nome']), id_socio, id_manager))
             except:
                 pass
         except requests.exceptions.ConnectionError:
@@ -1289,25 +1339,15 @@ class BoxBlocked(MDCard):
             self.ids.text_quant.color = (0.83, 0.04, 0.00, 1)
 
     def pop_dis_block(self,eu, nome, id_client, *args, **kwargs):
-        box = MDBoxLayout(orientation='vertical')
-        box_button = MDBoxLayout(padding=15, spacing='70dp')
+        # box = MDBoxLayout(orientation='vertical')
+        # box_button = MDBoxLayout(padding=15, spacing='70dp')
 
         img = Label(text=f'"{nome}"?',bold=True)
 
-        bt_sim = MDTextButton(text='Sim', theme_text_color="Custom",text_color=(1, 0, 0, .8), size_hint=(1, None),
-                        width='23dp')
-        bt_nao = MDTextButton(text='Não', color=(0, 0, 0, 1), size_hint=(1, None),
-                        width='23dp')
+        bt_sim = MDFlatButton(text='Sim', theme_text_color="Custom",text_color=(1, 0, 0, .8))
+        bt_nao = MDFlatButton(text='Não')
 
-        box_button.add_widget((bt_sim))
-        box_button.add_widget((bt_nao))
-
-
-        box.add_widget((img))
-        box.add_widget((box_button))
-
-        self.popup = Popup(title=f'Deseja desbloquear',
-                           size_hint=(.7, .3), content=box)
+        self.popup = MDDialog(title=f'Desbloquear cliente? ', buttons=[bt_sim, bt_nao])
 
         bt_sim.bind(on_release=partial(self.dis_blocked,eu, id_client))
         bt_nao.bind(on_release=self.popup.dismiss)
@@ -1365,9 +1405,41 @@ class MyBoxCategorieLabel(MDCard):
 
 
 class MyBoxSocio(MDCard):
-    def __init__(self,name, **kwargs):
+
+    API_KEY = 'AIzaSyAue2_eYU5S5TsUc692vHNlyxIHrlBVZjk'
+    LINK_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao'
+
+    def __init__(self,name, id_socio, id_manager, **kwargs):
         super().__init__(**kwargs)
         self.nome = name
+        self.id_socio = id_socio
+        self.id_manager = id_manager
+
+    def dialog_delet(self, id_socio, id_manager, *args, **kwargs):
+
+        bt_sim = MDFlatButton(text='Sim')
+        bt_sim.color = (1,0,0,1)
+
+        bt_nao = MDFlatButton(text='Não')
+
+        self.dialog = MDDialog(title='Deseja delêtar este sócio?', buttons=[bt_sim, bt_nao])
+
+        bt_sim.bind(on_release=partial(self.delet_socio, id_socio, id_manager))
+        bt_nao.bind(on_release=self.dialog.dismiss)
+
+        self.dialog.open()
+
+    def delet_socio(self, id_socio, id_manager, *args, **kwargs):
+
+        link_to_delet = f'{self.LINK_SALAO}/{id_manager}/socios/{id_socio}.json'
+
+        requisicao = requests.delete(link_to_delet)
+
+        managerprofile = ManagerProfile()
+        managerprofile.__init__()
+
+        self.dialog.dismiss()
+        toast('Sócio Deletado com sucesso!')
 
 
 class Table_shedule(MDBoxLayout):

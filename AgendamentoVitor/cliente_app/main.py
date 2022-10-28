@@ -66,8 +66,8 @@ class HomePage(Screen):
     def help(self):
 
         help_text = '"Atenção!" antes de fazer seu agendamento certifique-se que ira comparecer ao estábelecimento. ' \
-                    'O não compacecimento no horárion pode ser cobrado uma taxa pelo salão!' \
-                    'Você tem a opção de cancelar o agendamento dentro do tempo estabecido pelo salão!'
+                    'O não comparecimento no horárion pode ser cobrado uma taxa pelo salão!' \
+                    ' Você tem a opção de cancelar o agendamento dentro do tempo estabecido pelo salão!'
 
         infohelp = ''
         try:
