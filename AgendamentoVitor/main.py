@@ -11,6 +11,7 @@ from kivymd.uix.label import MDLabel
 from kivymd.uix.spinner import MDSpinner
 from kivymd.uix.navigationdrawer import  MDNavigationDrawer
 from kivymd.uix.dialog import  MDDialog
+from kivymd.uix.floatlayout import MDFloatLayout
 
 # from kivymd_extension.akivymd.uix.loader import AKLabelLoader, AKImageLoader
 
@@ -563,6 +564,7 @@ class HomePage(Screen):
 
         except requests.exceptions.ConnectionError:
             toast('Você não esta conectado a internet!')
+
 
 class ClientBlocked(Screen):
 
@@ -1369,8 +1371,10 @@ class BoxBlocked(MDCard):
         except requests.exceptions.ConnectionError:
             toast('Você não esta conectado a internet!')
 
+
 class MyButtonCard(MDCard):
     pass
+
 
 class MyButtonCard_2(MDCard):
     pass
@@ -1384,6 +1388,7 @@ class MyBoxCategorie(MDCard):
         self.servico = str(servico)
         self.tempo = str(tempo)
         self.valor = str(valor)
+
 
 class CategoriesWork(MDCard):
 
@@ -1453,6 +1458,7 @@ class Table_shedule(MDBoxLayout):
         self.time = time
         self.client = str(client)
 
+
 class TableEnpty(MDBoxLayout):
 
     def __init__(self,id_button='', id_schedule='',hours='', hours_second='', time='', client='',**kwargs):
@@ -1463,6 +1469,7 @@ class TableEnpty(MDBoxLayout):
         self.hours_second = hours_second
         self.time = time
         self.client = str(client)
+
 
 class TableInfo(MDBoxLayout):
     # def __init__(self,id_button='',id_schedule='',hours='',client='',hours2='',**kwargs):
@@ -1481,6 +1488,7 @@ class TableInfo(MDBoxLayout):
         self.hours_2 = hours_second
         self.time = time
         self.client = str(client)
+
 
 class CardButtonProficional(MDCard):
 
@@ -1588,6 +1596,12 @@ class ViewSchedule(Screen):
             self.id_manager = self.get_manager()
         except requests.exceptions.ConnectionError:
             toast('Você não esta conectado a internet!')
+
+    def get_data_hall(self):
+
+        requisicao = requests.get(self.LINK_SALAO + '.json')
+        requisicao_dic = requisicao.json()
+        return requisicao_dic
 
     def on_pre_enter(self, *args):
         try:
@@ -1797,9 +1811,14 @@ class ViewSchedule(Screen):
                                     delta_temp = timedelta(hours=hours, minutes=minute)
                                     soma_horas = entry + delta_temp
 
-                                    if user_id == lista_info[0]['id_user']:
+                                    # Here comparat the ids to know  if is of manager I take of  the number inserting on last
+                                    # Aqui comparo os ids  para saber se é do manager tiro os numeros adicionados no final
+                                    id_primay = len(user_id)
+                                    id_secont = lista_info[0]['id_user'][0:id_primay]
+
+                                    if user_id == lista_info[0]['id_user'] or user_id == id_secont:
                                         # Insert table #####################################################################################
-                                        table = TableInfo(str(cont), lista_info[num]['id_user'], entrada,
+                                        table = TableInfo(str(cont), lista_info[0]['id_user'], entrada,
                                                               f'{soma_horas.strftime("%H:%M")}', lista_info[num]['tempo'], lista_info[num]['nome'])
                                         self.ids.grid_shedule.add_widget(table)
                                         entrada = soma_horas.strftime('%H:%M')
@@ -1887,6 +1906,7 @@ class ViewSchedule(Screen):
             toast('Você não esta conectado a internet!')
         except:
             toast('Nenhuma Horário para hoje!')
+            raise
 
         # Clock.schedule_once(self.loop_actualizar, 3)
 
@@ -1906,6 +1926,7 @@ class ViewSchedule(Screen):
         Clock.schedule_once(refresh_callback, 1)
 
     def popup_mark_off(self,id_button, id_schedule, hours, hours_second, time, client, *args, **kwargs):
+
         id_user = ''
         with open('write_id_manager.json', 'r') as file:
             id_user = json.load(file)
@@ -1929,29 +1950,54 @@ class ViewSchedule(Screen):
         self.popup  = Popup(title='Deseja cancelar o agendamento?',
                        size_hint=(.8,None), height='200dp',content=box)
 
-        bt_sim.bind(on_release = partial(self.cancel_schedule, id_user["id_user"]))
+        bt_sim.bind(on_release = partial(self.cancel_schedule, id_schedule))
+        bt_sim.bind(on_press = partial(self.load_widget))
         bt_nao.bind(on_release = self.popup.dismiss)
         bt_view.bind(on_release = partial(self.inf_schedule_client, id_button, id_schedule, hours, hours_second, time, client))
         self.popup.open()
 
+    def load_widget(self, *args, **kwargs):
+        self.box_dialog = MDDialog()
+        spiner = MDSpinner(active=True, size_hint=(None,None), size=('56dp','56dp'), pos_hint=({'center_x':.5,'center_y':.5}))
+
+        self.box_dialog.add_widget(spiner)
+        # self.parent.parent.add_widget(self.boxlayout)
+        self.box_dialog.open()
+
     def cancel_schedule(self, id_user, *args, **kwargs):
+
+        data_hall = self.get_data_hall()
+
+        # eval_data_hall = eval(data_hall)
+
+
+        # print(data_hall[id_user]['agenda_do_salao'])
 
         try:
             id_proficional = self.get_id_proficional()
             id_manager = self.id_manager
-            info_login = self.info_login_file()
+            # info_login = self.info_login_file()
 
             link = ''
+            link_agenda_salao = ''
 
             if id_proficional['manager'] == "False":
-                link = self.LINK_SALAO + f'/{id_manager}/socios/{id_user}/agenda/{self.dia_atual}/{info_login["id_login"]}.json'
+                # link = self.LINK_SALAO + f'/{id_manager}/socios/{id_user}/agenda/{self.dia_atual}/{info_login["id_login"]}.json'
+                link = self.LINK_SALAO + f'/{id_manager}/socios/{id_user}/agenda/{self.dia_atual}/{id_user}.json'
+                link_agenda_salao = self.LINK_SALAO + f'/{id_manager}/socios/{id_user}/agenda_do_salao/{self.dia_atual}/{id_user}.json'
             elif id_proficional['manager'] == "True":
-                link = self.LINK_SALAO + f'/{id_manager}/agenda/{self.dia_atual}/{info_login["id_login"]}.json'
+                # link = self.LINK_SALAO + f'/{id_manager}/agenda/{self.dia_atual}/{info_login["id_login"]}.json'
+                link = self.LINK_SALAO + f'/{id_manager}/agenda/{self.dia_atual}/{id_user}.json'
+                link_agenda_salao = self.LINK_SALAO + f'/{id_manager}/agenda_do_salao/{self.dia_atual}/{id_user}.json'
 
 
             requisicao = requests.delete(link)
+            requisicao2 = requests.delete(link_agenda_salao)
+
             self.actualizar()
             self.popup.dismiss()
+            Clock.schedule_once(self.box_dialog.dismiss, 5)
+
         except requests.exceptions.ConnectionError:
             toast('Você não esta conectado a internet!')
 
@@ -1966,10 +2012,35 @@ class ViewSchedule(Screen):
 
         return soma.strftime('%H:%M')
 
+
+    def wait_blocked_schedule(self,id_button, id_schedule, hours, hours_second, client, *args):
+        """
+        Função para chamar a função "blocked_schedule" depois de um  tempo, só para mostrar que a tela esta sendo
+        carregada
+        :param id_button:
+        :param id_schedule:
+        :param hours:
+        :param hours_second:
+        :param client:
+        :param args:
+        :return:
+        """
+        Clock.schedule_once(partial(self.blocked_schedule,id_button, id_schedule, hours, hours_second, client, *args),2)
+
     def blocked_schedule(self,id_button, id_schedule, hours, hours_second, client, *args):
+        """
+        Sendo chamada pela função "wait_blocked_schedule"
+        being called by function "wait_blocked_schedule"
+        :param id_button:
+        :param id_schedule:
+        :param hours:
+        :param hours_second:
+        :param client:
+        :param args:
+        :return:
+        """
         try:
             # id_manager_id_button = self.id_manager + f'{id_button}'
-
             horas_hoje = self.time_now()
             list_works = []
             list_ids_schedule = []
@@ -1992,7 +2063,8 @@ class ViewSchedule(Screen):
                 info_user = json.load(arquivo)
 
             id_user = info_user['id_login']
-            id_log_id_button = id_user + f'{id_button}'
+            # id_log_id_button = id_user + f'{id_button}'
+            id_log_id_button = id_user
 
             horas = hours
             valor = 0
@@ -2008,8 +2080,12 @@ class ViewSchedule(Screen):
                 if_scheduled = requisicao_if_scheduled.json()
 
                 # Geting the id marked on schedule ###
-                for info in if_scheduled:
+                for pos, info in enumerate(if_scheduled):
                     list_id_marked.append(info)
+
+                    # The id of user recive more an number of position
+                    id_log_id_button = id_user + f'{pos}'
+
 
                 # Here getting the hours of marked ###
                 for id_marked in list_id_marked:
@@ -2027,8 +2103,9 @@ class ViewSchedule(Screen):
                 pass
             except requests.exceptions.ConnectionError:
                 toast('Você não esta conectado a internet!')
+            except:
+                pass
             # ######################################################################################
-
 
             if if_manager['manager'] == "False":
                 link = f'{self.LINK_SALAO}/{self.id_manager}/socios/{if_manager["id_user"]}/agenda/{self.dia_atual}/{id_log_id_button}.json'
@@ -2038,11 +2115,11 @@ class ViewSchedule(Screen):
             # Creating the schedule Here ##########################################################################
             info = f'{{"id_posicao":"{id_button}",' \
                    f'"id_horas":"{horas}",' \
-                   f'"id_user":"{id_user}",' \
+                   f'"id_user":"{id_log_id_button}",' \
                    f'"tempo":"{self.space_temp}",' \
                    f'"valor":"{valor}",' \
-                   f'"nome":"Reservado!",'\
-                   f'"horas_agendamento": "{horas_hoje}",'\
+                   f'"nome":"Reservado!",' \
+                   f'"horas_agendamento": "{horas_hoje}",' \
                    f'"servicos":"{[]}"}}'
 
             if free or second_free:
@@ -2055,31 +2132,45 @@ class ViewSchedule(Screen):
                 bt.bind(on_release=dialog.dismiss)
                 dialog.open()
             else:
+                # Saved the schedule
                 requisicao = requests.patch(link, data=info)
+
+
+                # Here geting the schedule of Hall ########
+                if if_manager['manager'] == "False":
+                    link2 = f'{self.LINK_SALAO}/{self.id_manager}/socios/{if_manager["id_user"]}/agenda_do_sala/{self.dia_atual}/{id_log_id_button}.json'
+                elif if_manager['manager'] == "True":
+                    link2 = f'{self.LINK_SALAO}/{self.id_manager}/agenda_do_salao/{self.dia_atual}/{id_log_id_button}.json'
+
+                info2 = f'{{"agenda":"{id_log_id_button}"}}'
+
+                requisicao2 = requests.patch(link2, data=info2)
+
                 toast(f'Hora reservada!')
 
             if if_manager['manager'] == "False":
                 # getting ids that are already scheduled ###########################################################################
-                    link_cliente = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_user}/ids_agendado.json'
-                    requisicao_client_get = requests.get(link_cliente)
-                    requisicao_client_get_dic = requisicao_client_get.json()
+                link_cliente = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_user}/ids_agendado.json'
+                requisicao_client_get = requests.get(link_cliente)
+                requisicao_client_get_dic = requisicao_client_get.json()
 
                 # list_ids_schedule receiver the ids what is in cloud ##############################################################
-                    if requisicao_client_get_dic != '':
-                        list_ids_schedule.append(requisicao_client_get_dic)
+                if requisicao_client_get_dic != '':
+                    list_ids_schedule.append(requisicao_client_get_dic)
 
                 # list_ids_schedule receiver the id what go be schedule ############################################################
-                    list_ids_schedule.append(if_manager['id_user'])
+                list_ids_schedule.append(if_manager['id_user'])
 
                 # Insert ids of schedule in user ###################################################################################
-                    link_cliente = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_user}/ids_agendado.json'
+                link_cliente = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_user}/ids_agendado.json'
 
-                    info = f'{{"ids_agendado":"{list_ids_schedule}" }}'
+                info = f'{{"ids_agendado":"{list_ids_schedule}" }}'
 
-                    requisicao_client = requests.patch(link_cliente, data=info)
+                requisicao_client = requests.patch(link_cliente, data=info)
             else:
                 pass
             self.actualizar()
+            Clock.schedule_once(self.box_dialog.dismiss,2)
         except requests.exceptions.ConnectionError:
             toast('Você não esta conectado a internet!')
 
@@ -2601,6 +2692,7 @@ class HoursSchedule(Screen):
         except requests.exceptions.ConnectionError:
             toast('Você não esta conectado a internet!')
 
+
 class InfoScheduleClient(Screen):
 
     LINK_DATA_BASE = 'https://shedule-vitor-default-rtdb.firebaseio.com/salao'
@@ -2848,6 +2940,7 @@ class InfoScheduleClient(Screen):
 
     def return_schedule(self):
         MDApp.get_running_app().root.current = 'viewshedule'
+
 
 class RegisterOfBox(Screen):
 

@@ -6,7 +6,7 @@
 #:include file_kv/info_schedule_client.kv
 #:include file_kv/msg_to_app.kv
 #:include file_kv/perfil.kv
-#:include module/may_tool_bar.kv
+
 
 #:import FadeTransition kivy.uix.screenmanager.FadeTransition
 #:import RiseInTransition kivy.uix.screenmanager.RiseInTransition
@@ -230,216 +230,213 @@
 #    pos_hint: {'center_x': .5}
 
 <HoursSchedule>:
-    ScrollView
-        MDBoxLayout:
+    MDBoxLayout:
+        size_hint_y:None
+        height:'50dp'
+        spacing:'20dp'
+        orientation:'vertical'
+        md_bg_color:1,1,1,.8
+        canvas:
+            Color:
+                rgba:.5,.5,.5,.1
+            Rectangle:
+                size:self.size
+                pos:self.pos
+                source:'images/wallpaper.png'
+        MDCard:
             size_hint_y:None
-            height:self.minimum_height
-            spacing:'20dp'
-            orientation:'vertical'
-            md_bg_color:1,1,1,.8
-            canvas:
-                Color:
-                    rgba:.5,.5,.5,.1
-                Rectangle:
-                    size:self.size
-                    pos:self.pos
-                    source:'images/wallpaper.png'
-            MDCard:
-                size_hint_y:None
-                height:'60dp'
-                md_bg_color:0.55, 0.57, 0.63,1
-                MDIconButton:
-                    icon:'arrow-left'
-                    theme_icon_color: "Custom"
-                    color:1,0,0,1
-                    on_release:app.root.current = 'viewshedule'
-                    on_press: app.root.transition = FadeTransition()
-                MDLabel:
-                    font_size:'30dp'
-                    halign:'center'
-                    color:0,0,0,1
-                    bold:True
-                    id:hours
-            MDBoxLayout:
-                size_hint:.7,None
-                height:'20dp'
-                pos_hint:{'center_x':.5}
-                MDLabel:
-                    font_size:'25dp'
-                    markup:True
-                    halign:'center'
-                    text:'Tipos de serviços'
-                    bold:True
-                    color:0,0,0,1
+            height:'80dp'
+            md_bg_color:0.55, 0.57, 0.63,1
+            MDIconButton:
+                icon:'arrow-left'
+                theme_icon_color: "Custom"
+                color:1,0,0,1
+                on_release:app.root.current = 'viewshedule'
+                on_press: app.root.transition = FadeTransition()
+            MDLabel:
+                font_size:'30dp'
+                halign:'center'
+                color:0,0,0,1
+                bold:True
+                id:hours
+        MDBoxLayout:
+            size_hint:.7,None
+            height:'20dp'
+            pos_hint:{'center_x':.5}
+            MDLabel:
+                font_size:'25dp'
+                markup:True
+                halign:'center'
+                text:'Selecione os tipos de serviços logo a baixo'
+                bold:True
+                color:0,0,0,1
 #                font_size:'30dp'
-            MDSeparator:
-                size_hint_x:.8
-                pos_hint:{'center_x':.5}
-            MDCard:
-                size_hint:.8,None
-                height:'200dp'
+        MDSeparator:
+            size_hint_x:.8
+            pos_hint:{'center_x':.5}
+        MDCard:
+            size_hint:.8,None
+            height:'240dp'
 #                md_bg_color:0.78, 0.80, 0.83,1
-                md_bg_color:0.55, 0.57, 0.63,1
+            md_bg_color:0.55, 0.57, 0.63,1
+            radius:8,8,8,8
+            pos_hint:{'center_x':.5}
+            id:color_card_fundo
+            MDCard:
+                orientation:'vertical'
+                size_hint:None,None
+                width:self.parent.width - 10
+                height:self.parent.height - 10
+                radius:8,8,8,8
+                md_bg_color:1,1,1,1
+                halign:'center'
+                pos_hint:{'center_x':.5,'center_y':.5}
+                MDBoxLayout:
+                    size_hint_y:None
+                    height:'10dp'
+                    MDLabel:
+                        size_hint_x:.40
+                        font_size:'15sp'
+                        bold:True
+                        color:1,0,0,1
+                        text:'Serviços'
+                    MDLabel:
+                        size_hint_x:.40
+                        font_size:'15sp'
+                        bold:True
+                        text:'Tempo'
+                        color:1,0,0,1
+                    MDLabel:
+                        size_hint_x:.20
+                        font_size:'15sp'
+                        bold:True
+                        text:'ValorR$'
+                        color:1,0,0,1
+                MDBoxLayout:
+                    ScrollView:
+                # Receive my_box_categorie ######################
+                        MDBoxLayout:
+                            orientation:'vertical'
+                            size_hint_y:None
+                            height:self.minimum_height
+                            spacing:'5dp'
+                            padding:'3dp'
+                            id:categorie
+
+        MDBoxLayout:
+            orientation:'vertical'
+            size_hint:.8,None
+            height:'200dp'
+            pos_hint:{'center_x':.5}
+            MDLabel:
+                size_hint_y:None
+                height:'20dp'
+                font_size:'25sp'
+                bold:True
+                halign:'center'
+                text:'Serviços escolhidos!'
+            Widget:
+                size_hint_y:None
+                height:'5dp'
+            MDCard:
+                md_bg_color:0.78, 0.80, 0.83,1
                 radius:8,8,8,8
                 pos_hint:{'center_x':.5}
-                id:color_card_fundo
                 MDCard:
                     orientation:'vertical'
                     size_hint:None,None
                     width:self.parent.width - 10
                     height:self.parent.height - 10
                     radius:8,8,8,8
-                    md_bg_color:1,1,1,1
                     halign:'center'
                     pos_hint:{'center_x':.5,'center_y':.5}
                     MDBoxLayout:
                         size_hint_y:None
-                        height:'10dp'
+                        height:'15dp'
+                        md_bg_color:1,1,1,.3
                         MDLabel:
                             size_hint_x:.40
                             font_size:'15sp'
                             bold:True
-                            color:1,0,0,1
+                            color:0,0,0,.6
                             text:'Serviços'
                         MDLabel:
                             size_hint_x:.40
                             font_size:'15sp'
                             bold:True
                             text:'Tempo'
-                            color:1,0,0,1
+                            color:0,0,0,.6
                         MDLabel:
                             size_hint_x:.20
                             font_size:'15sp'
                             bold:True
                             text:'ValorR$'
-                            color:1,0,0,1
+                            color:0,0,0,.6
                     MDBoxLayout:
+                        md_bg_color:1,1,1,.3
                         ScrollView:
-                    # Receive my_box_categorie ######################
                             MDBoxLayout:
                                 orientation:'vertical'
                                 size_hint_y:None
                                 height:self.minimum_height
                                 spacing:'5dp'
                                 padding:'3dp'
-                                id:categorie
-
-            MDBoxLayout:
+                                id:work_select
+        MDBoxLayout:
+            orientation:'vertical'
+            size_hint:.7,None
+            height:'150dp'
+            padding:'10dp',0,0,0
+            pos_hint:{'center_x':.5}
+            spacing:'8dp'
+            radius:8,8,8,8
+            MDCard:
                 orientation:'vertical'
-                size_hint:.8,None
-                height:'200dp'
+                padding:'10dp',0,0,0
                 pos_hint:{'center_x':.5}
+                radius:8,8,8,8
+                MDBoxLayout:
+                    MDLabel:
+                        text:'tempo'
+                        font_size:'18sp'
+                        color:0.13, 0.53, 0.95,.5
+                    MDLabel:
+                        text:'Valor R$'
+                        font_size:'18sp'
+                        color:0.13, 0.53, 0.95,.5
+                MDBoxLayout:
+                    MDLabel:
+                        font_size:'25sp'
+                        color:0.13, 0.53, 0.95,1
+                        id:time
+                    MDLabel:
+                        font_size:'25sp'
+                        color:0.13, 0.53, 0.95,1
+                        id:valor
+            MDCard:
+                orientation:'vertical'
+                size_hint_y:None
+                height:'60dp'
+                radius:8,8,8,8
+                md_bg_color:0.13, 0.53, 0.95,1
+                ripple_behavior:True
+                padding:'10dp'
+#                    disabled:True
+                id:card_save
+            # on_release is being used in "hours_limit" method
+#                    on_release:root.save_scheduleing()
                 MDLabel:
-                    size_hint_y:None
-                    height:'20dp'
+                    text:'Salvar'
+                    color:1,1,1,.7
+                    bold:True
+                    halign:'center'
+                MDLabel:
+                    text:'Agendamento'
                     font_size:'25sp'
                     bold:True
                     halign:'center'
-                    text:'Serviços escolhidos!'
-                Widget:
-                    size_hint_y:None
-                    height:'5dp'
-                MDCard:
-                    md_bg_color:0.78, 0.80, 0.83,1
-                    radius:8,8,8,8
-                    pos_hint:{'center_x':.5}
-                    MDCard:
-                        orientation:'vertical'
-                        size_hint:None,None
-                        width:self.parent.width - 10
-                        height:self.parent.height - 10
-                        radius:8,8,8,8
-                        halign:'center'
-                        pos_hint:{'center_x':.5,'center_y':.5}
-                        MDBoxLayout:
-                            size_hint_y:None
-                            height:'15dp'
-                            md_bg_color:1,1,1,.3
-                            MDLabel:
-                                size_hint_x:.40
-                                font_size:'15sp'
-                                bold:True
-                                color:0,0,0,.6
-                                text:'Serviços'
-                            MDLabel:
-                                size_hint_x:.40
-                                font_size:'15sp'
-                                bold:True
-                                text:'Tempo'
-                                color:0,0,0,.6
-                            MDLabel:
-                                size_hint_x:.20
-                                font_size:'15sp'
-                                bold:True
-                                text:'ValorR$'
-                                color:0,0,0,.6
-                        MDBoxLayout:
-                            md_bg_color:1,1,1,.3
-                            ScrollView:
-                                MDBoxLayout:
-                                    orientation:'vertical'
-                                    size_hint_y:None
-                                    height:self.minimum_height
-                                    spacing:'5dp'
-                                    padding:'3dp'
-                                    id:work_select
-            MDBoxLayout:
-                orientation:'vertical'
-                size_hint:.7,None
-                height:'150dp'
-                padding:'10dp',0,0,0
-                pos_hint:{'center_x':.5}
-                spacing:'8dp'
-                radius:8,8,8,8
-                MDCard:
-                    orientation:'vertical'
-                    padding:'10dp',0,0,0
-                    pos_hint:{'center_x':.5}
-                    radius:8,8,8,8
-                    MDBoxLayout:
-                        MDLabel:
-                            text:'tempo'
-                            font_size:'18sp'
-                            color:0.13, 0.53, 0.95,.5
-                        MDLabel:
-                            text:'Valor R$'
-                            font_size:'18sp'
-                            color:0.13, 0.53, 0.95,.5
-                    MDBoxLayout:
-                        MDLabel:
-                            font_size:'25sp'
-                            color:0.13, 0.53, 0.95,1
-                            id:time
-                        MDLabel:
-                            font_size:'25sp'
-                            color:0.13, 0.53, 0.95,1
-                            id:valor
-                MDCard:
-                    orientation:'vertical'
-                    size_hint_y:None
-                    height:'60dp'
-                    radius:8,8,8,8
-                    md_bg_color:0.13, 0.53, 0.95,1
-                    ripple_behavior:True
-                    padding:'10dp'
-#                    disabled:True
-                    id:card_save
-                # on_release is being used in "hours_limit" method
-#                    on_release:root.save_scheduleing()
-                    MDLabel:
-                        text:'Salvar'
-                        color:1,1,1,.7
-                        bold:True
-                        halign:'center'
-                    MDLabel:
-                        text:'Agendamento'
-                        font_size:'25sp'
-                        bold:True
-                        halign:'center'
-            MDSeparator:
-                size_hint_x:.8
-                pos_hint:{'center_x':.5}
-            MDBoxLayout:
-                size_hint_y:None
-                height:'70dp'
-                md_bg_color:0.53, 0.54, 0.56, .4
+        MDSeparator:
+            size_hint_x:.8
+            pos_hint:{'center_x':.5}
+        MDBoxLayout:
+            md_bg_color:0.53, 0.54, 0.56, .4

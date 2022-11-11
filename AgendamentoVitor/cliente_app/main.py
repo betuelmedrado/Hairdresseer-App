@@ -10,7 +10,7 @@ from kivymd.uix.spinner import MDSpinner
 from kivymd.uix.label import MDLabel
 from kivymd.uix.dialog import MDDialog
 from kivymd.toast import toast
-
+from kivymd.uix.taptargetview import MDTapTargetView
 
 # kivy ###
 from kivy.uix.screenmanager import ScreenManager, Screen
@@ -43,6 +43,7 @@ os.environ["SSL_CERT_FILE"] = certifi.where()
 class Manager(ScreenManager):
     pass
 
+
 class HomePage(Screen):
     LINK_SALAO = 'https://shedule-vitor-default-rtdb.firebaseio.com'
     lista_id_user = []
@@ -60,8 +61,18 @@ class HomePage(Screen):
         Clock.schedule_once(self.get_info, 1)
         Clock.schedule_once(self.get_local, 1)
 
-    def call_back(self):
-        pass
+    def call_back(self,windown, key, *args):
+
+        if key == 27:
+            try:
+                MDApp().stop()
+            except:
+                raise
+
+        else:
+            pass
+
+
 
     def help(self):
 
@@ -88,9 +99,21 @@ class HomePage(Screen):
 
         dialog.open()
 
+    def load_widget(self, *args, **kwargs):
+
+        # The "md_label" not show!
+        md_label = MDLabel(text='Carregando...', color=(1,1,1,1))
+        spiner = MDSpinner(active=True, size_hint=(None,None), size=('56dp','56dp'), pos_hint=({'center_x':.5,'center_y':.5}))
+        self.box_dialog = MDDialog(buttons=[md_label])
+
+
+        self.box_dialog.add_widget(spiner)
+        # self.parent.parent.add_widget(self.boxlayout)
+        self.box_dialog.open()
+
     def on_pre_enter(self, *args):
 
-        Window.unbind(on_keyboard=self.call_back)
+        Window.bind(on_keyboard=self.call_back)
 
         # Here to when entry or exit of Viwshcedule exclud content of file
         with open('select_works.json','w') as exclud_content:
@@ -102,7 +125,8 @@ class HomePage(Screen):
 
         # Permition to load scree home ###################################
         if load_home['load_home']:
-            toast('Aguarde carregando as informações!...')
+            # toast('Aguarde carregando as informações!...')
+            self.load_widget()
             Clock.schedule_once(self.get_info, 1)
 
             load = {}
@@ -112,6 +136,7 @@ class HomePage(Screen):
         else:
             pass
         return True
+
 
     # def get_client_data(self, *args):
     #     try:
@@ -202,9 +227,9 @@ class HomePage(Screen):
                 requisicao_id_dic = requisicao_id.json()
 
                 if check_image_manager:
-                    my_card_button = MyCardButton(requisicao_id_dic['manager'], self.id_manager, requisicao_id_dic['nome'])
-                    my_card_button.ids.image_check.add_widget(Image(source='images/check.png'))
-                    self.ids.my_card_button.add_widget(my_card_button)
+                    self.my_card_button = MyCardButton(requisicao_id_dic['manager'], self.id_manager, requisicao_id_dic['nome'])
+                    self.my_card_button.ids.image_check.add_widget(Image(source='images/check.png'))
+                    self.ids.my_card_button.add_widget(self.my_card_button)
                 else:
                     self.ids.my_card_button.add_widget(MyCardButton(requisicao_id_dic['manager'], self.id_manager, requisicao_id_dic['nome']))
 
@@ -236,6 +261,10 @@ class HomePage(Screen):
                             MyCardButton(requisicao_to_socio_dic[1][id]['manager'], id, requisicao_to_socio_dic[1][id]['nome']))
                 except:
                     pass
+            try:
+                Clock.schedule_once(self.box_dialog.dismiss,2)
+            except:
+                pass
         except requests.exceptions.ConnectionError:
             toast('Você não esta conectado a internet!')
 
@@ -603,20 +632,28 @@ class Register(Screen):
 
                     MDApp.get_running_app().root.current = 'homepage'
                 else:
-                    self.ids.warning.text = 'Email ou senha [color=D40A00]Invalida[/color]'
+                    self.ids.warning.text = 'Email ou senha [color=D40A00]Invalida[/color]\n[size=15]Faça o seu cadastro logo abaixo![/size]'
             else:
                 erro = str(requisicao_dic['error']['message'])
 
                 if erro == 'INVALID_EMAIL':
-                    self.ids.warning.text = 'Email [color=D40A00]Invalido[/color]'
+                    self.ids.warning.text = 'Email [color=D40A00]Invalido[/color]\n[size=15]Faça o seu cadastro logo abaixo![/size]'
                 elif erro == 'MISSING_PASSWORD':
                     self.ids.warning.text = 'Sem informação de [color=D40A00]Senha[/color]'
                 elif erro == 'INVALID_PASSWORD':
                     self.ids.warning.text = 'Senha [color=D40A00]Invalido[/color]'
                 elif erro == 'EMAIL_NOT_FOUND':
-                    self.ids.warning.text = 'Email não [color=D40A00]Encontrado[/color]'
+                    self.ids.warning.text = 'Email não [color=D40A00]Encontrado[/color]\n[size=15]Faça o seu cadastro logo abaixo![/size]'
         except requests.exceptions.ConnectionError:
             toast('Você não esta conectado a internet!')
+
+    def password_view(self, msg):
+        if msg.password == False:
+            self.ids.senha.password = True
+            self.ids.eye.icon = 'eye-off'
+        elif msg.password == True:
+            self.ids.senha.password = False
+            self.ids.eye.icon = 'eye'
 
 
 class CreatBill(Screen):
@@ -710,10 +747,23 @@ class CreatBill(Screen):
 
             creat_user = requests.patch(LINK_FIREBASE, data=info_user)
 
+            # dictionary to save the data of client
+            info_data_client = {}
+            info_data_client["nome"] = nome
+            info_data_client["cpf"] = cpf
+            info_data_client["email"] = email
+            info_data_client["bloqueado"] = "False"
+            info_data_client["quant_cancelado"] = "0"
+
+            # savaing the data of cliente creat
+            with open('get_client_data.json', 'w') as save_info:
+                json.dump(info_data_client, save_info, indent=2)
+
+
             info_user_dic = {}
 
-            info_user['id_user'] = localid
-            info_user['id_token'] = idtoken
+            info_user_dic['id_user'] = localid
+            info_user_dic['id_token'] = idtoken
 
             with open('info_user.json', 'w') as file:
                 json.dump(info_user_dic, file, indent=2)
@@ -776,6 +826,22 @@ class CreatBill(Screen):
         else:
             pass
 
+    def password_view(self, msg):
+        if msg.password == False:
+            self.ids.senha.password = True
+            self.ids.eye.icon = 'eye-off'
+            self.ids.eye.icon = 'eye-off'
+        elif msg.password == True:
+            self.ids.senha.password = False
+            self.ids.eye.icon = 'eye'
+
+    def rep_password_view(self, msg):
+        if msg.password == False:
+            self.ids.rep_senha.password = True
+            self.ids.eye_repeat.icon = 'eye-off'
+        elif msg.password == True:
+            self.ids.rep_senha.password = False
+            self.ids.eye_repeat.icon = 'eye'
 
 class RedefinitionSenha(Screen):
     API_KEY = 'AIzaSyAue2_eYU5S5TsUc692vHNlyxIHrlBVZjk'
@@ -866,6 +932,18 @@ class ViewSchedule(Screen):
         self.dia_atual = datetime.today().isoweekday()
 
         Clock.schedule_once(self.call_init,2)
+
+    def load_widget(self, *args, **kwargs):
+
+        # The "md_label" not show!
+        md_label = MDLabel(text='Carregando...', color=(1, 1, 1, 1))
+        spiner = MDSpinner(active=True, size_hint=(None, None), size=('56dp', '56dp'),
+                           pos_hint=({'center_x': .5, 'center_y': .5}))
+        self.box_dialog = MDDialog(buttons=[md_label])
+
+        self.box_dialog.add_widget(spiner)
+        # self.parent.parent.add_widget(self.boxlayout)
+        self.box_dialog.open()
 
     def call_init(self, *args):
         try:
@@ -1255,12 +1333,12 @@ class ViewSchedule(Screen):
         img = Image(source='images/atencao.png')
 
         bt_sim = Button(text='Sim',background_color=(0,1,1,1),color=(1,0,0,.8), size_hint=(1,None),height='40dp')
-        bt_nao = Button(text='Sair',background_color=(0,1,1,1),color=(0,0,0,1),size_hint=(1,None),height='40dp')
         bt_view = Button(text='View',background_color=(0,1,1,1),color=(0,0,0,1),size_hint=(1,None),height='40dp')
+        bt_nao = Button(text='Sair',background_color=(0,1,1,1),color=(0,0,0,1),size_hint=(1,None),height='40dp')
 
         box_button.add_widget((bt_sim))
-        box_button.add_widget((bt_nao))
         box_button.add_widget((bt_view))
+        box_button.add_widget((bt_nao))
 
         box.add_widget((img))
         box.add_widget((box_button))
@@ -1268,11 +1346,17 @@ class ViewSchedule(Screen):
         self.popup  = Popup(title='Deseja cancelar o agendamento?',
                             size_hint=(.8,None), height='200dp',content=box)
 
-        bt_sim.bind(on_release = partial(self.cancel_schedule, id_user["id_user"]))
+        # bt_sim.bind(on_release = partial(self.cancel_schedule, id_user["id_user"]))
+        bt_sim.bind(on_release = partial(self.wait_cancel_schedule, id_user["id_user"]))
+        bt_view.bind(on_release=partial(self.wait_call_info_schedule, id_button, id_schedule, hours, client, hours_second, time, hours_of_schedule,time_cancel))
         bt_nao.bind(on_release = self.popup.dismiss)
-        bt_view.bind(on_release=partial(self.call_info_schedule, id_button, id_schedule, hours, client, hours_second, time, hours_of_schedule,time_cancel))
 
         self.popup.open()
+
+    def wait_call_info_schedule(self,id_button='',id_schedule='',hours='', client='', hours_second='', time='', hours_of_schedule='', time_cancel='', *args):
+        self.load_widget()
+        Clock.schedule_once(partial(self.call_info_schedule, id_button,id_schedule,hours, client, hours_second, time, hours_of_schedule, time_cancel, *args),2)
+
 
     def call_info_schedule(self,id_button='',id_schedule='',hours='', client='', hours_second='', time='', hours_of_schedule='', time_cancel='', *args):
         dic_info = {}
@@ -1291,6 +1375,8 @@ class ViewSchedule(Screen):
             json.dump(dic_info, file, indent=2)
 
         MDApp.get_running_app().root.current = 'infoscheduleclient'
+
+        Clock.schedule_once(self.box_dialog.dismiss, 3)
 
         try:
             self.popup.dismiss()
@@ -1314,6 +1400,12 @@ class ViewSchedule(Screen):
 
         return info
 
+    def wait_cancel_schedule(self ,id_user, *args, **kwargs):
+        self.load_widget()
+
+        Clock.schedule_once(partial(self.cancel_schedule, id_user), 1)
+
+
     def cancel_schedule(self, id_user, *args, **kwargs):
 
         try:
@@ -1321,6 +1413,9 @@ class ViewSchedule(Screen):
             time_cancel = self.info_manager['time_cancel']
 
             link = ''
+
+            time = self.format_hours(time_cancel)
+
 
             if id_proficional['manager'] == "False":
                 link = self.LINK_SALAO + f'/socios/{id_proficional["id_user"]}/agenda/{self.dia_atual}/{id_user}.json'
@@ -1334,9 +1429,14 @@ class ViewSchedule(Screen):
             cancelar = self.check_time_cancel(str(time_cancel),requisicao_dic['horas_agendamento'])
 
             if cancelar:
+                try:
+                    self.box_dialog.dismiss()
+                except:
+                    pass
+
                 bt = MDFlatButton(text='OK')
                 dialog = MDDialog(title='"Aviso!"',
-                                  text=f'O agendamento não pode ser cancelado Passou do tempo de  "{time_cancel}"!',
+                                  text=f'O agendamento não pode ser cancelado Passou do tempo de  "{time[0]}{time[1]}"!',
                                   radius=[40, 7, 40, 7], buttons=[bt])
 
                 bt.bind(on_release=dialog.dismiss)
@@ -1365,14 +1465,24 @@ class ViewSchedule(Screen):
                     json.dump(load, load_home, indent=2)
 
             self.popup.dismiss()
+            self.box_dialog.dismiss()
         except requests.exceptions.ConnectionError:
             toast('Você não esta conectado a internet!')
 
-    def if_blocked(self,id_button, hours):
+    def dialog_of_mensagen(self,msg, *args):
+        bt = MDFlatButton(text='OK!')
+        dialog = MDDialog(title='"Aviso!"',
+                          text=msg,
+                           buttons=[bt])
+        bt.bind(on_release=dialog.dismiss)
+        dialog.open()
 
+    def if_blocked(self,id_button, hours):
+        self.load_widget()
         try:
             if self.agenda_marcada:
-                toast('Você já tem um agendamento marcado aqui para fazer outro agendamento\nCancele o seu agendamento!')
+                Clock.schedule_once(self.dismiss_dialog, 1)
+                self.dialog_of_mensagen('Você já tem um agendamento marcado aqui para fazer outro agendamento\nCancele o seu agendamento!')
             else:
                 link = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{self.user_id}.json'
 
@@ -1398,11 +1508,33 @@ class ViewSchedule(Screen):
         with open('info_schedule.json','w') as arquivo:
             json.dump(hours_dic, arquivo, indent=2)
 
+        Clock.schedule_once(self.dismiss_dialog, 5)
         MDApp.get_running_app().root.current = 'hoursschedule'
+
+    def dismiss_dialog(self, *args):
+        self.box_dialog.dismiss()
 
     def on_leave(self, *args):
         self.ids.grid_shedule.clear_widgets()
         Window.unbind(on_keyboard=self.call_back)
+
+    def format_hours(self, msg):
+
+        time = ''
+
+        horas = msg[0:2]
+        minutos = msg[3:]
+
+
+        if horas == '00' and minutos < '60':
+            time = msg
+            return msg, 'm'
+        elif horas == '00' and minutos >= '60':
+            time = '01:00'
+            return time, 'h'
+        elif horas != '00':
+            time = msg
+            return time, 'h'
 
     def return_homepage(self):
         MDApp.get_running_app().root.current = 'homepage'
@@ -1438,7 +1570,7 @@ class HoursSchedule(Screen):
         except FileNotFoundError:
             pass
 
-        self.ids.categorie.add_widget(MDSpinner(size_hint=(None,None,), size=('46dp','46dp'),color=(0,0,0,1),pos_hint={'center_x':.5,'center_y':.1}))
+        # self.ids.categorie.add_widget(MDSpinner(size_hint=(None,None,), size=('46dp','46dp'),color=(0,0,0,1),pos_hint={'center_x':.5,'center_y':.1}))
         Clock.schedule_once(self.get_works, 2)
         self.includ_color_select()
         self.soma_hours_values()
@@ -1469,7 +1601,7 @@ class HoursSchedule(Screen):
         if my_select == []:
             self.ids.card_save.md_bg_color = 1, 0, 0, .1
             self.ids.color_card_fundo.md_bg_color = 0.55, 0.57, 0.63, 1
-            self.ids.card_save.unbind(on_release=self.save_scheduleing)
+            self.ids.card_save.unbind(on_release=self.wait_save_scheduleing)
             self.ids.card_save.bind(on_release=self.nada)
         else:
             pass
@@ -1625,7 +1757,7 @@ class HoursSchedule(Screen):
         if self.ids.work_select.children == []:
             self.ids.card_save.md_bg_color = 1, 0, 0, .1
             self.ids.color_card_fundo.md_bg_color = 0.55, 0.57, 0.63,1
-            self.ids.card_save.unbind(on_release=self.save_scheduleing)
+            self.ids.card_save.unbind(on_release=self.wait_save_scheduleing)
             self.ids.card_save.bind(on_release=self.nada)
 
     def includ_color_select(self,*args):
@@ -1723,7 +1855,7 @@ class HoursSchedule(Screen):
         if boolian:
             self.ids.card_save.md_bg_color = 1,0,0,.1
             self.ids.color_card_fundo.md_bg_color = 0.55, 0.57, 0.63,1
-            self.ids.card_save.unbind(on_release = self.save_scheduleing)
+            self.ids.card_save.unbind(on_release = self.wait_save_scheduleing)
             self.ids.card_save.bind(on_release = self.disable_release)
 
             self.disable_release()
@@ -1732,7 +1864,7 @@ class HoursSchedule(Screen):
             self.ids.card_save.unbind(on_release = self.disable_release)
             self.ids.card_save.md_bg_color = 0.13, 0.53, 0.95,1
             self.ids.color_card_fundo.md_bg_color = 0.13, 0.53, 0.95,1
-            self.ids.card_save.bind(on_release = self.save_scheduleing)
+            self.ids.card_save.bind(on_release = self.wait_save_scheduleing)
 
     def check_time(self, *args):
         pass
@@ -1770,6 +1902,22 @@ class HoursSchedule(Screen):
         soma = delta + id_hours
 
         return soma.strftime('%H:%M')
+
+    def load_widget(self, *args, **kwargs):
+
+        # The "md_label" not show!
+        md_label = MDLabel(text='Carregando...', color=(1, 1, 1, 1))
+        spiner = MDSpinner(active=True, size_hint=(None, None), size=('56dp', '56dp'),
+                           pos_hint=({'center_x': .5, 'center_y': .5}))
+        self.box_dialog = MDDialog(buttons=[md_label])
+
+        self.box_dialog.add_widget(spiner)
+        # self.parent.parent.add_widget(self.boxlayout)
+        self.box_dialog.open()
+
+    def wait_save_scheduleing(self, *args):
+        self.load_widget()
+        Clock.schedule_once(self.save_scheduleing, 2)
 
     def save_scheduleing(self, *args):
 
@@ -1913,9 +2061,14 @@ class HoursSchedule(Screen):
                 with open('infoscheduleclient.json', 'w', encoding='utf-8') as file:
                     json.dump(information_of_file, file, indent=2)
 
+
+                time = self.format_hours(time_cancel)
+
+                print(time)
+
                 bt = MDFlatButton(text='OK')
                 dialog2 = MDDialog(title='"Aviso!"',
-                                  text=f'Agendamento Marcado! Você tem {time_cancel} para cancelar!',
+                                  text=f'Agendamento Marcado! Você tem {time[0]}{time[1]} para cancelar!',
                                   radius=[20, 7, 20, 7], buttons=[bt])
 
                 bt.bind(on_release=dialog2.dismiss)
@@ -1955,6 +2108,30 @@ class HoursSchedule(Screen):
         with open('select_works.json','w') as file:
             json.dump([], file)
         MDApp.get_running_app().root.current = 'viewshedule'
+
+        try:
+            Clock.schedule_once(self.box_dialog.dismiss, 2)
+        except:
+            pass
+
+    def format_hours(self, msg):
+
+        time = ''
+
+        horas = msg[0:2]
+        minutos = msg[3:]
+
+
+        if horas == '00' and minutos < '60':
+            time = msg
+            return msg, 'm'
+        elif horas == '00' and minutos >= '60':
+            time = '01:00'
+            return time, 'h'
+        elif horas != '00':
+            time = msg
+            return time, 'h'
+
 
 
 class InfoScheduleClient(Screen):
@@ -2263,7 +2440,7 @@ class InfoScheduleClient(Screen):
         pass
 
     def return_schedule(self):
-        MDApp.get_running_app().root.current = 'viewshedule'
+        MDApp.get_running_app().root.current = 'homepage'
 
 
 class DrawerInfoSchedule(InfoScheduleClient):
@@ -2278,6 +2455,15 @@ class DrawerInfoSchedule(InfoScheduleClient):
     def on_pre_enter(self):
         self.set_info_day()
         self.inf_schedule_client()
+        Window.bind(on_keyboard=self.call_back)
+
+    def call_back(self, windown, key, *args):
+
+        if key == 27:
+            MDApp.get_running_app().root.current = 'homepage'
+            return True
+        else:
+            pass
 
     def set_info_day(self):
 
@@ -2381,24 +2567,24 @@ class Perfil(Screen):
     def get_client_data(self):
         is_bloqued = ''
 
-        try:
-            with open('get_client_data.json','r') as data:
-                data_client = json.load(data)
+        # try:
+        with open('get_client_data.json','r') as data:
+            data_client = json.load(data)
 
-            if data_client["bloqueado"] == "False":
-                is_bloqued = 'Não'
-            elif data_client["bloqueado"] == 'True':
-                is_bloqued = 'Bloqueado!'
+        if data_client["bloqueado"] == "False":
+            is_bloqued = 'Não'
+        elif data_client["bloqueado"] == 'True':
+            is_bloqued = 'Bloqueado!'
 
-            set_cpf = f'{data_client["cpf"][:3]}.{data_client["cpf"][3:6]}.{data_client["cpf"][6:9]}-{data_client["cpf"][9:]}'
+        set_cpf = f'{data_client["cpf"][:3]}.{data_client["cpf"][3:6]}.{data_client["cpf"][6:9]}-{data_client["cpf"][9:]}'
 
-            self.ids.nome.text = str(data_client["nome"])
-            self.ids.cpf.text = str(set_cpf)
-            self.ids.email.text = str(data_client["email"])
-            self.ids.bloqueio.text = str(is_bloqued)
-            self.ids.quant_cancel.text = str(data_client["quant_cancelado"])
-        except:
-            pass
+        self.ids.nome.text = str(data_client["nome"])
+        self.ids.cpf.text = str(set_cpf)
+        self.ids.email.text = str(data_client["email"])
+        self.ids.bloqueio.text = str(is_bloqued)
+        self.ids.quant_cancel.text = str(data_client["quant_cancelado"])
+        # except:
+        #     pass
 
 
 class MyCardButton(MDCard):
@@ -2408,6 +2594,15 @@ class MyCardButton(MDCard):
         self.socio_or_manager = socio_or_manager
         self.id_user = id_user
         self.nome = nome
+
+        # self.tap_target = MDTapTargetView(
+        #     widget=self,
+        #     title_text="This is an add button",
+        #     description_text="This is a description of the button",
+        #     widget_position="left_bottom",
+        # )
+        #
+        # self.tap_target.start()
 
     def send_info(self,socio_or_manager, id_user):
         dictionary = {}

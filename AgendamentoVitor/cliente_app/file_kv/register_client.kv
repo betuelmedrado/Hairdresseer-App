@@ -34,23 +34,34 @@
                 font_size:'15dp'
                 text:'Senha'
                 color:1,1,1,.4
-            TextInput:
+            MDBoxLayout:
                 size_hint_y:None
                 height:'40dp'
-                hint_text:'******'
-                bold:True
-                font_size:'30dp'
-                multiline:False
-                password:True
-                foreground_color:0,1,1,1
-                id:senha
+                TextInput:
+                    hint_text:'******'
+                    bold:True
+                    font_size:'30dp'
+                    multiline:False
+                    password:True
+                    foreground_color:0,1,1,1
+                    id:senha
+                FloatLayout:
+                    size_hint_x:None
+                    width:0
+                    MDIconButton:
+                        icon:'eye-off'
+                        pos_hint:{'right':.8, 'center_y':.5}
+                        id:eye
+                        on_release:root.password_view(senha)
+
             Widget:
                 size_hint_y:None
                 height:'15dp'
-            Label:
-                text:'Faça o seu cadastro'
+            MDLabel:
+                text:''
                 font_size:'25sp'
                 markup:True
+                halign:'center'
                 color:1,1,1,1
                 id:warning
         MDCard:
@@ -88,13 +99,14 @@
                 font_size:'25dp'
                 text:'Criar'
             Label:
-                font_size:'10dp'
+#                font_size:'10dp'
                 text:'Conta'
-    MDTextButton:
-        text:'Redefinir senha!'
-        color:1,1,1,.6
-        pos_hint:{'right':.9}
-        on_release:app.root.current = 'redefinitionsenha'
+        MDTextButton:
+            text:'Redefinir senha!'
+            color:1,1,1,.6
+            pos_hint:{'right':.9, 'y':.05}
+            on_release:app.root.current = 'redefinitionsenha'
+
 
 <CreatBill>:
     canvas:
@@ -154,32 +166,53 @@
                 font_size:'15dp'
                 color:1,1,1,.5
                 text:'Senha'
-            TextInput:
+
+            MDBoxLayout:
                 size_hint_y:None
                 height:'40dp'
-                font_size:'30dp'
-                bold:True
-                hint_text:'******'
-                foreground_color:0,1,1,1
-                multiline:False
-                password:True
-                id:senha
+                TextInput:
+                    hint_text:'******'
+                    bold:True
+                    font_size:'30dp'
+                    multiline:False
+                    password:True
+                    foreground_color:0,1,1,1
+                    id:senha
+                FloatLayout:
+                    size_hint_x:None
+                    width:0
+                    MDIconButton:
+                        icon:'eye-off'
+                        pos_hint:{'right':.8, 'center_y':.5}
+                        id:eye
+                        on_release:root.password_view(senha)
+
+
             MDLabel:
                 size_hint_y:None
                 height:'15sp'
                 font_size:'15dp'
                 color:1,1,1,.5
                 text:'Confirmar Senha'
-            TextInput:
+            MDBoxLayout:
                 size_hint_y:None
                 height:'40dp'
-                font_size:'30dp'
-                bold:True
-                hint_text:'******'
-                multiline:False
-                foreground_color:0,1,1,1
-                password:True
-                id:rep_senha
+                TextInput:
+                    hint_text:'******'
+                    bold:True
+                    font_size:'30dp'
+                    multiline:False
+                    password:True
+                    foreground_color:0,1,1,1
+                    id:rep_senha
+                FloatLayout:
+                    size_hint_x:None
+                    width:0
+                    MDIconButton:
+                        icon:'eye-off'
+                        pos_hint:{'right':.8, 'center_y':.5}
+                        id:eye_repeat
+                        on_release:root.rep_password_view(rep_senha)
 
         Label:
             text:'Faça o seu cadastro'
@@ -204,8 +237,6 @@
                 font_size:'25dp'
                 text:'Criar'
             Label:
-                size_hint_y:None
-                height:'10dp'
                 font_size:'10dp'
                 text:'Conta'
         MDIconButton:
