@@ -1307,8 +1307,8 @@ class ViewSchedule(Screen):
 
             self.actualizar()
             self.ids.refresh_id.refresh_done()
-
         Clock.schedule_once(refresh_callback, 1)
+
 
     def spiner(self,id_button, hours, *args, **kwargs):
         self.spiner = MDSpinner(size_hint=(None, None,), size=('46dp', '46dp'), pos_hint={'center_x': .5, 'center_y': .1})
@@ -1555,7 +1555,7 @@ class HoursSchedule(Screen):
         self.hours = hours
         self.id_manager = self.get_manager()
 
-        self.LINK_SALAO_ID_MANAGER = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}'
+        self.LINK_SALAO_ID_MANAGER = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager[0]}'
         self.info_manager = self._info_manager()
 
 
@@ -1623,7 +1623,7 @@ class HoursSchedule(Screen):
             requisicao = requests.get(self.LINK_SALAO + '.json')
             requisicao_dic = requisicao.json()
             for id in requisicao_dic:
-                return id
+                return id, requisicao_dic[id]['nome']
         except requests.exceptions.ConnectionError:
             toast('Você não esta conectado a internet!')
 
@@ -1647,10 +1647,10 @@ class HoursSchedule(Screen):
 
             # LINK DATA BASE
             if self.id_diverse['manager'] == "False":
-                link = self.LINK_SALAO + '/' + self.id_manager + '/socios/' + self.id_diverse["id_user"] + '.json'
+                link = self.LINK_SALAO + '/' + self.id_manager[0] + '/socios/' + self.id_diverse["id_user"] + '.json'
                 socio_or_manager = True
             elif self.id_diverse['manager'] == "True":
-                link = self.LINK_SALAO + '/' + self.id_manager + '.json'
+                link = self.LINK_SALAO + '/' + self.id_manager[0] + '.json'
                 socio_or_manager = False
 
             requisicao = requests.get(link)
@@ -1671,9 +1671,9 @@ class HoursSchedule(Screen):
                 for num, id_work in enumerate(lista):
 
                     if socio_or_manager:
-                        link_id = self.LINK_SALAO + '/' + self.id_manager + '/socios/' + self.id_diverse["id_user"] + '/servicos/' + id_work + '.json'
+                        link_id = self.LINK_SALAO + '/' + self.id_manager[0] + '/socios/' + self.id_diverse["id_user"] + '/servicos/' + id_work + '.json'
                     else:
-                        link_id = self.LINK_SALAO + '/' + self.id_manager + '/' + 'servicos' + '/' + id_work + '.json'
+                        link_id = self.LINK_SALAO + '/' + self.id_manager[0] + '/' + 'servicos' + '/' + id_work + '.json'
 
                     works = requests.get(link_id)
                     works_dic = works.json()
@@ -1693,9 +1693,9 @@ class HoursSchedule(Screen):
             except:
                 try:
                     if socio_or_manager:
-                        work_socio = self.LINK_SALAO + '/' + self.id_manager + '/socios/' + self.id_diverse["id_user"] + '/' + id_work + '.json'
+                        work_socio = self.LINK_SALAO + '/' + self.id_manager[0] + '/socios/' + self.id_diverse["id_user"] + '/' + id_work + '.json'
                     else:
-                        work_socio = self.LINK_SALAO + '/' + self.id_manager + '/socios/' + id_work + '.json'
+                        work_socio = self.LINK_SALAO + '/' + self.id_manager[0] + '/socios/' + id_work + '.json'
                 except:
                     pass
         except requests.exceptions.ConnectionError:
@@ -1980,9 +1980,9 @@ class HoursSchedule(Screen):
 
         # Here is to know is have schedule marked ##############################################
         if if_manager['manager'] == "False":
-            link_info = f'{self.LINK_SALAO}/{self.id_manager}/socios/{if_manager["id_user"]}/agenda/{self.semana}.json'
+            link_info = f'{self.LINK_SALAO}/{self.id_manager[0]}/socios/{if_manager["id_user"]}/agenda/{self.semana}.json'
         elif if_manager['manager'] == "True":
-            link_info = f'{self.LINK_SALAO}/{self.id_manager}/agenda/{self.semana}.json'
+            link_info = f'{self.LINK_SALAO}/{self.id_manager[0]}/agenda/{self.semana}.json'
         # ######################################################################################
 
         try:
@@ -2011,12 +2011,14 @@ class HoursSchedule(Screen):
 
 
         if if_manager['manager'] == "False":
-            link = f'{self.LINK_SALAO}/{self.id_manager}/socios/{if_manager["id_user"]}/agenda/{self.semana}/{id_user}.json'
+            link = f'{self.LINK_SALAO}/{self.id_manager[0]}/socios/{if_manager["id_user"]}/agenda/{self.semana}/{id_user}.json'
         elif if_manager['manager'] == "True":
-            link = f'{self.LINK_SALAO}/{self.id_manager}/agenda/{self.semana}/{id_user}.json'
+            link = f'{self.LINK_SALAO}/{self.id_manager[0]}/agenda/{self.semana}/{id_user}.json'
+
 
         # information of date base #########################
         info = f'{{"id_posicao":"{id_pos["id_posicao"]}",' \
+               f'"nome_barbeiro":"{if_manager["nome"]}",' \
                f'"id_horas":"{horas}",' \
                f'"id_user":"{id_user}",' \
                f'"tempo":"{tempo}",' \
@@ -2032,9 +2034,10 @@ class HoursSchedule(Screen):
 
         information_of_file["date"] = date
         information_of_file["id_button"] = id_pos["id_posicao"]
+        information_of_file["nome_barbeiro"] = if_manager["nome"]
         information_of_file["id_schedule"] = id_user
         information_of_file["hours"] = horas
-        information_of_file["client"] = 'Você agendou esse horarion!'
+        information_of_file["client"] = 'Seu agendamento!'
         information_of_file["hours_second"] = str(second_hours)
         information_of_file["hours_of_schedule"] = str(horas_hoje)
         information_of_file["time"] = str(tempo)
@@ -2064,8 +2067,6 @@ class HoursSchedule(Screen):
 
                 time = self.format_hours(time_cancel)
 
-                print(time)
-
                 bt = MDFlatButton(text='OK')
                 dialog2 = MDDialog(title='"Aviso!"',
                                   text=f'Agendamento Marcado! Você tem {time[0]}{time[1]} para cancelar!',
@@ -2081,6 +2082,8 @@ class HoursSchedule(Screen):
 
             except requests.exceptions.ConnectionError:
                 toast('Você não esta conectado a internet!')
+            except:
+                pass
 
         # if if_manager['manager'] == "False":
         #     # getting ids that are already scheduled ###########################################################################
@@ -2131,7 +2134,6 @@ class HoursSchedule(Screen):
         elif horas != '00':
             time = msg
             return time, 'h'
-
 
 
 class InfoScheduleClient(Screen):
@@ -2217,7 +2219,6 @@ class InfoScheduleClient(Screen):
 
             id_client = info_schedule['id_schedule']
             self.ids.scheduling.text = info_schedule['hours_of_schedule']
-
             self.ids.nome.text = f'[color=#6B0A00]{info_schedule["client"]}[/color]'
             self.ids.hours.text = f'[b]Agendado as[/b] [color=#6B0A00]{info_schedule["hours"]}[/color] [size=20]hs[/size]'
             self.ids.hours_second.text = f'[b]Termino do serviço[/b] [color=#6B0A00]{info_schedule["hours_second"]}[/color] [size=20]hs[/size]'
@@ -2440,7 +2441,7 @@ class InfoScheduleClient(Screen):
         pass
 
     def return_schedule(self):
-        MDApp.get_running_app().root.current = 'homepage'
+        MDApp.get_running_app().root.current = 'viewshedule'
 
 
 class DrawerInfoSchedule(InfoScheduleClient):
@@ -2451,11 +2452,29 @@ class DrawerInfoSchedule(InfoScheduleClient):
         self.month = datetime.today().month
         self.year = datetime.today().year
 
+        self.clear_drawer_schedule()
 
     def on_pre_enter(self):
         self.set_info_day()
         self.inf_schedule_client()
         Window.bind(on_keyboard=self.call_back)
+
+    def clear_drawer_schedule(self):
+
+        actual_date = f'{self.day}/{self.month}/{self.year}'
+
+        try:
+            with open('inf_to_infoschedule_drawer.json', 'r') as file:
+                info_schedule = json.load(file)
+
+            for info in info_schedule:
+                if info['date'] != actual_date:
+                    with open('inf_to_infoschedule_drawer.json', 'w') as file:
+                        json.dump([], file)
+                else:
+                    pass
+        except:
+            pass
 
     def call_back(self, windown, key, *args):
 
@@ -2503,7 +2522,7 @@ class DrawerInfoSchedule(InfoScheduleClient):
             self.ids.scheduling.text = info_schedule[number_pos]['hours_of_schedule']
             tru_fal = eval(info_schedule[number_pos]['id_proficional'])
 
-            self.ids.nome.text = f'[size=20][color=#9B9894]Nome[/color][/size]\n[color=#6B0A00]{info_schedule[number_pos]["client"]}[/color]'
+            self.ids.nome.text = f'[color=#9B9894]Barbeiro:  {info_schedule[number_pos]["nome_barbeiro"].title()}[/color]\n[color=#6B0A00]{info_schedule[number_pos]["client"]}[/color]'
             self.ids.hours.text = f'[b]Agendado as[/b] [color=#6B0A00]{info_schedule[number_pos]["hours"]}[/color] [size=20]hs[/size]'
             self.ids.hours_second.text = f'[b]Termino do serviço[/b] [color=#6B0A00]{info_schedule[number_pos]["hours_second"]}[/color] [size=20]hs[/size]'
             self.ids.time.text = f'[b]Tempo de serviço[/b] [color=#6B0A00]{info_schedule[number_pos]["time"]}[/color] [size=20]hs[/size]'
@@ -2541,7 +2560,7 @@ class DrawerInfoSchedule(InfoScheduleClient):
 
             tru_fal = eval(info_schedule[0]['id_proficional'])
 
-            self.ids.nome.text = f'[size=20][color=#9B9894]Nome[/color][/size]\n[color=#6B0A00]{info_schedule[0]["client"]}[/color]'
+            self.ids.nome.text = f'[color=#9B9894]Barbeiro:  {info_schedule[0]["nome_barbeiro"].title()}[/color]\n[color=#6B0A00]{info_schedule[0]["client"]}[/color]'
             self.ids.hours.text = f'[b]Agendado as[/b] [color=#6B0A00]{info_schedule[0]["hours"]}[/color] [size=20]hs[/size]'
             self.ids.hours_second.text = f'[b]Termino do serviço[/b] [color=#6B0A00]{info_schedule[0]["hours_second"]}[/color] [size=20]hs[/size]'
             self.ids.time.text = f'[b]Tempo de serviço[/b] [color=#6B0A00]{info_schedule[0]["time"]}[/color] [size=20]hs[/size]'
@@ -2552,6 +2571,10 @@ class DrawerInfoSchedule(InfoScheduleClient):
             self.info_cliente_and_cancel(id_client)
         except:
             self.ids.nome.text = '"Nem uma hora marcada!"'
+            raise
+
+    def return_schedule(self):
+        MDApp.get_running_app().root.current = 'homepage'
 
 class Perfil(Screen):
 
@@ -2604,9 +2627,24 @@ class MyCardButton(MDCard):
         #
         # self.tap_target.start()
 
+    def load_widget(self, *args, **kwargs):
+
+        # The "md_label" not show!
+        md_label = MDLabel(text='Carregando...', color=(1, 1, 1, 1))
+        spiner = MDSpinner(active=True, size_hint=(None, None), size=('56dp', '56dp'),
+                           pos_hint=({'center_x': .5, 'center_y': .5}))
+        self.box_dialog = MDDialog(buttons=[md_label])
+
+        self.box_dialog.add_widget(spiner)
+        # self.parent.parent.add_widget(self.boxlayout)
+        self.box_dialog.open()
+
     def send_info(self,socio_or_manager, id_user):
+        self.load_widget()
+
         dictionary = {}
 
+        dictionary['nome'] = self.nome
         dictionary['manager'] = socio_or_manager
         dictionary['id_user'] = id_user
 
@@ -2614,6 +2652,7 @@ class MyCardButton(MDCard):
             json.dump(dictionary, arquivo, indent=2)
 
         MDApp.get_running_app().root.current = 'viewshedule'
+        Clock.schedule_once(self.box_dialog.dismiss, 3)
 
 
 class MyBoxCategorie(MDCard):
