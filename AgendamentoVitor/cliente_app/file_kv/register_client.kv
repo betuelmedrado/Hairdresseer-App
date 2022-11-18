@@ -8,6 +8,7 @@
             size:root.size
             source:'images/degrade.jpg'
     FloatLayout:
+        size_hint_y:.8
         MDBoxLayout:
             orientation:'vertical'
             size_hint:.8, None
@@ -64,6 +65,18 @@
                 halign:'center'
                 color:1,1,1,1
                 id:warning
+            Widget:
+                size_hint_y:None
+                height:'10dp'
+            MDLabel:
+                text:''
+                font_size:'20sp'
+                markup:True
+                halign:'center'
+                color:1,1,1,1
+                id:warning2
+
+
         MDCard:
             orientation:'vertical'
             size_hint:.8,None
@@ -88,7 +101,7 @@
             orientation:'vertical'
             size_hint:.8,None
             height:'60sp'
-            pos_hint:{'center_x':.5,'center_y':.2}
+            pos_hint:{'center_x':.5,'center_y':.18}
             ripple_behavior:True
             md_bg_color:0.16, 0.50, 0.73,1
             radius:'20dp','5dp','20dp','5dp'

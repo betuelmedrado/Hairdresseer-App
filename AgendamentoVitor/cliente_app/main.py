@@ -72,8 +72,6 @@ class HomePage(Screen):
         else:
             pass
 
-
-
     def help(self):
 
         help_text = '"Atenção!" antes de fazer seu agendamento certifique-se que ira comparecer ao estábelecimento. ' \
@@ -632,18 +630,20 @@ class Register(Screen):
 
                     MDApp.get_running_app().root.current = 'homepage'
                 else:
-                    self.ids.warning.text = 'Email ou senha [color=D40A00]Invalida[/color]\n[size=15]Faça o seu cadastro logo abaixo![/size]'
+                    self.ids.warning.text = 'Email ou senha [color=D40A00]Invalida[/color]'
+                    self.ids.warning2.text = 'Faça o seu cadastro logo abaixo!'
             else:
                 erro = str(requisicao_dic['error']['message'])
 
                 if erro == 'INVALID_EMAIL':
-                    self.ids.warning.text = 'Email [color=D40A00]Invalido[/color]\n[size=15]Faça o seu cadastro logo abaixo![/size]'
+                    self.ids.warning.text = 'Email [color=D40A00]Invalido[/color]'
+                    self.ids.warning2.text  ='Faça o seu cadastro logo abaixo!'
                 elif erro == 'MISSING_PASSWORD':
                     self.ids.warning.text = 'Sem informação de [color=D40A00]Senha[/color]'
                 elif erro == 'INVALID_PASSWORD':
                     self.ids.warning.text = 'Senha [color=D40A00]Invalido[/color]'
                 elif erro == 'EMAIL_NOT_FOUND':
-                    self.ids.warning.text = 'Email não [color=D40A00]Encontrado[/color]\n[size=15]Faça o seu cadastro logo abaixo![/size]'
+                    self.ids.warning.text = 'Email não [color=D40A00]Encontrado[/color]\n[size=35]Faça o seu cadastro logo abaixo![/size]'
         except requests.exceptions.ConnectionError:
             toast('Você não esta conectado a internet!')
 
@@ -2202,12 +2202,13 @@ class InfoScheduleClient(Screen):
 
         try:
             cpf = str(cpf_email[0]["cpf"])
-            e_meil = str(cpf_email[0]["email"])
+            e_mail = str(cpf_email[0]["email"])
         except:
             with open('get_client_data.json', 'r') as date:
                 date_client = json.load(date)
                 cpf  = date_client['cpf']
                 e_mail = date_client['email']
+
 
         # for info_schedule in info_schedules:
 
@@ -2340,32 +2341,6 @@ class InfoScheduleClient(Screen):
             self.ids.label_block.text = 'Cliente bloqueado!'
         except requests.exceptions.ConnectionError:
             toast('Você não esta conectado a internet!')
-
-    def popup_leave(self, *args, **kwargs):
-
-        if self.ids.img_block.source != '':
-            box_content = MDBoxLayout(orientation='vertical',spacing='5')
-            box_bt = MDBoxLayout(spacing='10dp', padding='5dp')
-
-            pop = Popup(title='Liberar cliente?', size_hint=(None, None),
-                        size=('240dp', '200dp'), content=box_content)
-
-            bt_sim = Button(text='Sim!', background_color=(0.13, 0.53, 0.95,1),on_release=pop.dismiss)
-            bt_nao = Button(text='Não!',color=(0,0,0,1),background_color=(0.13, 0.53, 0.95,1), on_release=pop.dismiss)
-
-            box_bt.add_widget(bt_sim)
-            box_bt.add_widget(bt_nao)
-
-            image = Image(source='images/atencao.png')
-
-            box_content.add_widget(image)
-            box_content.add_widget(box_bt)
-
-            bt_sim.bind(on_press=self.leave_client)
-
-            pop.open()
-        else:
-            pass
 
     def leave_client(self, *args):
 
@@ -2571,7 +2546,6 @@ class DrawerInfoSchedule(InfoScheduleClient):
             self.info_cliente_and_cancel(id_client)
         except:
             self.ids.nome.text = '"Nem uma hora marcada!"'
-            raise
 
     def return_schedule(self):
         MDApp.get_running_app().root.current = 'homepage'
@@ -2700,13 +2674,24 @@ class MsgToApp(Screen):
 
         webbrowser.open(link)
 
+    def call_back_close(self,windown, key, *args):
+
+        if key == 27:
+            try:
+                MDApp().stop()
+            except:
+                raise
+
+        else:
+            pass
 
     def on_pre_enter(self, *args):
-        # with open('msg_to_app.json','r') as file:
-        #     msg = json.load(file)
-        #
-        # self.ids.msg.text = msg['msg_actualiza']
-        # self.ids.link.text = msg['link']
+        try:
+            Window.unbind(on_keyboard=self.call_back)
+            Window.bind(on_keyboard=self.call_back_close)
+        except:
+            pass
+
         self.dialog_msg()
 
 

@@ -1,14 +1,10 @@
 {
-  "date": "11/11/2022",
-  "id_button": "2",
-  "nome_barbeiro": "jaba4",
+  "id_button": "3",
   "id_schedule": "4mukcmq0Zyec59iP9Bj4ZGGv67t1",
-  "hours": "08:00",
-  "client": "Seu agendamento!",
-  "hours_second": "08:40",
-  "hours_of_schedule": "21:46",
-  "time": "00:40",
-  "id_proficional": "{'nome': 'jaba4', 'manager': 'False', 'id_user': 'VKG0v84jmlTjh3oUaAxMtTfmNkX2'}",
-  "cpf": "31077928882",
-  "email": "joao@gmail.com"
+  "hours": "10:30",
+  "client": "Voc\u00ea agendou esse horarion",
+  "hours_second": "12:00",
+  "time": "01:30",
+  "hours_of_schedule": "19:39",
+  "time_cancel": "[color=#6B0A00][b]\"Aten\u00e7\u00e3o\":[/b][/color] Voc\u00ea tem [b]00:60[/b] [size=13]H/M[/size] para desmarcar apos agendamento!"
 }
