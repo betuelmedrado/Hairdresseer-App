@@ -1,10 +1,10 @@
 {
   "id_button": "3",
   "id_schedule": "4mukcmq0Zyec59iP9Bj4ZGGv67t1",
-  "hours": "10:30",
-  "client": "Voc\u00ea agendou esse horarion",
-  "hours_second": "12:00",
+  "hours": "09:30",
+  "client": "Seu agendamento!",
+  "hours_second": "11:00",
   "time": "01:30",
-  "hours_of_schedule": "19:39",
+  "hours_of_schedule": "20:37",
   "time_cancel": "[color=#6B0A00][b]\"Aten\u00e7\u00e3o\":[/b][/color] Voc\u00ea tem [b]00:60[/b] [size=13]H/M[/size] para desmarcar apos agendamento!"
 }

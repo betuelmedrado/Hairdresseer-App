@@ -1197,7 +1197,7 @@ class ViewSchedule(Screen):
 
                                     if user_id == lista_info[0]['id_user']: # -----------------------------[0]
                                         # Insert table #####################################################################################
-                                        table = TableInfo(str(cont), lista_info[num]['id_user'], entrada, 'Você agendou esse horarion', f'{soma_horas.strftime("%H:%M")}', lista_info[num]['tempo'], time_cancel)
+                                        table = TableInfo(str(cont), lista_info[num]['id_user'], entrada, 'Seu agendamento!', f'{soma_horas.strftime("%H:%M")}', lista_info[num]['tempo'], time_cancel)
                                         self.ids.grid_shedule.add_widget(table)
                                         list_content.append(entrada)
                                         entrada = soma_horas.strftime('%H:%M')
@@ -1357,7 +1357,6 @@ class ViewSchedule(Screen):
         self.load_widget()
         Clock.schedule_once(partial(self.call_info_schedule, id_button,id_schedule,hours, client, hours_second, time, hours_of_schedule, time_cancel, *args),2)
 
-
     def call_info_schedule(self,id_button='',id_schedule='',hours='', client='', hours_second='', time='', hours_of_schedule='', time_cancel='', *args):
         dic_info = {}
         horas_agendamento = hours_of_schedule
@@ -1404,7 +1403,6 @@ class ViewSchedule(Screen):
         self.load_widget()
 
         Clock.schedule_once(partial(self.cancel_schedule, id_user), 1)
-
 
     def cancel_schedule(self, id_user, *args, **kwargs):
 
@@ -1491,7 +1489,8 @@ class ViewSchedule(Screen):
 
                 try:
                     if requisicao_dic['bloqueado'] == 'True':
-                        toast('Você foi bloqueado! Entre em contato com um proficional do salão! ')
+                        self.dialog_of_mensagen('Você foi bloqueado! Entre em contato com um proficional do salão! ')
+                        Clock.schedule_once(self.dismiss_dialog, 1)
                     elif requisicao_dic['bloqueado'] == 'False':
                         self.get_hours(id_button, hours)
                 except:
@@ -2221,9 +2220,9 @@ class InfoScheduleClient(Screen):
             id_client = info_schedule['id_schedule']
             self.ids.scheduling.text = info_schedule['hours_of_schedule']
             self.ids.nome.text = f'[color=#6B0A00]{info_schedule["client"]}[/color]'
-            self.ids.hours.text = f'[b]Agendado as[/b] [color=#6B0A00]{info_schedule["hours"]}[/color] [size=20]hs[/size]'
-            self.ids.hours_second.text = f'[b]Termino do serviço[/b] [color=#6B0A00]{info_schedule["hours_second"]}[/color] [size=20]hs[/size]'
-            self.ids.time.text = f'[b]Tempo de serviço[/b] [color=#6B0A00]{info_schedule["time"]}[/color] [size=20]hs[/size]'
+            self.ids.hours.text = f'[b]Agendado as[/b] [color=#6B0A00]{info_schedule["hours"]}[/color] hs'
+            self.ids.hours_second.text = f'[b]Termino do serviço[/b] [color=#6B0A00]{info_schedule["hours_second"]}[/color] hs'
+            self.ids.time.text = f'[b]Tempo de serviço[/b] [color=#6B0A00]{info_schedule["time"]}[/color] hs'
             self.ids.cpf.text = f'{cpf[:3]}.{cpf[3:6]}.{cpf[6:9]}-{cpf[9:]}'
             self.ids.email.text = str(e_mail)
 
