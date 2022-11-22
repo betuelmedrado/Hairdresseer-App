@@ -43,7 +43,16 @@ from datetime import datetime, timedelta
 
 # print(datetime.today().isoweekday())
 
-Window.size = 400,820
+# Window.size = 400,820
+Window.size = 800,800
+Window.minimum_width = 800
+Window.minimum_height = 800
+
+
+# print(help(Window))
+
+
+# Window.pos =
 
 os.environ["SSL_CERT_FILE"] = certifi.where()
 
@@ -55,6 +64,11 @@ class Manager(ScreenManager):
 class LoginManager(Screen):
     API_KEY = 'AIzaSyAue2_eYU5S5TsUc692vHNlyxIHrlBVZjk'
     LINK_ID_MANAGER = 'https://shedule-vitor-default-rtdb.firebaseio.com/salao'
+
+    def on_pre_enter(self, *args):
+        # Clock.schedule_once(self.spiner,1)
+        self.creat_files()
+        self.load_refresh()
 
     def get_id_manager(self, *args):
         try:
@@ -247,10 +261,14 @@ class LoginManager(Screen):
     #     self.ids.float_home.add_widget(
     #         MDSpinner(size_hint=(None, None,), size=('46dp', '46dp'), pos_hint={'center_x': .5, 'center_y': .5}))
 
-    def on_pre_enter(self, *args):
-        # Clock.schedule_once(self.spiner,1)
-        self.creat_files()
-        self.load_refresh()
+
+    def password_view(self, msg):
+        if msg.password == False:
+            self.ids.senha.password = True
+            self.ids.eye.icon = 'eye-off'
+        elif msg.password == True:
+            self.ids.senha.password = False
+            self.ids.eye.icon = 'eye'
 
 
 class CreatProfile(Screen):
@@ -260,7 +278,7 @@ class CreatProfile(Screen):
         super().__init__(**kwargs)
         self.LINK_DATABASE_SALAO = 'https://shedule-vitor-default-rtdb.firebaseio.com/salao'
 
-        Clock.schedule_once(self.call_init,3)
+        Clock.schedule_once(self.call_init,1)
 
     def call_init(self, *args):
         self.id_manager = self.get_manager()
@@ -274,7 +292,18 @@ class CreatProfile(Screen):
         except requests.exceptions.ConnectionError:
             toast('Sem concção a internet!')
 
+    def call_login(self, window, key, *args, **kwargs):
+
+        if key == 27:
+            MDApp.get_running_app().root.current = 'loginmanager'
+        else:
+            pass
+        return True
+
     def on_pre_enter(self, *args):
+
+        Window.bind(on_keyboard=self.call_login)
+
         try:
             verification = self.verification_if_manger()
 
@@ -416,6 +445,22 @@ class CreatProfile(Screen):
         except requests.exceptions.ConnectionError:
             toast('Você não esta conectado a internet!')
 
+    def password_view(self, msg):
+        if msg.password == False:
+            self.ids.senha.password = True
+            self.ids.eye.icon = 'eye-off'
+        elif msg.password == True:
+            self.ids.senha.password = False
+            self.ids.eye.icon = 'eye'
+
+    def rep_password_view(self, msg):
+        if msg.password == False:
+            self.ids.rep_senha.password = True
+            self.ids.eye_repeat.icon = 'eye-off'
+        elif msg.password == True:
+            self.ids.rep_senha.password = False
+            self.ids.eye_repeat.icon = 'eye'
+
 
 class RedefinitionSenha(Screen):
     API_KEY = 'AIzaSyAue2_eYU5S5TsUc692vHNlyxIHrlBVZjk'
@@ -463,7 +508,7 @@ class HomePage(Screen):
         super().__init__(**kwargs)
         self.day_semana = datetime.today().isoweekday()
 
-        Clock.schedule_once(self.call_init,2)
+        Clock.schedule_once(self.call_init,1)
 
     def call_init(self, *args):
         self.id_manager = self.get_id_manager()
@@ -477,7 +522,7 @@ class HomePage(Screen):
         MDApp.get_running_app().root.current = 'loginmanager'
 
     def on_pre_enter(self):
-        Clock.schedule_once(self.get_local, 2)
+        Clock.schedule_once(self.get_local, 1)
 
     def get_id_manager(self, *args):
         try:
@@ -667,7 +712,7 @@ class ManagerProfile(Screen):
         self.dia_atual = datetime.today().isoweekday()
 
         # print('dia ',self.dia_atual)
-        Clock.schedule_once(self.call_init,2)
+        Clock.schedule_once(self.call_init,1)
 
     # function that init with 'init'
     def call_init(self, *args):
@@ -948,12 +993,14 @@ class ManagerProfile(Screen):
     def focus_exit_press(self, *args):
         self.ids.exit.focus = True
         Clock.schedule_once(self.focus_exit_leave,2)
+
     def focus_exit_leave(self, *args):
         self.ids.exit.focus = False
 
     def focus_time_cancel_press(self, *args):
         self.ids.time_cancel.focus = True
         Clock.schedule_once(self.focus_time_cancel_leave,2)
+
     def focus_time_cancel_leave(self, *args):
         self.ids.time_cancel.focus = False
     #/########################################################################
@@ -1197,7 +1244,7 @@ class ManagerProfile(Screen):
                 bt.unbind(on_release=self.insert_local)
                 bt.md_bg_color = (1,0,0,1)
         except:
-            raise
+            pass
 
     def insert_local(self, *args):
 
@@ -1449,14 +1496,17 @@ class MyBoxSocio(MDCard):
 
 class Table_shedule(MDBoxLayout):
 
-    def __init__(self,id_button='', id_schedule='',hours='', hours_second='', time='', client='',**kwargs):
+    def __init__(self,id_button='', id_schedule='',hours='', hours_second='', time='',time_cancel='', client='', email='',cpf='', **kwargs):
         super().__init__(**kwargs)
         self.id_button = id_button
         self.id_schedule = id_schedule
         self.hours = str(hours)
         self.hours_second = hours_second
         self.time = time
+        self.time_cancel = time_cancel
         self.client = str(client)
+        self.email = str(email)
+        self.cpf = str(cpf)
 
 
 class TableEnpty(MDBoxLayout):
@@ -1473,7 +1523,7 @@ class TableEnpty(MDBoxLayout):
 
 class TableInfo(MDBoxLayout):
     # def __init__(self,id_button='',id_schedule='',hours='',client='',hours2='',**kwargs):
-    def __init__(self,id_button='', id_schedule='',hours='', hours_second='', time='', client='',**kwargs):
+    def __init__(self,id_button='', id_schedule='',hours='', hours_second='', time='', client='', email='', cpf='', *args, **kwargs):
         super().__init__(**kwargs)
 
         #         # self.id_button = id_button
@@ -1488,6 +1538,8 @@ class TableInfo(MDBoxLayout):
         self.hours_2 = hours_second
         self.time = time
         self.client = str(client)
+        self.email = str(email)
+        self.cpf = str(cpf)
 
 
 class CardButtonProficional(MDCard):
@@ -1517,7 +1569,7 @@ class ScreenChoiceSchedule(Screen):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
 
-        Clock.schedule_once(self.call_init,3)
+        Clock.schedule_once(self.call_init,1)
 
     def call_init(self, *args):
         try:
@@ -1616,7 +1668,6 @@ class ViewSchedule(Screen):
         else:
             pass
         return True
-
 
     def time_now(self):
         h = datetime.today().hour
@@ -1755,6 +1806,15 @@ class ViewSchedule(Screen):
             saida = self.saida
             tempo = self.space_temp
 
+            data_hall = self.get_data_hall()
+            id_manager = self.get_manager()
+            print(data_hall[id_manager]['time_cancel'])
+
+
+            time_c = data_hall[id_manager]['time_cancel']
+            # Time Mensage of cancel ot schedule #############################
+            time_cancel = f'[color=#6B0A00][b]"Atenção":[/b][/color][b]{time_c}[/b] [size=18]H/M[/size] para desmarcar apos agendamento!'
+
             # variable to show the first schedule if it is scheduled, is implemented in "for range", I do this to display the correct schedule table
             # variável para mostrar o primeiro agendamento se for agendado, está implementado no "for range", Eu faço isso para exibir a tabela de agendamento correta
             ranger_init = 0
@@ -1777,6 +1837,20 @@ class ViewSchedule(Screen):
             while entrada[:2] < saida[:2]:
                 for num, agenda in enumerate(lista_info):
                     ranger_init = 0
+
+                    # In field email and cpf if not go manager then givin an error of keyError:
+                    # In the e-mail and cpf field if it is not a manager then it gives a keyError error: ## traduzido
+                    # No campo e-mail e cpf se não for gerenciador então dá erro de keyError:
+                    try:
+                        email = lista_info[num]['email']
+                    except:
+                        email = ''
+
+                    try:
+                        cpf = lista_info[num]['cpf']
+                    except:
+                        cpf = ''
+
                     try:
                         if entrada[:2] == lista_info[num]['id_horas'][:2]:
                             for mim in range(ranger_init, ranger_last):
@@ -1819,7 +1893,9 @@ class ViewSchedule(Screen):
                                     if user_id == lista_info[0]['id_user'] or user_id == id_secont:
                                         # Insert table #####################################################################################
                                         table = TableInfo(str(cont), lista_info[0]['id_user'], entrada,
-                                                              f'{soma_horas.strftime("%H:%M")}', lista_info[num]['tempo'], lista_info[num]['nome'])
+                                                              f'{soma_horas.strftime("%H:%M")}', lista_info[num]['tempo'], lista_info[num]['nome'], str(email), str(cpf))
+                                        table.msg = f'[color=#6B0A00][b]"Atenção":[/b][/color] Você tem {data_hall[id_manager]["time_cancel"]} minutos para desmarcar apos agendamento!'
+                                        # print(table)
                                         self.ids.grid_shedule.add_widget(table)
                                         entrada = soma_horas.strftime('%H:%M')
                                         block = True
@@ -1832,7 +1908,8 @@ class ViewSchedule(Screen):
                                         break
                                     else:
                                         table = Table_shedule(str(cont), lista_info[num]['id_user'], entrada,
-                                                              f'{soma_horas.strftime("%H:%M")}', lista_info[num]['tempo'], lista_info[num]['nome'])
+                                                              f'{soma_horas.strftime("%H:%M")}', lista_info[num]['tempo'], str(time_cancel), lista_info[num]['nome'], str(email), str(cpf))
+                                        table.msg = f'[color=#6B0A00][b]"Atenção":[/b][/color] Você tem {data_hall[id_manager]["time_cancel"]} minutos para desmarcar apos agendamento!'
                                         self.ids.grid_shedule.add_widget(table)
                                         list_content.append(entrada)
                                         entrada = soma_horas.strftime('%H:%M')
@@ -1843,6 +1920,7 @@ class ViewSchedule(Screen):
                                         cont += 1
                                         break
 
+                                # To not give error, of disappear the scheduling previous
                                 # para não dá erro, de sumir o agendamento anterior
                                 elif str(int(mim) + 1).zfill(2) == tempo[3:] and soma_future.strftime('%H:%M') <= lista_info[0]['id_horas'] :
                                     table = TableEnpty(str(cont), '', entrada, f'', '')
@@ -1854,6 +1932,7 @@ class ViewSchedule(Screen):
                                     cont += 1
                     except:
                         print('Deu algum erro na função actualizar da class "ViewSchedule"')
+
                 # except:
                 #     print('Deu algum erro na função actualizar da class "ViewSchedule"')
 
@@ -1906,7 +1985,7 @@ class ViewSchedule(Screen):
             toast('Você não esta conectado a internet!')
         except:
             toast('Nenhuma Horário para hoje!')
-            raise
+
 
         # Clock.schedule_once(self.loop_actualizar, 3)
 
@@ -1925,52 +2004,60 @@ class ViewSchedule(Screen):
 
         Clock.schedule_once(refresh_callback, 1)
 
-    def popup_mark_off(self,id_button, id_schedule, hours, hours_second, time, client, *args, **kwargs):
+    def popup_mark_off(self, id_button, id_schedule, hours, hours_second, time, client, email, cpf, *args, **kwargs):
 
-        id_user = ''
-        with open('write_id_manager.json', 'r') as file:
-            id_user = json.load(file)
+        try:
+            id_user = ''
+            with open('write_id_manager.json', 'r') as file:
+                id_user = json.load(file)
 
-        box = MDBoxLayout(orientation='vertical')
-        box_button = MDBoxLayout(padding=5,spacing=5)
+            box = MDBoxLayout(orientation='vertical')
+            box_button = MDBoxLayout(padding=5,spacing=5)
 
-        img = Image(source='images/atencao.png')
+            img = Image(source='images/atencao.png')
 
-        bt_sim = Button(text='Sim',background_color=(0,1,1,1),color=(1,0,0,.8), size_hint=(1,None),height='40dp')
-        bt_nao = Button(text='Não',background_color=(0,1,1,1),color=(0,0,0,1),size_hint=(1,None),height='40dp')
-        bt_view = Button(text='View',background_color=(0,1,1,1),color=(0,0,0,1),size_hint=(1,None),height='40dp')
+            bt_sim = Button(text='Sim',background_color=(0,1,1,1),color=(1,0,0,.8), size_hint=(1,None),height='40dp')
+            bt_nao = Button(text='Não',background_color=(0,1,1,1),color=(0,0,0,1),size_hint=(1,None),height='40dp')
+            bt_view = Button(text='View',background_color=(0,1,1,1),color=(0,0,0,1),size_hint=(1,None),height='40dp')
 
-        box_button.add_widget((bt_sim))
-        box_button.add_widget((bt_nao))
-        box_button.add_widget((bt_view))
+            box_button.add_widget((bt_sim))
+            box_button.add_widget((bt_nao))
+            box_button.add_widget((bt_view))
 
-        box.add_widget((img))
-        box.add_widget((box_button))
+            box.add_widget((img))
+            box.add_widget((box_button))
 
-        self.popup  = Popup(title='Deseja cancelar o agendamento?',
-                       size_hint=(.8,None), height='200dp',content=box)
+            self.popup  = Popup(title='Deseja cancelar o agendamento?',
+                           size_hint=(.8,None), height='200dp',content=box)
 
-        bt_sim.bind(on_release = partial(self.cancel_schedule, id_schedule))
-        bt_sim.bind(on_press = partial(self.load_widget))
-        bt_nao.bind(on_release = self.popup.dismiss)
-        bt_view.bind(on_release = partial(self.inf_schedule_client, id_button, id_schedule, hours, hours_second, time, client))
-        self.popup.open()
+            bt_sim.bind(on_release = partial(self.cancel_schedule, id_schedule))
+            bt_sim.bind(on_press = partial(self.load_widget))
+            bt_nao.bind(on_release = self.popup.dismiss)
+            bt_view.bind(on_release = partial(self.wait_inf_schedule_client, id_button, id_schedule, hours, hours_second, time, client, email, cpf))
+            self.popup.open()
+        except:
+            pass
 
     def load_widget(self, *args, **kwargs):
-        self.box_dialog = MDDialog()
-        spiner = MDSpinner(active=True, size_hint=(None,None), size=('56dp','56dp'), pos_hint=({'center_x':.5,'center_y':.5}))
 
-        self.box_dialog.add_widget(spiner)
-        # self.parent.parent.add_widget(self.boxlayout)
-        self.box_dialog.open()
+        # The "md_label" not show!
+        try:
+            md_label = MDLabel(text='Carregando...', color=(1, 1, 1, 1))
+            spiner = MDSpinner(active=True, size_hint=(None, None), size=('56dp', '56dp'),
+                               pos_hint=({'center_x': .5, 'center_y': .5}))
+            self.box_dialog = MDDialog(buttons=[md_label])
+
+            self.box_dialog.add_widget(spiner)
+            # self.parent.parent.add_widget(self.boxlayout)
+            self.box_dialog.open()
+        except:
+            pass
 
     def cancel_schedule(self, id_user, *args, **kwargs):
 
         data_hall = self.get_data_hall()
 
         # eval_data_hall = eval(data_hall)
-
-
         # print(data_hall[id_user]['agenda_do_salao'])
 
         try:
@@ -2011,7 +2098,6 @@ class ViewSchedule(Screen):
         soma = delta + id_hours
 
         return soma.strftime('%H:%M')
-
 
     def wait_blocked_schedule(self,id_button, id_schedule, hours, hours_second, client, *args):
         """
@@ -2169,8 +2255,12 @@ class ViewSchedule(Screen):
                 requisicao_client = requests.patch(link_cliente, data=info)
             else:
                 pass
+
             self.actualizar()
-            Clock.schedule_once(self.box_dialog.dismiss,2)
+            try:
+                Clock.schedule_once(self.box_dialog.dismiss, 2)
+            except:
+                pass
         except requests.exceptions.ConnectionError:
             toast('Você não esta conectado a internet!')
 
@@ -2189,7 +2279,11 @@ class ViewSchedule(Screen):
             json.dump(hours_dic, arquivo, indent=2)
         MDApp.get_running_app().root.current = 'hoursschedule'
 
-    def inf_schedule_client(self,id_button, id_schedule, hours, hours_second, time, client, *args):
+    def wait_inf_schedule_client(self, id_button, id_schedule, hours, hours_second, time, client, email, cpf, *args):
+        self.load_widget()
+        Clock.schedule_once(partial(self.inf_schedule_client, id_button, id_schedule, hours, hours_second, time, client, email, cpf, *args))
+
+    def inf_schedule_client(self,id_button, id_schedule, hours, hours_second, time, client, email, cpf, *args, **kwargs):
         dic_info = {}
 
         dic_info['id_button'] = id_button
@@ -2198,6 +2292,13 @@ class ViewSchedule(Screen):
         dic_info['hours_second'] = hours_second
         dic_info['time'] = time
         dic_info['client'] = client
+        dic_info['email'] = email
+        dic_info['cpf'] = str(cpf)
+
+        print(email)
+        print(cpf)
+
+        print(dic_info)
 
         with open('infoscheduleclient.json', 'w') as file:
             json.dump(dic_info, file, indent=2)
@@ -2206,6 +2307,11 @@ class ViewSchedule(Screen):
 
         try:
             self.popup.dismiss()
+        except:
+            pass
+
+        try:
+            Clock.schedule_once(self.box_dialog.dismiss, 3)
         except:
             pass
 
@@ -2705,10 +2811,10 @@ class InfoScheduleClient(Screen):
         self.day_actual = datetime.today().isoweekday()
 
     def on_pre_enter(self):
-        Window.unbind(on_keyboard=self.preview)
+        Window.bind(on_keyboard=self.preview)
         self.inf_schedule_client()
 
-    def preview(self,windows,kye, *args):
+    def preview(self,windows,key, *args):
         if key == 27:
             MDApp.get_running_app().root.current = 'viewshedule'
         return True
@@ -2717,7 +2823,6 @@ class InfoScheduleClient(Screen):
         Window.unbind(on_keyboard=self.preview)
         self.ids.img_block.source = ''
         self.ids.label_block.text = ''
-
 
     def id_manager(self):
 
@@ -2737,11 +2842,14 @@ class InfoScheduleClient(Screen):
             info_schedule = json.load(file)
 
         id_client = info_schedule['id_schedule']
+        cpf = info_schedule['cpf']
 
         self.ids.nome.text = f'[size=20][color=#9B9894]Nome[/color][/size]\n[color=#6B0A00]{info_schedule["client"]}[/color]'
-        self.ids.hours.text = f'[b]Agendado as[/b] [color=#6B0A00]{info_schedule["hours"]}[/color] [size=20]hs[/size]'
-        self.ids.hours_second.text = f'[b]Termino do serviço[/b] [color=#6B0A00]{info_schedule["hours_second"]}[/color] [size=20]hs[/size]'
-        self.ids.time.text = f'[b]Tempo de serviço[/b] [color=#6B0A00]{info_schedule["time"]}[/color] [size=20]hs[/size]'
+        self.ids.hours.text = f'[b]Agendado as[/b] [color=#6B0A00]{info_schedule["hours"]}[/color] hs'
+        self.ids.hours_second.text = f'[b]Termino do serviço[/b] [color=#6B0A00]{info_schedule["hours_second"]}[/color] hs'
+        self.ids.time.text = f'[b]Tempo de serviço[/b] [color=#6B0A00]{info_schedule["time"]}[/color] hs'
+        self.ids.email.text = str(info_schedule['email'])
+        self.ids.cpf.text = f'{cpf[:3]}.{cpf[3:6]}.{cpf[6:9]}-{cpf[9:]}'
 
         self.work(id_client)
         self.info_cliente_and_cancel(id_client)
@@ -2801,7 +2909,6 @@ class InfoScheduleClient(Screen):
 
         except:
             pass
-
 
     def client_missed(self):
 
@@ -2887,7 +2994,6 @@ class InfoScheduleClient(Screen):
         self.ids.img_block.source = ''
         self.ids.label_block.text = ''
 
-
     def work(self, id_client):
         self.ids.box_work.clear_widgets()
 
@@ -2928,8 +3034,6 @@ class InfoScheduleClient(Screen):
             pass
 
         self.ids.id_valor.text = str(valor).replace('.',',') + ' [size=15][b]R$[/b][/size]'
-
-
 
     def nada_pass(selfm, *args):
         """

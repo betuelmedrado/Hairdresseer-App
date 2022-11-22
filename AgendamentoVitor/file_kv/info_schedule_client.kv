@@ -5,7 +5,7 @@
         orientation:'vertical'
         MDTopAppBar:
             title:'Informações do agendamento'
-            elevation:'10dp'
+#            elevation:'10dp'
             left_action_items:[['arrow-left',lambda x:root.return_schedule()]]
         MDBoxLayout:
             orientation:'vertical'
@@ -20,8 +20,8 @@
                     spacing:'20dp'
 
                     MDBoxLayout:
-                        size_hint:None,None
-                        width:'360dp'
+                        size_hint:.80,None
+#                        width:'360dp'
                         height:'360dp'
                         pos_hint:{'center_x':.5}
                 # faixa of quant
@@ -40,7 +40,7 @@
     #                        height:'260dp'
                             radius:0,10,10,0
 #                            padding:('15dp','15dp',0,0)
-                            elevation:8
+#                            elevation:8
                             pos_hint:{'center_x':.5}
                             MDLabel:
                                 size_hint_y:None
@@ -68,8 +68,8 @@
                                         id:label_block
                                 MDCard:
                                     orientation:'vertical'
-                                    size_hint_x:None
-                                    width:'100dp'
+                                    size_hint_x:.30
+#                                    width:'100dp'
 #                                    height:'45dp'
                                     pos_hint:{'x':.6}
                                     radius:7,7,7,7
@@ -132,7 +132,7 @@
                                     MDLabel:
                                         size_hint_y:None
                                         height:'15sp'
-                                        text:'123212323-2'
+                                        id:cpf
                                 MDLabel:
                                     size_hint_y:None
                                     height:'25sp'
@@ -148,14 +148,14 @@
                                     MDLabel:
                                         size_hint_y:None
                                         height:'15sp'
-                                        text:'www.email@gmail.com'
+                                        id:email
                     MDCard:
                         orientation:'vertical'
-                        size_hint:None,None
-                        width:'360dp'
+                        size_hint:.80,None
+#                        width:'360dp'
                         height:'200dp'
                         radius:10,10,10,10
-                        elevation:8
+#                        elevation:8
                         pos_hint:{'center_x':.5}
                         MDLabel:
                             size_hint_y:None

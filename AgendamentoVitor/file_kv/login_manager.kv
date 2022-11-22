@@ -35,23 +35,32 @@
                 font_size:'15dp'
                 text:'Senha'
                 color:1,1,1,.4
-            MDTextFieldRect:
+            MDBoxLayout:
                 size_hint_y:None
                 height:'40dp'
-                font_size:'18sp'
-                multiline:False
-                bold:True
-                hint_text:'******'
-                foreground_color:0,1,1,1
-                password:True
-                id:senha
+                MDTextFieldRect:
+                    font_size:'30sp'
+                    multiline:False
+#                    bold:True
+                    hint_text:'********'
+                    foreground_color:0,1,1,1
+                    password:True
+                    id:senha
+                FloatLayout:
+                    size_hint_x:None
+                    width:0
+                    MDIconButton:
+                        icon:'eye-off'
+                        pos_hint:{'right':.8, 'center_y':.5}
+                        id:eye
+                        on_release:root.password_view(senha)
             Widget:
                 size_hint_y:None
                 height:'15dp'
             Label:
                 font_size:'25dp'
-                text:'Faça o seu cadastro'
                 markup:True
+                text:'Logar com [color=#2E2E2E]e-mail e senha[/color]'
                 color:1,1,1,1
                 id:warning
         MDCard:
@@ -59,6 +68,9 @@
             size_hint:.8,None
             height:'60sp'
             pos_hint:{'center_x':.5,'center_y':.32}
+            focus_behavior:True
+            focus_color:0.23, 0.69, 1,1
+            unfocus_color:0.13, 0.59, 0.95,1
             md_bg_color:0.13, 0.59, 0.95,1
             radius:'20dp','5dp','20dp','5dp'
             padding:'10dp'
@@ -79,7 +91,10 @@
             height:'60sp'
             pos_hint:{'center_x':.5,'center_y':.2}
             ripple_behavior:True
-            md_bg_color:0.16, 0.50, 0.73,1
+            focus_behavior:True
+            unfocus_color:0.16, 0.50, 0.73,.2
+            focus_color:0.16, 0.50, 0.73,1
+            md_bg_color:0.16, 0.50, 0.73,.2
             radius:'20dp','5dp','20dp','5dp'
             padding:'10sp'
             on_release:app.root.current = 'creatprofile'

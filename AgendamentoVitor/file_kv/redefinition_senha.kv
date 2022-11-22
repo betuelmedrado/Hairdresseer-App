@@ -11,7 +11,7 @@
         spacing:'20dp'
         MDTopAppBar:
             title:'Redefinir senha!'
-            elevation:9
+            elevation:2
             left_action_items:[['arrow-left',lambda x: root.return_login()]]
         Widget:
             size_hint_y:.1
@@ -44,6 +44,9 @@
             height:'60sp'
             pos_hint:{'center_x':.5}
             ripple_behavior:True
+            focus_behavior:True
+            focus_color:0.16, 0.50, 0.73,1
+            unfocus_color:0.16, 0.50, 0.73,.2
             md_bg_color:0.16, 0.50, 0.73,1
             radius:20,5,20,5
             padding:'10sp'

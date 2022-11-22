@@ -72,6 +72,10 @@ class HomePage(Screen):
         else:
             pass
 
+    def exit_app(self, *args):
+        MDApp().stop()
+
+
     def help(self):
 
         help_text = '"Atenção!" antes de fazer seu agendamento certifique-se que ira comparecer ao estábelecimento. ' \
@@ -632,6 +636,7 @@ class Register(Screen):
                 else:
                     self.ids.warning.text = 'Email ou senha [color=D40A00]Invalida[/color]'
                     self.ids.warning2.text = 'Faça o seu cadastro logo abaixo!'
+                    Clock.schedule_once(self.set_msg,6)
             else:
                 erro = str(requisicao_dic['error']['message'])
 
@@ -644,8 +649,15 @@ class Register(Screen):
                     self.ids.warning.text = 'Senha [color=D40A00]Invalido[/color]'
                 elif erro == 'EMAIL_NOT_FOUND':
                     self.ids.warning.text = 'Email não [color=D40A00]Encontrado[/color]\n[size=35]Faça o seu cadastro logo abaixo![/size]'
+                else:
+                    pass
+                Clock.schedule_once(self.set_msg, 6)
         except requests.exceptions.ConnectionError:
             toast('Você não esta conectado a internet!')
+
+    def set_msg(self, *args):
+        self.ids.warning.text = ''
+        self.ids.warning2.text = ''
 
     def password_view(self, msg):
         if msg.password == False:
@@ -1296,6 +1308,14 @@ class ViewSchedule(Screen):
         except:
             toast('Nenhuma agenda para hoje!')
 
+        # # inserting the label opening ou closeup #################################
+        # mdbox = MDBoxLayout(size_hint_y=(None), height='100dp')
+        # text_label = MDLabel(text='ABERTO', halign='center', bold=True)
+        # text_label.color = 1,0,0,1
+        # mdbox.add_widget(text_label)
+        #
+        # self.ids.grid_shedule.add_widget(mdbox)
+
     def refresh_callback(self, *args):
         '''A method that updates the state of your application
         while the spinner remains on the screen.'''
@@ -1480,7 +1500,7 @@ class ViewSchedule(Screen):
         try:
             if self.agenda_marcada:
                 Clock.schedule_once(self.dismiss_dialog, 1)
-                self.dialog_of_mensagen('Você já tem um agendamento marcado aqui para fazer outro agendamento\nCancele o seu agendamento!')
+                self.dialog_of_mensagen('Você já tem um agendamento marcado aqui para fazer outro agendamento Cancele o seu agendamento ou escolha outro proficional!')
             else:
                 link = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{self.user_id}.json'
 
@@ -1881,7 +1901,8 @@ class HoursSchedule(Screen):
             pass
 
     def nada(self,*args):
-        toast('Selecione o tipo de serviço!')
+        # toast('Selecione o tipo de serviço!')
+        pass
 
     def disable_release(self,*args):
         bt = MDFlatButton(text='OK!')
@@ -2563,24 +2584,36 @@ class Perfil(Screen):
     def get_client_data(self):
         is_bloqued = ''
 
-        # try:
-        with open('get_client_data.json','r') as data:
-            data_client = json.load(data)
+        try:
+            self.ids.nome.text = ''
+            self.ids.cpf.text = ''
+            self.ids.email.text = ''
+            self.ids.bloqueio.text = ''
+            self.ids.quant_cancel.text = ''
+        except:
+            pass
 
-        if data_client["bloqueado"] == "False":
-            is_bloqued = 'Não'
-        elif data_client["bloqueado"] == 'True':
-            is_bloqued = 'Bloqueado!'
+        try:
+            with open('get_client_data.json','r') as data:
+                data_client = json.load(data)
 
-        set_cpf = f'{data_client["cpf"][:3]}.{data_client["cpf"][3:6]}.{data_client["cpf"][6:9]}-{data_client["cpf"][9:]}'
+            if data_client["bloqueado"] == "False":
+                is_bloqued = 'Não'
+            elif data_client["bloqueado"] == 'True':
+                is_bloqued = 'Bloqueado!'
 
-        self.ids.nome.text = str(data_client["nome"])
-        self.ids.cpf.text = str(set_cpf)
-        self.ids.email.text = str(data_client["email"])
-        self.ids.bloqueio.text = str(is_bloqued)
-        self.ids.quant_cancel.text = str(data_client["quant_cancelado"])
-        # except:
-        #     pass
+            cpf_client = str(data_client["cpf"])
+
+            # set_cpf = f'{data_client["cpf"][:3]}.{data_client["cpf"][3:6]}.{data_client["cpf"][6:9]}-{data_client["cpf"][9:]}'
+            set_cpf = f'{cpf_client[:3]}.{cpf_client[3:6]}.{cpf_client[6:9]}-{cpf_client[9:]}'
+
+            self.ids.nome.text = str(data_client["nome"])
+            self.ids.cpf.text = str(set_cpf)
+            self.ids.email.text = str(data_client["email"])
+            self.ids.bloqueio.text = str(is_bloqued)
+            self.ids.quant_cancel.text = str(data_client["quant_cancelado"])
+        except:
+            pass
 
 
 class MyCardButton(MDCard):

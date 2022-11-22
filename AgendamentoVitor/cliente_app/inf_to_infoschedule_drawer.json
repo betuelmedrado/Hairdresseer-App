@@ -1,16 +1,1 @@
-[
-  {
-    "date": "18/11/2022",
-    "id_button": "3",
-    "nome_barbeiro": "betuel2",
-    "id_schedule": "4mukcmq0Zyec59iP9Bj4ZGGv67t1",
-    "hours": "09:30",
-    "client": "Seu agendamento!",
-    "hours_second": "11:00",
-    "hours_of_schedule": "20:37",
-    "time": "01:30",
-    "id_proficional": "{'nome': 'betuel2', 'manager': 'True', 'id_user': 'ysha0Hsx0nXrZRBRwDeLL5Bhe422'}",
-    "cpf": "31077928882",
-    "email": "joao@gmail.com"
-  }
-]
+[]

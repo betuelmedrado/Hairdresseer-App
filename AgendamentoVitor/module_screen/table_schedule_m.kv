@@ -6,9 +6,12 @@
     hours:''
     hours_second:''
     time:''
+    time_cancel:''
     client:''
+    email:''
+    cpf:''
     size_hint_y:None
-    height:'100dp'
+    height:'140dp'
 
     MDCard:
         orientation:'vertical'
@@ -16,7 +19,7 @@
         md_bg_color:1,1,1,.3
         radius:7,7,7,7
         id:card
-        on_release: app.root.get_screen('viewshedule').inf_schedule_client(root.id_button, root.id_schedule, root.hours, root.hours_second, root.time, root.client)
+        on_release: app.root.get_screen('viewshedule').wait_inf_schedule_client(root.id_button, root.id_schedule, root.hours, root.hours_second, root.time, root.client, root.email, root.cpf)
         MDBoxLayout:
             MDBoxLayout:
                 orientation:'vertical'
@@ -53,8 +56,8 @@
                     pos_hint:{'center_x':.3,'center_y':.8}
                     text:root.client
                 Label:
-                    font_size:'10dp'
-                    color:0,0,0,.7
+#                    font_size:'10dp'
+                    color:1,1,1,1
                     bold:True
                     pos_hint:{'center_x':.9,'center_y':.9}
                     text:root.time
@@ -65,7 +68,7 @@
             color:0,0,0,1
             halign:'center'
             markup:True
-            text:'[color=#6B0A00][b]"Atenção":[/b][/color] Você tem 15 minutos para desmarcar apos agendamento!'
+            text:root.time_cancel
 
 <TableEnpty>:
     id_button:''
@@ -74,8 +77,9 @@
     hours_second:''
     time:''
     client:''
+    msg:''
     size_hint_y:None
-    height:'100dp'
+    height:'140dp'
 
     MDCard:
         orientation:'vertical'
@@ -111,9 +115,9 @@
                     text:root.hours_second
             FloatLayout:
                 MDBoxLayout:
-                    size_hint_y:None
-                    height:'40dp'
-                    spacing:'10dp'
+                    size_hint:.5,.5
+#                    height:'40dp'
+                    spacing:'40dp'
                     padding:'5dp'
                     pos_hint:{'center_x':.4, 'center_y':.3}
                     MyButtonCard_2:
@@ -133,18 +137,18 @@
                     pos_hint:{'center_x':.4,'center_y':.7}
                     text:root.client
                 Label:
-                    font_size:'10dp'
-                    color:1,0,0,.7
+#                    font_size:'10dp'
+                    color:1,1,1,1
                     pos_hint:{'center_x':.9,'center_y':.9}
                     text:root.time
         MDLabel:
             size_hint_y:None
             height:'13dp'
             font_size:'8dp'
-            color:0,0,0,1
+            color:1,1,1,1
             halign:'center'
             markup:True
-            text:'[color=#6B0A00][b]"Atenção":[/b][/color] Você tem 15 minutos para desmarcar apos agendamento!'
+            text:root.msg
 
 
 
@@ -156,6 +160,9 @@
     hours_2:''
     time:''
     client:''
+    email:''
+    cpf:''
+    msg:''
 
 #    id_button:''
 #    id_schedule:''
@@ -163,7 +170,7 @@
 #    hours_2:''
 #    client:''
     size_hint_y:None
-    height:'100dp'
+    height:'140dp'
     MDCard:
         orientation:'vertical'
         ripple_behavior:True
@@ -171,7 +178,7 @@
         radius:7,7,7,7
         id:card
 #        on_release: app.root.get_screen('viewshedule').popup_mark_off(root.id_button, root.hours)
-        on_release: app.root.get_screen('viewshedule').popup_mark_off(root.id_button, root.id_schedule, root.hours, root.hours_2, root.time, root.client)
+        on_release: app.root.get_screen('viewshedule').popup_mark_off(root.id_button, root.id_schedule, root.hours, root.hours_2, root.time, root.client, root.email, root.cpf)
         MDBoxLayout:
             MDBoxLayout:
                 orientation:'vertical'
@@ -207,11 +214,12 @@
         MDLabel:
             size_hint_y:None
             height:'13dp'
-            font_size:'8dp'
-            color:0,0,0,1
+#            font_size:'8dp'
+            color:1,1,1,1
             halign:'center'
             markup:True
-            text:'[color=#6B0A00][b]"Atenção":[/b][/color] Você tem 15 minutos para desmarcar apos agendamento!'
+#            text:'[color=#6B0A00][b]"Atenção":[/b][/color] Você tem 15 minutos para desmarcar apos agendamento!'
+            text:root.msg
 
 
 <Table_block>:
@@ -221,7 +229,7 @@
     hours_2:''
     client:''
     size_hint_y:None
-    height:'100dp'
+    height:'140dp'
     MDCard:
         ripple_behavior:True
         md_bg_color:.2,0,0,.3

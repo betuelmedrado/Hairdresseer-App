@@ -44,10 +44,10 @@
     MDBoxLayout:
         orientation:'vertical'
         MDTopAppBar:
-            title:'Sejam bem vindos'
+            title:'Salão Barbershop299'
             specific_text_color:0,0,0,1
             left_action_items:[['account-arrow-left-outline', lambda x: root.return_login()]]
-            right_action_items:[['help-circle', lambda x: root.help()], ['menu', lambda x:nav_drawer.set_state('open')]]
+            right_action_items:[['help-circle', lambda x: root.help()], ['exit-to-app', lambda x: root.exit_app()] ,['menu', lambda x:nav_drawer.set_state('open')]]
 
 #        Widget:
 #            size_hint_y:.10
@@ -55,7 +55,7 @@
             size_hint_y:.12
             md_bg_color:0,0,0,.5
             MDLabel:
-                text:'Escolha o proficional de sua preferencia!'
+                text:'Escolha o proficional de sua preferência!'
                 outline_width:1
                 outline_color:0,0,0,1
                 color:0.13, 0.59, 0.95,1
@@ -156,8 +156,8 @@
                         icon:'account'
                         pos_hint:{'center_y':.5}
                     MDLabel:
-                        text:'Perfil'
-                        font_size:'25sp'
+                        text:'  Perfil'
+
                 MDCard:
                     size_hint_y:None
                     height:'60dp'
@@ -172,7 +172,7 @@
                         icon:'information'
                         pos_hint:{'center_y':.5}
                     MDLabel:
-                        text:'informação do agendamento!'
+                        text:'  Informações do agendamento!'
 
                 Widget:
                 MDLabel:
@@ -235,6 +235,7 @@
         size_hint_y:None
         height:'50dp'
         spacing:'20dp'
+        adaptive:True
         orientation:'vertical'
         md_bg_color:1,1,1,.8
         canvas:
@@ -439,5 +440,5 @@
         MDSeparator:
             size_hint_x:.8
             pos_hint:{'center_x':.5}
-        MDBoxLayout:
-            md_bg_color:0.53, 0.54, 0.56, .4
+        Widget:
+
