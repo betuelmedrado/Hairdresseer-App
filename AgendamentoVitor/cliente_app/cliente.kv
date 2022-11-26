@@ -47,7 +47,7 @@
             title:'Salão Barbershop299'
             specific_text_color:0,0,0,1
             left_action_items:[['account-arrow-left-outline', lambda x: root.return_login()]]
-            right_action_items:[['help-circle', lambda x: root.help()], ['exit-to-app', lambda x: root.exit_app()] ,['menu', lambda x:nav_drawer.set_state('open')]]
+            right_action_items:[['help-circle', lambda x: root.help()], ['exit-to-app', lambda x: root.dialog_exit_app()] ,['menu', lambda x:nav_drawer.set_state('open')]]
 
 #        Widget:
 #            size_hint_y:.10
@@ -231,6 +231,7 @@
 #    pos_hint: {'center_x': .5}
 
 <HoursSchedule>:
+    transition:FadeTransition()
     MDBoxLayout:
         size_hint_y:None
         height:'50dp'
@@ -245,28 +246,18 @@
                 size:self.size
                 pos:self.pos
                 source:'images/wallpaper.png'
-        MDCard:
-            size_hint_y:None
-            height:'80dp'
+        MDTopAppBar:
+            id:hours
+            markup:True
             md_bg_color:0.55, 0.57, 0.63,1
-            MDIconButton:
-                icon:'arrow-left'
-                theme_icon_color: "Custom"
-                color:1,0,0,1
-                on_release:app.root.current = 'viewshedule'
-                on_press: app.root.transition = FadeTransition()
-            MDLabel:
-                font_size:'30dp'
-                halign:'center'
-                color:0,0,0,1
-                bold:True
-                id:hours
+            left_action_items:[['arrow-left', lambda x: root.current_transition()]]
+#
         MDBoxLayout:
             size_hint:.7,None
             height:'20dp'
             pos_hint:{'center_x':.5}
             MDLabel:
-                font_size:'25dp'
+                font_size:'22dp'
                 markup:True
                 halign:'center'
                 text:'Selecione os tipos de serviços logo a baixo'
@@ -333,7 +324,7 @@
             MDLabel:
                 size_hint_y:None
                 height:'20dp'
-                font_size:'25sp'
+                font_size:'22sp'
                 bold:True
                 halign:'center'
                 text:'Serviços escolhidos!'

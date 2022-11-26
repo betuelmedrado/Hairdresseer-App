@@ -72,8 +72,21 @@ class HomePage(Screen):
         else:
             pass
 
+    # function to exit the app ###
     def exit_app(self, *args):
         MDApp().stop()
+
+    # Dialog to show the msg to exit the app ###
+    def dialog_exit_app(self, *args, **kwargs):
+
+        bt_sim = MDFlatButton(text='Sair')
+        bt_nao = MDFlatButton(text='Não')
+        dialog = MDDialog(title='Deseja sair do app?', buttons=[bt_sim, bt_nao])
+
+        bt_sim.bind(on_press=self.exit_app)
+        bt_nao.bind(on_press=dialog.dismiss)
+
+        dialog.open()
 
 
     def help(self):
@@ -1126,7 +1139,7 @@ class ViewSchedule(Screen):
             time_c = self.info_manager['time_cancel']
 
             # Time Mensage of cancel ot schedule #############################
-            time_cancel = f'[color=#6B0A00][b]"Atenção":[/b][/color] Você tem [b]{time_c}[/b] [size=13]H/M[/size] para desmarcar apos agendamento!'
+            time_cancel = f'[color=#6B0A00][b]"Atenção":[/b][/color] Você tem [color=#AC0C18][b]{time_c}[/b][/color] [size=13]H/M[/size] para desmarcar apos agendamento!'
 
             # variable to show the first schedule if it is scheduled, is implemented in "for range", I do this to display the correct schedule table
             # variável para mostrar o primeiro agendamento se for agendado, está implementado no "for range", Eu faço isso para exibir a tabela de agendamento correta
@@ -1577,15 +1590,14 @@ class HoursSchedule(Screen):
         self.LINK_SALAO_ID_MANAGER = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager[0]}'
         self.info_manager = self._info_manager()
 
-
     def on_pre_enter(self, *args):
-
         Window.bind(on_keyboard=self.call_back)
 
         try:
             with open('info_schedule.json', 'r') as arquivo:
                 horas = json.load(arquivo)
-            self.ids.hours.text = horas['horas']
+            self.hours = horas['horas']
+            self.ids.hours.title = f"Horário escolhido! [color=#AC0C18][b]{str(horas['horas'])}[/b][/color]"
         except FileNotFoundError:
             pass
 
@@ -1595,6 +1607,9 @@ class HoursSchedule(Screen):
         self.soma_hours_values()
 
         self.valid_button_save()
+
+    def current_transition(self, *args):
+        MDApp.get_running_app().root.current = 'viewshedule'
 
     def call_back(self, windown, key, *args):
         if key == 27:
@@ -1686,7 +1701,7 @@ class HoursSchedule(Screen):
                 except:
                     pass
 
-            # LINK DATA BASE
+                # LINK DATA BASE
                 for num, id_work in enumerate(lista):
 
                     if socio_or_manager:
@@ -1739,7 +1754,7 @@ class HoursSchedule(Screen):
                     my_select = json.load(arquivo)
                     lista = (my_select)
             except:
-               pass
+                pass
 
             lista.append(dic)
 
@@ -1812,7 +1827,7 @@ class HoursSchedule(Screen):
             hours += h
             minute += m
 
-        # here is for the minutes not to exceed 59 ########
+            # here is for the minutes not to exceed 59 ########
             if minute >= 60:
                 minute = minute % 60
                 hours += 1
@@ -1908,13 +1923,13 @@ class HoursSchedule(Screen):
         bt = MDFlatButton(text='OK!')
         dialog = MDDialog(title='"Aviso!"',
                           text='O gendamento excede o horario do proximo agendamento escolha outro horário ou outro barbeiro!',
-                           buttons=[bt])
+                          buttons=[bt])
         bt.bind(on_release=dialog.dismiss)
         dialog.open()
 
     def sum_hours_end_time(self,hours, time, *args):
 
-        id_hours = datetime.strptime(hours,'%H:%M')
+        id_hours = datetime.strptime((hours),'%H:%M')
 
         horas , min = map(int, time.split(':'))
         delta = timedelta(hours=horas, minutes=min)
@@ -1987,7 +2002,7 @@ class HoursSchedule(Screen):
 
         id_user = info_user['id_user']
         nome = self.get_name_user(id_user)
-        horas = self.ids.hours.text
+        horas = self.hours
         tempo = self.ids.time.text
         valor = self.ids.valor.text
         link_info = ''
@@ -2043,8 +2058,8 @@ class HoursSchedule(Screen):
                f'"id_user":"{id_user}",' \
                f'"tempo":"{tempo}",' \
                f'"valor":"{valor}",' \
-               f'"nome":"{nome["nome"]}",'\
-               f'"horas_agendamento": "{horas_hoje}",'\
+               f'"nome":"{nome["nome"]}",' \
+               f'"horas_agendamento": "{horas_hoje}",' \
                f'"servicos":"{list_works}",' \
                f'"cpf":"{cpf}",' \
                f'"email":"{email}"}}'
@@ -2089,8 +2104,8 @@ class HoursSchedule(Screen):
 
                 bt = MDFlatButton(text='OK')
                 dialog2 = MDDialog(title='"Aviso!"',
-                                  text=f'Agendamento Marcado! Você tem {time[0]}{time[1]} para cancelar!',
-                                  radius=[20, 7, 20, 7], buttons=[bt])
+                                   text=f'Agendamento Marcado! Você tem {time[0]}{time[1]} para cancelar!',
+                                   radius=[20, 7, 20, 7], buttons=[bt])
 
                 bt.bind(on_release=dialog2.dismiss)
                 dialog2.open()
@@ -2127,7 +2142,7 @@ class HoursSchedule(Screen):
         # else:
         #     pass
 
-    # Clearing file "select_work" after of save ########################################################################
+        # Clearing file "select_work" after of save ########################################################################
         with open('select_works.json','w') as file:
             json.dump([], file)
         MDApp.get_running_app().root.current = 'viewshedule'
