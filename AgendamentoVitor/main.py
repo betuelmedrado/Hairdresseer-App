@@ -46,6 +46,7 @@ from datetime import datetime, timedelta
 # Window.size = 400,820
 Window.size = 800,800
 Window.minimum_width = 800
+Window.max_width = 800
 Window.minimum_height = 800
 
 

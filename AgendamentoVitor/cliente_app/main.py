@@ -2576,7 +2576,18 @@ class Perfil(Screen):
         super().__init__(**kwargs)
 
     def on_pre_enter(self, *args):
+
+        Window.bind(on_keyboard=self.get_return_home)
+
         self.get_client_data()
+
+    def get_return_home(self, windown, key, *args):
+
+        if key == 27:
+            self.return_home()
+        else:
+            pass
+        return True
 
     def return_home(self):
         MDApp.get_running_app().root.current = 'homepage'
