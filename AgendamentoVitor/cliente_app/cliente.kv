@@ -156,7 +156,7 @@
                         icon:'account'
                         pos_hint:{'center_y':.5}
                     MDLabel:
-                        text:'  Perfil'
+                        text:'Perfil'
 
                 MDCard:
                     size_hint_y:None
@@ -172,7 +172,7 @@
                         icon:'information'
                         pos_hint:{'center_y':.5}
                     MDLabel:
-                        text:'  Informações do agendamento!'
+                        text:'Informações do agendamento!'
 
                 Widget:
                 MDLabel:
@@ -200,6 +200,7 @@
         orientation:'vertical'
         MDTopAppBar:
 #            elevation:10
+            markup:True
             id:title_toobar
             left_action_items:[['arrow-left-bold', lambda x: root.return_homepage()]]
             right_action_items:[['refresh',lambda x: root.actualizar()]]
@@ -233,8 +234,6 @@
 <HoursSchedule>:
     transition:FadeTransition()
     MDBoxLayout:
-        size_hint_y:None
-        height:'50dp'
         spacing:'20dp'
         adaptive:True
         orientation:'vertical'
@@ -268,8 +267,8 @@
             size_hint_x:.8
             pos_hint:{'center_x':.5}
         MDCard:
-            size_hint:.8,None
-            height:'240dp'
+            size_hint:.8,root.height
+#            height:'240dp'
 #                md_bg_color:0.78, 0.80, 0.83,1
             md_bg_color:0.55, 0.57, 0.63,1
             radius:8,8,8,8
@@ -318,8 +317,8 @@
 
         MDBoxLayout:
             orientation:'vertical'
-            size_hint:.8,None
-            height:'200dp'
+            size_hint:.8,root.height
+#            height:'200dp'
             pos_hint:{'center_x':.5}
             MDLabel:
                 size_hint_y:None
@@ -428,8 +427,8 @@
                     font_size:'25sp'
                     bold:True
                     halign:'center'
-        MDSeparator:
-            size_hint_x:.8
-            pos_hint:{'center_x':.5}
+#        MDSeparator:
+#            size_hint_x:.8
+#            pos_hint:{'center_x':.5}
         Widget:
 

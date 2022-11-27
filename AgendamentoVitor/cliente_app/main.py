@@ -1061,7 +1061,7 @@ class ViewSchedule(Screen):
                 requisicao_dic = requisicao.json()
 
                 nome = requisicao_dic['nome']
-                self.ids.title_toobar.title = f'Agenda {str(nome)}'
+                self.ids.title_toobar.title = f'Agenda [color=#2E2E2E]{str(nome)}[/color]'
 
                 self.entrada = requisicao_dic[f'{self.dia_atual}']['entrada']
 
@@ -1087,7 +1087,7 @@ class ViewSchedule(Screen):
                 requisicao_dic = requisicao.json()
 
                 nome = requisicao_dic['nome']
-                self.ids.title_toobar.title = f'Agenda {str(nome)}'
+                self.ids.title_toobar.title = f'Agenda [color=#2E2E2E]{str(nome)}[/color]'
 
                 self.entrada = requisicao_dic[f'{self.dia_atual}']['entrada']
 
@@ -1922,7 +1922,7 @@ class HoursSchedule(Screen):
     def disable_release(self,*args):
         bt = MDFlatButton(text='OK!')
         dialog = MDDialog(title='"Aviso!"',
-                          text='O gendamento excede o horario do proximo agendamento escolha outro horário ou outro barbeiro!',
+                          text='O agendamento excede o horário do proximo agendamento escolha outro horário ou outro barbeiro!',
                           buttons=[bt])
         bt.bind(on_release=dialog.dismiss)
         dialog.open()
