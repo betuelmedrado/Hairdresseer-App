@@ -366,7 +366,7 @@ class HomePage(Screen):
     def return_login(self):
 
         # excluding refreshToken to not entry automatic in home page
-        with open('refreshtoken.json','w') as arquivo:
+        with open('refreshtoken.json', 'w') as arquivo:
             json.dump('',arquivo)
         MDApp.get_running_app().root.current = 'register'
 
@@ -451,13 +451,6 @@ class Register(Screen):
 #     Clock.schedule_once(self.log_aut,1)
 
     def info_msg_user(self, *args):
-        # with open('info_user.json', 'r') as file:
-        #     id_user = json.load(file)
-        #
-        # link = f'{self.link}/client/{id_user["id_user"]}.json'
-        #
-        # requisicao = requests.get(link)
-        # requisicao_dic = requisicao.json()
 
         try:
             with open('msg_to_app.json', 'r') as file_msg:
@@ -491,9 +484,20 @@ class Register(Screen):
         try:
             msg = requisicao_dic['msg_client']
 
+            # Here I will go change the app link msg ####
             if int(info_msg_user['valid']) < int(msg['valid']):
-                # with open('msg_to_app.json','w',encoding='utf-8') as file:
-                #     json.dump(msg, file, indent=2)
+
+                # geting the msg of app to change the link ###
+                with open('msg_to_app.json','r',encoding='utf-8') as file:
+                    msg_to_app = json.load(file)
+
+                # change the link ###
+                msg_to_app['link'] = msg['link']
+                msg_to_app['msg_actualiza'] = msg['msg_actualiza']
+
+                # wrinting link in file msg_to_app ###
+                with open('msg_to_app.json', 'w', encoding='utf-8') as writ_file:
+                    json.dump(msg_to_app, writ_file, indent=2)
 
                 self.show_msg_to_app()
             else:
@@ -753,7 +757,7 @@ class CreatBill(Screen):
         try:
             LINK_FIREBASE = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{localid}.json'
 
-            with open('refreshtoken.json','w') as arquivo:
+            with open('refreshtoken.json', 'w') as arquivo:
                 json.dump(refreshtoken, arquivo)
 
             nome = self.ids.nome.text
@@ -1366,8 +1370,8 @@ class ViewSchedule(Screen):
         img = Image(source='images/atencao.png')
 
         bt_sim = Button(text='Sim',background_color=(0,1,1,1),color=(1,0,0,.8), size_hint=(1,None),height='40dp')
-        bt_view = Button(text='View',background_color=(0,1,1,1),color=(0,0,0,1),size_hint=(1,None),height='40dp')
-        bt_nao = Button(text='Sair',background_color=(0,1,1,1),color=(0,0,0,1),size_hint=(1,None),height='40dp')
+        bt_view = Button(text='Ver/Agenda',background_color=(0,1,1,1),color=(0,0,0,1),size_hint=(1,None),height='40dp')
+        bt_nao = Button(text='Fechar',background_color=(0,1,1,1),color=(0,0,0,1),size_hint=(1,None),height='40dp')
 
         box_button.add_widget((bt_sim))
         box_button.add_widget((bt_view))
@@ -2436,7 +2440,7 @@ class InfoScheduleClient(Screen):
                     self.ids.box_work.add_widget(myboxcategorie)
             except TypeError:
                 pass
-
+            valor = round(valor, 2)
             self.ids.id_valor.text = str(valor).replace('.',',') + ' [size=15][b]R$[/b][/size]'
         except requests.exceptions.ConnectionError:
             toast('Você não esta conectado a internet!')
@@ -2717,7 +2721,6 @@ class MsgToApp(Screen):
             msg = json.load(file)
 
         link = msg['link']
-
         soma_msg = msg['valid']
         soma_msg += 1
 
