@@ -50,6 +50,13 @@ class HomePage(Screen):
 
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
+
+        # week day ==================
+        self.day = datetime.today().day
+        self.month = datetime.today().month
+        self.year = datetime.today().year
+        self.date = f'{str(self.day).zfill(2)}/{str(self.month).zfill(2)}/{self.year}'
+
         self.day_semana = datetime.today().isoweekday()
 
         # Creating the files go then open app
@@ -87,7 +94,6 @@ class HomePage(Screen):
         bt_nao.bind(on_press=dialog.dismiss)
 
         dialog.open()
-
 
     def help(self):
 
@@ -150,6 +156,13 @@ class HomePage(Screen):
                 json.dump(load, load_home, indent=2)
         else:
             pass
+
+        try:
+            Clock.schedule_once(self.box_dialog.dismiss, 2)
+        except:
+            pass
+
+
         return True
 
 
@@ -282,6 +295,8 @@ class HomePage(Screen):
                 pass
         except requests.exceptions.ConnectionError:
             toast('Você não esta conectado a internet!')
+        except:
+            pass
 
     def get_id_socios(self, *args):
 
@@ -384,7 +399,11 @@ class HomePage(Screen):
             requisicao_dic = requisicao.json()
 
             for id in requisicao_dic:
-                list_of_id.append(id)
+
+                if requisicao_dic[id]['data'] == self.date:
+                    list_of_id.append(id)
+                else:
+                    pass
 
             if id_user['id_user'] in list_of_id:
                 return True
@@ -413,13 +432,16 @@ class HomePage(Screen):
                 requisicao = requests.get(LINK)
                 requisicao_dic = requisicao.json()
 
-
                 try:
                     for id in requisicao_dic:
                         # list_of_id.append(id)
                         if id_user['id_user'] == id:
-                            list_of_id.append(True)
-                            break
+
+                            if requisicao_dic[id]['data'] == self.date:
+                                list_of_id.append(True)
+                                break
+                            else:
+                                pass
                         else:
                             pass
                             # list_of_id.append(False)
@@ -957,6 +979,12 @@ class ViewSchedule(Screen):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
 
+        self.day = datetime.today().day
+        self.month = datetime.today().month
+        self.year = datetime.today().year
+        self.date = f'{str(self.day).zfill(2)}/{str(self.month).zfill(2)}/{self.year}'
+
+
         # Geting day actual ##########################################################################
         self.dia_atual = datetime.today().isoweekday()
 
@@ -1055,6 +1083,8 @@ class ViewSchedule(Screen):
         id_manager = self.get_id_proficional()
         lista_info = []
         lista_requisicao = []
+        msg_close = ''
+        msg_title = ''
 
         try:
             # information socio ############################################################################################
@@ -1065,7 +1095,13 @@ class ViewSchedule(Screen):
                 requisicao_dic = requisicao.json()
 
                 nome = requisicao_dic['nome']
-                self.ids.title_toobar.title = f'Agenda [color=#2E2E2E]{str(nome)}[/color]'
+
+                msg_title = f'Agenda [color=#2E2E2E]{str(nome)}[/color]'
+
+                if requisicao_dic[f'{self.dia_atual}']['fechado'] == "True":
+                    msg_title = f'[color=#2E2E2E]{str(nome)}[/color]  [color=#AC0C18]"AUSENTE"![/color]'
+
+                self.ids.title_toobar.title = str(msg_title)
 
                 self.entrada = requisicao_dic[f'{self.dia_atual}']['entrada']
 
@@ -1073,17 +1109,28 @@ class ViewSchedule(Screen):
 
                 self.space_temp = requisicao_dic[f'{self.dia_atual}']['space_temp']
 
-                try:
-                    # Estes "FOR" é porque esta dando erro as vêzes quer "self.dia_atual" STR ou INT #######################
+                if requisicao_dic[f'{self.dia_atual}']['fechado'] == "True":
+                    pass
+                else:
                     try:
-                        for id_agenda in requisicao_dic['agenda'][int(self.dia_atual)]:
-                            lista_info.append(requisicao_dic['agenda'][int(self.dia_atual)][id_agenda])
+                        # Estes "FOR" é porque esta dando erro as vêzes quer "self.dia_atual" STR ou INT #######################
+                        try:
+                            for id_agenda in requisicao_dic['agenda'][int(self.dia_atual)]:
+
+                                if requisicao_dic['agenda'][int(self.dia_atual)][id_agenda]['data'] == self.date:
+                                    lista_info.append(requisicao_dic['agenda'][int(self.dia_atual)][id_agenda])
+                                else:
+                                    pass
+                        except:
+                            for id_agenda in requisicao_dic['agenda'][str(self.dia_atual)]:
+
+                                if requisicao_dic['agenda'][str(self.dia_atual)][id_agenda]['data'] == self.date:
+                                    lista_info.append(requisicao_dic['agenda'][str(self.dia_atual)][id_agenda])
+                                else:
+                                    pass
+                        return lista_info
                     except:
-                        for id_agenda in requisicao_dic['agenda'][str(self.dia_atual)]:
-                            lista_info.append(requisicao_dic['agenda'][str(self.dia_atual)][id_agenda])
-                    return lista_info
-                except:
-                    return lista_info
+                        return lista_info
 
             elif id_manager["manager"] == 'True':
                 # Here to geting the id of manager to get schedule #######################################
@@ -1091,7 +1138,12 @@ class ViewSchedule(Screen):
                 requisicao_dic = requisicao.json()
 
                 nome = requisicao_dic['nome']
-                self.ids.title_toobar.title = f'Agenda [color=#2E2E2E]{str(nome)}[/color]'
+                msg_title = f'Agenda [color=#2E2E2E]{str(nome)}[/color]'
+
+                if requisicao_dic[f'{self.dia_atual}']['fechado'] == "True":
+                    msg_title = f'[color=#2E2E2E]{str(nome)}[/color]  [color=#AC0C18]"AUSENTE"![/color]'
+
+                self.ids.title_toobar.title = str(msg_title)
 
                 self.entrada = requisicao_dic[f'{self.dia_atual}']['entrada']
 
@@ -1102,18 +1154,29 @@ class ViewSchedule(Screen):
                 # print(requisicao_dic['agenda'][self.dia_atual])
 
                 # Here get the ids of schedule client ######################################################################
-                try:
-                    # Estes "FOR" é porque esta dando erro as vêzes quer "self.dia_atual" STR ou INT #######################
+                if requisicao_dic[f'{self.dia_atual}']['fechado'] == "True":
+                    pass
+                else:
                     try:
-                        for id_agenda in requisicao_dic['agenda'][int(self.dia_atual)]:
-                            lista_info.append(requisicao_dic['agenda'][int(self.dia_atual)][id_agenda])
-                    except:
-                        for id_agenda in requisicao_dic['agenda'][str(self.dia_atual)]:
-                            lista_info.append(requisicao_dic['agenda'][str(self.dia_atual)][id_agenda])
-                    return lista_info
+                        # Estes "FOR" é porque esta dando erro as vêzes quer "self.dia_atual" STR ou INT #######################
+                        try:
+                            for id_agenda in requisicao_dic['agenda'][int(self.dia_atual)]:
 
-                except:
-                    return lista_info
+                                if requisicao_dic['agenda'][int(self.dia_atual)][id_agenda]['data'] == self.date:
+                                    lista_info.append(requisicao_dic['agenda'][int(self.dia_atual)][id_agenda])
+                                else:
+                                    pass
+                        except:
+                            for id_agenda in requisicao_dic['agenda'][str(self.dia_atual)]:
+
+                                if requisicao_dic['agenda'][str(self.dia_atual)][id_agenda]['data'] ==  self.date:
+                                    lista_info.append(requisicao_dic['agenda'][str(self.dia_atual)][id_agenda])
+                                else:
+                                    pass
+                        return lista_info
+
+                    except:
+                        return lista_info
         # else:
         #     self.entrada = '00:00'
         #     self.saida = '00:00'
@@ -1186,7 +1249,14 @@ class ViewSchedule(Screen):
                         # --------------------------------------------------------------------------/CHANGE
 
                         # Aqui compara o horario na posição horas e compara com o orario marcado na lista
-                        if entrada[:2] == lista_info[0]['id_horas'][:2] :#or entrada[:2] == lista_info[0]['id_horas'][:2]: # --------------------------------------------- [0] [num]
+                        print('lista ',lista_info[num]['data'])
+                        if entrada[:2] == lista_info[0]['id_horas'][:2]:   #or entrada[:2] == lista_info[0]['id_horas'][:2]: # --------------------------------------------- [0] [num]
+
+                            # if lista_info[num]['data'] == self.date:
+                            #     pass
+                            # else:
+                            #     del(lista_info[num])
+
                             for mim in range(ranger_init, ranger_last): # -----------------------------------------------Change +1
 
                                 # ---------------------------------------------------------------------CHANGE
@@ -1587,6 +1657,8 @@ class HoursSchedule(Screen):
         self.day = datetime.today().day
         self.month = datetime.today().month
         self.year = datetime.today().year
+        self.date = f'{str(self.day).zfill(2)}/{str(self.month).zfill(2)}/{self.year}'
+
 
         self.hours = hours
         self.id_manager = self.get_manager()
@@ -1603,6 +1675,8 @@ class HoursSchedule(Screen):
             self.hours = horas['horas']
             self.ids.hours.title = f"Horário escolhido! [color=#AC0C18][b]{str(horas['horas'])}[/b][/color]"
         except FileNotFoundError:
+            pass
+        except:
             pass
 
         # self.ids.categorie.add_widget(MDSpinner(size_hint=(None,None,), size=('46dp','46dp'),color=(0,0,0,1),pos_hint={'center_x':.5,'center_y':.1}))
@@ -1631,6 +1705,8 @@ class HoursSchedule(Screen):
             return requisicao_dic
         except requests.exceptions.ConnectionError:
             toast('Você não esta conectado a internet!')
+        except:
+            pass
 
     def valid_button_save(self):
         with open('select_works.json', 'r') as arquivo:
@@ -1664,6 +1740,8 @@ class HoursSchedule(Screen):
                 return id, requisicao_dic[id]['nome']
         except requests.exceptions.ConnectionError:
             toast('Você não esta conectado a internet!')
+        except:
+            pass
 
     def get_id_diverse(self):
         if_manager = {}
@@ -1854,10 +1932,10 @@ class HoursSchedule(Screen):
 
         lista_pos = ''
 
-        with open('info_schedule.json','r') as file_info:
+        with open('info_schedule.json','r', encoding='utf-8') as file_info:
             info = json.load(file_info)
 
-        with open('list_content.json','r') as lista:
+        with open('list_content.json','r', encoding='utf-8') as lista:
             lista_content = json.load(lista)
 
         # hours of schedule
@@ -1960,8 +2038,6 @@ class HoursSchedule(Screen):
 
     def save_scheduleing(self, *args):
 
-        date = f'{self.day}/{self.month}/{self.year}'
-
         time_cancel = self.info_manager['time_cancel']
         horas_hoje = self.time_now()
         # list_works = []
@@ -2034,20 +2110,23 @@ class HoursSchedule(Screen):
 
             # Here getting the hours of marked ###
             for id_marked in list_id_marked:
-                list_comparate_hours.append(if_scheduled[id_marked]['id_horas'])
 
-                time_marked = self.sum_hours_end_time(if_scheduled[id_marked]['id_horas'],if_scheduled[id_marked]['tempo'])
-                list_second_hours.append(time_marked)
+                if if_scheduled[id_marked]['data'] == self.date:
+                    list_comparate_hours.append(if_scheduled[id_marked]['id_horas'])
 
-                if if_scheduled[id_marked]['id_horas'] < horas and time_marked > horas:
-                    second_free = True
-                    break
+                    time_marked = self.sum_hours_end_time(if_scheduled[id_marked]['id_horas'],if_scheduled[id_marked]['tempo'])
+                    list_second_hours.append(time_marked)
+
+                    if if_scheduled[id_marked]['id_horas'] < horas and time_marked > horas:
+                        second_free = True
+                        break
             free = horas in list_comparate_hours
         except TypeError:
             pass
         except requests.exceptions.ConnectionError:
             toast('Você não esta conectado a internet!')
-
+        except:
+            pass
 
         if if_manager['manager'] == "False":
             link = f'{self.LINK_SALAO}/{self.id_manager[0]}/socios/{if_manager["id_user"]}/agenda/{self.semana}/{id_user}.json'
@@ -2059,6 +2138,7 @@ class HoursSchedule(Screen):
         info = f'{{"id_posicao":"{id_pos["id_posicao"]}",' \
                f'"nome_barbeiro":"{if_manager["nome"]}",' \
                f'"id_horas":"{horas}",' \
+               f'"data":"{self.date}",' \
                f'"id_user":"{id_user}",' \
                f'"tempo":"{tempo}",' \
                f'"valor":"{valor}",' \
@@ -2071,7 +2151,7 @@ class HoursSchedule(Screen):
         # information of file "infoscheduleclient" ##########
         second_hours =self.sum_hours_end_time(horas,tempo)
 
-        information_of_file["date"] = date
+        information_of_file["date"] = self.date
         information_of_file["id_button"] = id_pos["id_posicao"]
         information_of_file["nome_barbeiro"] = if_manager["nome"]
         information_of_file["id_schedule"] = id_user
@@ -2123,28 +2203,6 @@ class HoursSchedule(Screen):
                 toast('Você não esta conectado a internet!')
             except:
                 pass
-
-        # if if_manager['manager'] == "False":
-        #     # getting ids that are already scheduled ###########################################################################
-        #         link_cliente = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_user}/ids_agendado.json'
-        #         requisicao_client_get = requests.get(link_cliente)
-        #         requisicao_client_get_dic = requisicao_client_get.json()
-        #
-        #     # list_ids_schedule receiver the ids what is in cloud ##############################################################
-        #         if requisicao_client_get_dic != '':
-        #             list_ids_schedule.append(requisicao_client_get_dic)
-        #
-        #     # list_ids_schedule receiver the id what go be schedule ############################################################
-        #         list_ids_schedule.append(if_manager['id_user'])
-        #
-        #     # Insert ids of schedule in user ###################################################################################
-        #         link_cliente = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_user}/ids_agendado.json'
-        #
-        #         info = f'{{"ids_agendado":"{list_ids_schedule}" }}'
-        #
-        #         requisicao_client = requests.patch(link_cliente, data=info)
-        # else:
-        #     pass
 
         # Clearing file "select_work" after of save ########################################################################
         with open('select_works.json','w') as file:
@@ -2462,9 +2520,11 @@ class DrawerInfoSchedule(InfoScheduleClient):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+
         self.day = datetime.today().day
         self.month = datetime.today().month
         self.year = datetime.today().year
+        self.date = f'{str(self.day).zfill(2)}/{str(self.month).zfill(2)}/{self.year}'
 
         self.clear_drawer_schedule()
 
@@ -2474,19 +2534,20 @@ class DrawerInfoSchedule(InfoScheduleClient):
         Window.bind(on_keyboard=self.call_back)
 
     def clear_drawer_schedule(self):
-
-        actual_date = f'{self.day}/{self.month}/{self.year}'
+        lista = []
 
         try:
             with open('inf_to_infoschedule_drawer.json', 'r') as file:
                 info_schedule = json.load(file)
 
-            for info in info_schedule:
-                if info['date'] != actual_date:
-                    with open('inf_to_infoschedule_drawer.json', 'w') as file:
-                        json.dump([], file)
-                else:
+            for pos, info in enumerate(info_schedule):
+                if info['date'] != self.date:
                     pass
+                else:
+                    lista.append(info[pos])
+
+                with open('inf_to_infoschedule_drawer.json', 'w') as file:
+                    json.dump(lista, file)
         except:
             pass
 
@@ -2501,7 +2562,6 @@ class DrawerInfoSchedule(InfoScheduleClient):
     def set_info_day(self):
 
         # current days for day comparison from inf_to_infoschedule_drawer file ###
-        set_day = f'{self.day}/{self.month}/{self.year}'
 
         lista = []
 
@@ -2511,7 +2571,7 @@ class DrawerInfoSchedule(InfoScheduleClient):
 
             for day in day_file:
 
-                if day['date'] == set_day:
+                if day['date'] == self.date:
                     lista.append(day)
                 else:
                     pass
@@ -2709,6 +2769,7 @@ class MyBoxCategorieLabel(MDCard):
         self.tempo = str(tempo)
         self.valor = str(valor)
 
+
 class MsgToApp(Screen):
     link = f'https://shedule-vitor-default-rtdb.firebaseio.com'
 
@@ -2733,7 +2794,31 @@ class MsgToApp(Screen):
 
         requisicao = requests.patch(link_client, data=info)
 
-        webbrowser.open(link)
+        try:
+            if link == '':
+                MDApp().stop()
+            elif link == 'register':
+                cont = 1
+
+                # dictionary to get values of msg_to_app.json
+                get_read = {}
+
+                with open('msg_to_app.json','r') as read_file:
+                    get_read = json.load(read_file)
+
+                cont += int(get_read['valid'])
+
+                get_read['valid'] = cont
+
+                with open('msg_to_app.json', 'w') as write_file:
+                    json.dump(get_read, write_file, indent=2)
+
+                MDApp.get_running_app().root.current = 'register'
+                self.dialog.dismiss()
+            else:
+                webbrowser.open(link)
+        except:
+            pass
 
     def call_back_close(self,windown, key, *args):
 
@@ -2765,10 +2850,10 @@ class MsgToApp(Screen):
 
         button_ok = MDFlatButton(text='OK')
 
-        dialog = MDDialog(title='Atualização necessária', text=str(msg), buttons=[button_ok])
+        self.dialog = MDDialog(title='Atualização necessária', text=str(msg), buttons=[button_ok])
 
         button_ok.bind(on_release=self.set_msg)
-        dialog.open()
+        self.dialog.open()
 
 
 class AgendamentoApp(MDApp):

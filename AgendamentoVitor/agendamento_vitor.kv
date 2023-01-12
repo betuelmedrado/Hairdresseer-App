@@ -211,7 +211,8 @@
                 height:'60dp'
                 padding:('20dp',0,0,0)
                 ripple_behavior:True
-                on_release:app.root.current = 'registerofbox'
+#                on_release:app.root.current = 'registerofbox'
+                on_release:root.under_development()
                 MDIcon:
                     size_hint_x:None
                     width:'60dp'
@@ -235,6 +236,7 @@
         orientation:'vertical'
         MDTopAppBar:
             elevation:10
+            markup:True
             id:title_toobar
             right_action_items:[['refresh',lambda x: root.actualizar()],['menu', lambda x:nav_drawer.set_state('open')]]
             left_action_items:[['arrow-left-bold-outline', lambda x: root.return_schoice_schedule()]]

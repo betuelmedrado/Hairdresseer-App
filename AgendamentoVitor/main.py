@@ -13,6 +13,7 @@ from kivymd.uix.navigationdrawer import  MDNavigationDrawer
 from kivymd.uix.dialog import  MDDialog
 from kivymd.uix.floatlayout import MDFloatLayout
 
+
 # from kivymd_extension.akivymd.uix.loader import AKLabelLoader, AKImageLoader
 
 #imports kivy
@@ -81,7 +82,9 @@ class LoginManager(Screen):
             for id in requisicao_dic:
                 return id
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
+        except:
+            pass
 
     def not_can_client(self):
         lista_info_ids = []
@@ -108,7 +111,9 @@ class LoginManager(Screen):
 
             return lista_info_ids
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
+        except:
+            return lista_info_ids
 
     def login(self, *args):
 
@@ -160,7 +165,9 @@ class LoginManager(Screen):
                     self.ids.warning.text = 'Email não [color=D40A00]Encontrado[/color]'
 
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
+        except:
+            pass
 
     def info_login(self, localo_id):
 
@@ -175,14 +182,13 @@ class LoginManager(Screen):
 
             MDApp.get_running_app().root.current = 'homepage'
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
         except:
 
             with open('is_manager_or_socio.json','w') as file:
                 json.dump('socio', file)
 
             MDApp.get_running_app().root.current = 'homepage'
-
 
     def load_refresh(self, *args):
         try:
@@ -212,10 +218,9 @@ class LoginManager(Screen):
             else:
                 toast('usuario não encontrado!')
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
         except:
             pass
-
 
     def load_screen(self, *args):
         MDApp.get_running_app().root.transition = FadeTransition()
@@ -292,6 +297,8 @@ class CreatProfile(Screen):
                 return id
         except requests.exceptions.ConnectionError:
             toast('Sem concção a internet!')
+        except:
+            return ''
 
     def call_login(self, window, key, *args, **kwargs):
 
@@ -313,7 +320,7 @@ class CreatProfile(Screen):
             else:
                 self.ids.enter_as_socio.text = 'Cadastro de Sócio'
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
 
     def valid_field(self):
         if self.ids.nome.text == '':
@@ -332,7 +339,7 @@ class CreatProfile(Screen):
             requisicao_dic = requisicao.json()
 
             if requisicao.ok :
-                if requisicao_dic == '':
+                if requisicao_dic == None:
                     with open('is_manager_or_socio.json','w') as file:
                         json.dump('manager', file)
                     return True
@@ -341,7 +348,7 @@ class CreatProfile(Screen):
                         json.dump('socio', file)
                     return False
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
 
     #  Here I will change to change the id
     def creat_profile(self,id_token, localid, refreshtoken, *args):
@@ -351,7 +358,7 @@ class CreatProfile(Screen):
             nome = self.ids.nome.text
 
             info = f'{{"nome":"{nome}",' \
-                   f'"manager":True}}'
+                   f'"manager":"True"}}'
 
             requisicao = requests.patch(LINK_SALAO, data=info)
             self.ids.warning.text = 'Perfil creado com sucesso!'
@@ -359,8 +366,9 @@ class CreatProfile(Screen):
             with open('refreshtoken.json','w') as file:
                 json.dump(refreshtoken, file)
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
-
+            toast('Você não está conectado a internet!')
+        except:
+            pass
 
     def creat_socio(self, id_token, localid, refreshtoken, *args):
         try:
@@ -382,9 +390,12 @@ class CreatProfile(Screen):
             with open('refreshtoken.json', 'w') as file:
                 json.dump(refreshtoken, file)
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
 
     def creat_bill(self, *args):
+
+        info = {}
+
         try:
             if self.valid_field():
                 try:
@@ -414,6 +425,13 @@ class CreatProfile(Screen):
                             self.creat_profile(idtoken, localid, refreshtoken)
 
                         self.ids.warning.text = '[b][color=D40A00]Conta criada[/color] com sucesso![/b]'
+
+                        info['email'] = email
+                        info['id_login'] = localid
+
+                        with open('info_login.json','w', encoding='utf-8') as info_login:
+                            json.dump(info, info_login, indent=2)
+
                         MDApp.get_running_app().root.current = 'homepage'
                     else:
                         erro = str(requisicao_dic['error']['message'])
@@ -444,7 +462,14 @@ class CreatProfile(Screen):
             else:
                 pass
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
+        except:
+            pass
+
+        Clock.schedule_once(self.return_msg_default, 6)
+
+    def return_msg_default(self, *args):
+        self.ids.warning.text = " Faça o seu cadastro"
 
     def password_view(self, msg):
         if msg.password == False:
@@ -496,7 +521,7 @@ class RedefinitionSenha(Screen):
             else:
                 pass
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
 
     def return_login(self):
         MDApp.get_running_app().root.current = 'loginmanager'
@@ -534,6 +559,8 @@ class HomePage(Screen):
                 return id
         except requests.exceptions.ConnectionError:
             toast('Sem conecção a internet!')
+        except:
+            return ''
 
     def get_local(self, *args):
         try:
@@ -552,8 +579,13 @@ class HomePage(Screen):
                 self.ids.num.text = str(number)
             except KeyError:
                 pass
+            except:
+                self.ids.rua.text = ''
+                self.ids.num.text = ''
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
+        except:
+            pass
 
     def get_ids_socios(self):
         # usad in fuction :
@@ -569,7 +601,9 @@ class HomePage(Screen):
                 lista_id.append(id)
             return lista_id
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
+        except:
+            return []
 
     def delet_day(self, *args):
 
@@ -586,7 +620,7 @@ class HomePage(Screen):
             lista_id = self.get_ids_socios()
 
             # Manager Here to delet three day before #################################################
-            for dia in range(5):
+            for dia in range(3):
                 # link = f'{self.LINK_SALAO}/{id_login["id_login"]}/agenda/{day}.json'
                 link = f'{self.LINK_SALAO}/{self.id_manager}/agenda/{day}.json'
                 requisicao_manager = requests.delete(link)
@@ -600,7 +634,7 @@ class HomePage(Screen):
             day = int(self.day_semana) + 1
 
             for id_socio in lista_id:
-                for dia in range(2):
+                for dia in range(3):
                     link = f'{self.LINK_SALAO}/{self.id_manager}/socios/{id_socio}/agenda/{day}.json'
                     requisicao = requests.delete(link)
                     day += 1
@@ -609,8 +643,10 @@ class HomePage(Screen):
                         day = 1
 
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
 
+    def under_development(self, *args):
+        toast('Em desenvolvimento !')
 
 class ClientBlocked(Screen):
 
@@ -667,7 +703,7 @@ class ClientBlocked(Screen):
                 except:
                     pass
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
 
     def search_client_blocked(self):
         self.ids.scrool_blocked.clear_widgets()
@@ -676,30 +712,30 @@ class ClientBlocked(Screen):
 
         for index, data in enumerate(self.LIST_DATA_CLIENT):
             # print(data)
-            # try:
-            if search_text in data["nome"]:
-                if int(data["quant_cancelado"]) <= 1:
-                    # self.ids.color_card.md_bg_color = (0.75, 0.86, 0.44, .4)
-                    self.ids.scrool_blocked.add_widget(
-                        BoxBlocked(data["nome"],data["quant_cancelado"],
-                                   data["cpf"], data["email"], data["id_client"]))
+            try:
+                if search_text in data["nome"]:
+                    if int(data["quant_cancelado"]) <= 1:
+                        # self.ids.color_card.md_bg_color = (0.75, 0.86, 0.44, .4)
+                        self.ids.scrool_blocked.add_widget(
+                            BoxBlocked(data["nome"],data["quant_cancelado"],
+                                       data["cpf"], data["email"], data["id_client"]))
 
-                elif int(data["quant_cancelado"]) == 2:
-                    # self.ids.color_card.md_bg_color = (1.00, 0.61, 0.44, .4)
-                    self.ids.scrool_blocked.add_widget(
-                        BoxBlocked(data["nome"], data["quant_cancelado"],
-                                   data["cpf"], data["email"], data["id_client"]))
+                    elif int(data["quant_cancelado"]) == 2:
+                        # self.ids.color_card.md_bg_color = (1.00, 0.61, 0.44, .4)
+                        self.ids.scrool_blocked.add_widget(
+                            BoxBlocked(data["nome"], data["quant_cancelado"],
+                                       data["cpf"], data["email"], data["id_client"]))
 
-                elif int(data["quant_cancelado"]) >= 3:
-                    # self.ids.color_card.md_bg_color = (0.48, 0.04, 0.00, .4)
-                    self.ids.scrool_blocked.add_widget(
-                        BoxBlocked(data["nome"], data["quant_cancelado"],
-                                   data["cpf"], data["email"], data["id_client"]))
+                    elif int(data["quant_cancelado"]) >= 3:
+                        # self.ids.color_card.md_bg_color = (0.48, 0.04, 0.00, .4)
+                        self.ids.scrool_blocked.add_widget(
+                            BoxBlocked(data["nome"], data["quant_cancelado"],
+                                       data["cpf"], data["email"], data["id_client"]))
 
-                elif search_text == ' ':
-                    pass
-            # except:
-            #     pass
+                    elif search_text == ' ':
+                        pass
+            except:
+                pass
 
 
 class ManagerProfile(Screen):
@@ -711,8 +747,6 @@ class ManagerProfile(Screen):
         super().__init__(**kwargs)
 
         self.dia_atual = datetime.today().isoweekday()
-
-        # print('dia ',self.dia_atual)
         Clock.schedule_once(self.call_init,1)
 
     # function that init with 'init'
@@ -747,6 +781,7 @@ class ManagerProfile(Screen):
         #     self.ids.valor.text = str(valor[0:len(self.ids.valor.text)-1])
 
     def un_focus(self):
+
         first = self.ids.tempo.text[:2]
         last = self.ids.tempo.text[2:]
 
@@ -784,6 +819,8 @@ class ManagerProfile(Screen):
         space_temp = ''
         dia = day
         semana = ''
+        fechado = ''
+        text_close = ''
 
         with open('is_manager_or_socio.json', 'r') as file:
             is_manager = json.load(file)
@@ -814,6 +851,14 @@ class ManagerProfile(Screen):
                     saida = requisicao_dic['saida']
                     space_temp = requisicao_dic['space_temp']
 
+                    try:
+                        fechado = requisicao_dic['fechado']
+                        if fechado == "True":
+                            text_close = 'Você não vai comparecer o salão esse dia'
+                        else:
+                            pass
+                    except:
+                        fechado = "False"
 
                 elif is_manager == 'socio':
 
@@ -828,13 +873,189 @@ class ManagerProfile(Screen):
                     saida = requisicao_dic['saida']
                     space_temp = requisicao_dic['space_temp']
 
+                    try:
+                        fechado = requisicao_dic['fechado']
+                        if fechado == "True":
+                            text_close = 'Você não vai comparecer ao salão esse dia'
+                        else:
+                            pass
+                    except:
+                        fechado = "False"
+
+
                 toast(f'       {semana}\nEntrada - {entrada}\nSaida   -   {saida}\ntempo  -  {space_temp}')
+
+                msg = f'Entrada - {entrada}\nSaida   -   {saida}\ntempo  -  {space_temp}\n[color=#AC0C18]{text_close}[/color]'
+
+                self.open_dialog_block_day(semana, msg, dia, fechado)
+
             else:
                 pass
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
         except:
             toast(f'"{semana}"\nNem uma agenda criada nesse dia!')
+
+    def open_dialog_block_day(self,semana, msg, dia, fechado, *args, **kwargs):
+        """
+        Function to open MDDialog to close or open the day
+        :param semana: dia em numero da semana
+        :param msg: mensagem recebida
+        :param dia: day actual
+        :param fechado: receive a boolian True or False if close or open
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        bt_state_day = None
+
+        bt = MDFlatButton(text='Close')
+        if fechado == "True":
+            bt_state_day = MDFlatButton(text='Abrir esse dia!')
+        else:
+            bt_state_day = MDFlatButton(text='Fechar esse dia!')
+
+        self.dialog = MDDialog(title=semana,
+                          text=str(msg),
+                          buttons=[bt_state_day, bt])
+        bt_state_day.bind(on_release=partial(self.open_and_close_day, semana, dia, fechado))
+        bt.bind(on_release=self.dialog.dismiss)
+        self.dialog.markup=True
+        self.dialog.open()
+
+    def open_and_close_day(self, semana, dia, fechado, *args):
+
+        if fechado == "True":
+            toast(f'{semana} Você ira ao salão! ')
+            fechado = "False"
+
+            if int(dia) == 1:
+                self.ids.monday.background_color = 0.35, 0.42, 0.49, .5
+            elif int(dia) == 2:
+                self.ids.tuesday.background_color = 0.35, 0.42, 0.49, .5
+            elif int(dia) == 3:
+                self.ids.wednesday.background_color = 0.35, 0.42, 0.49, .5
+            elif int(dia) == 4:
+                self.ids.thursday.background_color = 0.35, 0.42, 0.49, .5
+            elif int(dia) == 5:
+                self.ids.friday.background_color = 0.35, 0.42, 0.49, .5
+            elif int(dia) == 6:
+                self.ids.saturday.background_color = 0.35, 0.42, 0.49, .5
+            elif int(dia) == 7:
+                self.ids.sunday.background_color = 0.35, 0.42, 0.49, .5
+        else:
+            toast(f'{semana} Você estara de folga! ')
+            fechado = "True"
+
+            if int(dia) == 1:
+                self.ids.monday.background_color = 1,0,0,.5
+                self.ids.monday.state = "normal"
+            elif int(dia) == 2:
+                self.ids.tuesday.background_color = 1, 0, 0, .5
+                self.ids.tuesday.state = "normal"
+            elif int(dia) == 3:
+                self.ids.wednesday.background_color = 1, 0, 0, .5
+                self.ids.wednesday.state = "normal"
+            elif int(dia) == 4:
+                self.ids.thursday.background_color = 1, 0, 0, .5
+                self.ids.thursday.state = "normal"
+            elif int(dia) == 5:
+                self.ids.friday.background_color = 1, 0, 0, .5
+                self.ids.friday.state = "normal"
+            elif int(dia) == 6:
+                self.ids.saturday.background_color = 1, 0, 0, .5
+                self.ids.saturday.state = "normal"
+            elif int(dia) == 7:
+                self.ids.sunday.background_color = 1, 0, 0, .5
+                self.ids.sunday.state = "normal"
+
+
+        with open('is_manager_or_socio.json', 'r') as file:
+            is_manager = json.load(file)
+
+        if is_manager == 'manager':
+            link = f'{self.LINK_SALAO}/{self.id_manager}/{dia}.json'
+
+            content = f'{{"fechado":"{fechado}"}}'
+            requisicao = requests.patch(link, data=content)
+
+            self.dialog.dismiss()
+
+        elif is_manager == 'socio':
+
+            with open('info_login.json', 'r') as file_login:
+                id = json.load(file_login)
+
+            link = f'{self.LINK_SALAO}/{self.id_manager}/socios/{id["id_login"]}/{dia}.json'
+
+            content = f'{{"fechado":"{fechado}"}}'
+            requisicao = requests.patch(link, data=content)
+
+            self.dialog.dismiss()
+
+    def color_togglebutton(self, *args, **kwargs):
+
+        fechado = 'False'
+        list_day = []
+
+        with open('is_manager_or_socio.json', 'r') as file:
+            is_manager = json.load(file)
+
+        if is_manager == 'manager':
+            link = f'{self.LINK_SALAO}/{self.id_manager}.json'
+            requisicao = requests.get(link)
+            requisicao_dic = requisicao.json()
+
+        elif is_manager == 'socio':
+
+            with open('info_login.json', 'r') as file_login:
+                id = json.load(file_login)
+
+            link = f'{self.LINK_SALAO}/{self.id_manager}/socios/{id["id_login"]}.json'
+            requisicao = requests.get(link)
+            requisicao_dic = requisicao.json()
+
+        try:
+            if requisicao_dic['1']['fechado'] == 'True':
+                self.ids.monday.background_color = 1, 0, 0, .5
+        except:
+            pass
+
+        try:
+            if requisicao_dic['2']['fechado'] == "True":
+                self.ids.tuesday.background_color = 1, 0, 0, .5
+        except:
+            pass
+
+        try:
+            if requisicao_dic['3']['fechado'] == "True":
+                self.ids.wednesday.background_color = 1, 0, 0, .5
+        except:
+            pass
+
+        try:
+            if requisicao_dic['4']['fechado'] == "True":
+                self.ids.thursday.background_color = 1, 0, 0, .5
+        except:
+            pass
+
+        try:
+            if requisicao_dic['5']['fechado'] == "True":
+                self.ids.friday.background_color = 1, 0, 0, .5
+        except:
+            pass
+
+        try:
+            if requisicao_dic['6']['fechado'] == "True":
+                self.ids.saturday.background_color = 1, 0, 0, .5
+        except:
+            pass
+
+        try:
+            if requisicao_dic['7']['fechado'] == "True":
+                self.ids.sunday.background_color = 1, 0, 0, .5
+        except:
+            pass
 
     def on_pre_enter(self, *args):
         Window.bind(on_keyboard=self.preview)
@@ -843,9 +1064,12 @@ class ManagerProfile(Screen):
             self.insert_hours()
             self.only_manager_local()
             Clock.schedule_once(self.get_socios,2)
-            Clock.schedule_once(self.infill,3)
+            Clock.schedule_once(self.infill,2)
+            Clock.schedule_once(self.color_togglebutton,2)
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
+        except:
+            pass
 
     def on_pre_leave(self, *args):
         Window.unbind(on_keyboard=self.preview)
@@ -864,6 +1088,8 @@ class ManagerProfile(Screen):
                 return id
         except requests.exceptions.ConnectionError:
             toast('Sem conecção a internet!')
+        except:
+            return ''
 
     # Here only return the id of user
     def get_id_whith_refreshtoken(self, *args):
@@ -884,7 +1110,7 @@ class ManagerProfile(Screen):
 
             return user_id
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
 
     def creat_profile(self, *args):
         try:
@@ -923,7 +1149,9 @@ class ManagerProfile(Screen):
             except:
                 pass
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
+        except:
+            pass
 
     def insert_hours(self, *args, **kwargs):
         """
@@ -1039,7 +1267,7 @@ class ManagerProfile(Screen):
                 self.ids.carosel.load_next()
 
                 toast('Tabela de horas salva com sucesso!')
-    # "For in end Point" ??????????????????????????????????????????????????????????????????????????????
+            # "For in end Point" ??????????????????????????????????????????????????????????????????????????????
             elif if_manager == 'manager':
 
                 for day in self.list_day:
@@ -1074,7 +1302,7 @@ class ManagerProfile(Screen):
 
                 toast('Tabela de horas salva com sucesso!')
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
 
     def save_servicos(self,*args):
 
@@ -1100,7 +1328,7 @@ class ManagerProfile(Screen):
                     toast('Categoria criada')
 
                     self.infill()
-                    self.ids.carosel.load_next()
+                    # self.ids.carosel.load_next()
 
                     self.ids.nome_servico.text = ''
                     self.ids.tempo.text = ''
@@ -1119,7 +1347,7 @@ class ManagerProfile(Screen):
 
                     self.infill()
 
-                    self.ids.carosel.load_next()
+                    # self.ids.carosel.load_next()
 
                     self.ids.nome_servico.text = ''
                     self.ids.tempo.text = ''
@@ -1127,7 +1355,7 @@ class ManagerProfile(Screen):
             else:
                 toast('Precisa de todas as informções de serviços!')
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
 
     def infill(self, *args):
         socio_ou_gerente = False
@@ -1136,7 +1364,7 @@ class ManagerProfile(Screen):
         with open('is_manager_or_socio.json','r') as file:
             is_manager = json.load(file)
         try:
-            # Para saber si quem esta acessando é o socio ou o gerente #####################################################
+            # Para saber si quem está acessando é o socio ou o gerente #####################################################
             if is_manager == 'socio':
                 LINK_CATEGORIA = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{self.user_id}/servicos.json'
                 requisicao_get = requests.get(LINK_CATEGORIA)
@@ -1173,7 +1401,7 @@ class ManagerProfile(Screen):
                 pass
 
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
 
     def save_socio(self,*args):
         try:
@@ -1203,7 +1431,7 @@ class ManagerProfile(Screen):
                 toast('Socio criado com sucesso!')
                 self.ids.box_socio.add_widget(MyBoxSocio(nome_socio))
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
 
     def get_socios(self,*args):
 
@@ -1211,8 +1439,6 @@ class ManagerProfile(Screen):
 
         # geting the id of manager to send in class MyBoxSocio
         id_manager = self.get_id_manager()
-
-        print('id__', id_manager)
 
         lista = []
 
@@ -1229,7 +1455,7 @@ class ManagerProfile(Screen):
             except:
                 pass
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
 
     def only_manager_local(self, *args):
         try:
@@ -1250,6 +1476,9 @@ class ManagerProfile(Screen):
     def insert_local(self, *args):
 
         try:
+
+            self.id_manager = self.get_id_manager()
+
             link = f'{self.LINK_SALAO}/{self.id_manager}.json'
 
             local = self.ids.rua.text
@@ -1260,14 +1489,16 @@ class ManagerProfile(Screen):
                 info = f'{{"local":"{local}",' \
                        f'"numero":{number} }}'
 
-                requisicao = requests.patch(link, data=info)
+                requisicao = requests.patch(link, data=info.encode('utf-8'))
 
-                toast('Local inserido com exito!')
+                toast('Local inserido com êxito!')
                 self.ids.carosel.load_next()
             else:
-                toast('Local não foi inserido folta de informação!')
+                toast('Local não foi inserido falta de informação!')
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
+        # except:
+        #     toast('Deu algum erro! contate o desenvolvedor')
 
     def pop_alteration(self,id_work, servico, tempo, valor, *args, **kwargs):
         box_main = MDBoxLayout(orientation='vertical',md_bg_color=([1,1,1,1]),radius=(5,5,5,5))
@@ -1317,7 +1548,7 @@ class Popup_widgets(MDBoxLayout):
                    f'"valor":"{valor}"}}'
 
             try:
-                # Para saber si quem esta acessando é o socio ou o gerente #####################################################
+                # Para saber si quem está acessando é o socio ou o gerente #####################################################
                 if is_manager == 'socio':
                     LINK_CATEGORIA = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{self.user_id}/servicos{id_work}.json'
                     requisicao_get = requests.patch(LINK_CATEGORIA, data=info)
@@ -1336,7 +1567,7 @@ class Popup_widgets(MDBoxLayout):
             except:
                 toast('Deu Algum erro! não foi alterado ')
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
 
     def pop_delet_work(self, id_work):
 
@@ -1344,7 +1575,7 @@ class Popup_widgets(MDBoxLayout):
             is_manager = json.load(file)
 
         try:
-            # Para saber si quem esta acessando é o socio ou o gerente #####################################################
+            # Para saber si quem está acessando é o socio ou o gerente #####################################################
             if is_manager == 'socio':
                 LINK_CATEGORIA = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{self.user_id}/servicos{id_work}.json'
                 requisicao_get = requests.delete(LINK_CATEGORIA)
@@ -1359,7 +1590,7 @@ class Popup_widgets(MDBoxLayout):
 
             MDApp.get_running_app().root.current = 'managerprofile'
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
         except:
             toast('Deu Algum erro! não foi excluido ')
 
@@ -1417,7 +1648,7 @@ class BoxBlocked(MDCard):
             toast('Cliente Desbloqueado!')
             eu.parent.remove_widget(eu)
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
 
 
 class MyButtonCard(MDCard):
@@ -1567,20 +1798,32 @@ class CardButtonProficional(MDCard):
 class ScreenChoiceSchedule(Screen):
     LINK_DATABASE_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao'
 
+    # permition read the class "call_init()" only when app the open
+    read_get_info = True
+
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
 
-        Clock.schedule_once(self.call_init,1)
+        # Clock.schedule_once(self.call_init,1)
 
     def call_init(self, *args):
         try:
             self.id_manager =  self.get_id_manager()
             Clock.schedule_once(self.get_info, 1)
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
+        except:
+            pass
+
+        self.read_get_info = False
 
     def on_pre_enter(self):
         Window.bind(on_keyboard=self.previews)
+
+        if self.read_get_info :
+            Clock.schedule_once(self.call_init,1)
+        else:
+            pass
 
     def on_pre_leave(self, *args):
         Window.unbind(on_keyboard=self.previews)
@@ -1601,7 +1844,9 @@ class ScreenChoiceSchedule(Screen):
             for id in requisicao_dic:
                 return id
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
+        except:
+            return ''
 
     def get_info(self, *args):
 
@@ -1622,7 +1867,9 @@ class ScreenChoiceSchedule(Screen):
                 requiscao_socio_dic = requiscao_socio.json()
                 self.ids.choice_schedule.add_widget(CardButtonProficional(requiscao_socio_dic['manager'], id_socio ,requiscao_socio_dic['nome'] ))
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
+        except:
+            pass
     # def on_pre_enter(self, *args):
     #     self.get_info()
 
@@ -1638,6 +1885,12 @@ class ViewSchedule(Screen):
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
 
+        self.day = datetime.today().day
+        self.month = datetime.today().month
+        self.year = datetime.today().year
+
+        self.date = f'{str(self.day).zfill(2)}/{str(self.month).zfill(2)}/{self.year}'
+
         self.dia_atual = datetime.today().isoweekday()
 
         # self.LINK = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao.json'
@@ -1648,7 +1901,7 @@ class ViewSchedule(Screen):
             # Getting the id of manager ####################################################################################
             self.id_manager = self.get_manager()
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
 
     def get_data_hall(self):
 
@@ -1661,7 +1914,7 @@ class ViewSchedule(Screen):
             Clock.schedule_once(self.actualizar, 1)
             Window.bind(on_keyboard=self.previews)
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
 
     def previews(self,windown, key, *args):
         if key == 27:
@@ -1684,7 +1937,9 @@ class ViewSchedule(Screen):
             for id in requisicao_dic:
                 return id
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
+        except:
+            return ''
 
     def get_id_proficional(self, *args):
         dic_information = {}
@@ -1720,9 +1975,12 @@ class ViewSchedule(Screen):
             except:
                 pass
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
 
     def info_entrace_salao(self, *args):
+
+        msg_title = ''
+
         try:
             id_manager = self.get_id_proficional()
             lista_info = []
@@ -1736,7 +1994,16 @@ class ViewSchedule(Screen):
                     requisicao_dic_socio = requisicao.json()
 
                     nome = requisicao_dic_socio['nome']
-                    self.ids.title_toobar.title = f'Agenda {str(nome)}'
+                    msg_title = f'Agenda [color=#2E2E2E]{str(nome.title())}[/color]'
+
+                    try:
+                        if requisicao_dic_socio[f'{self.dia_atual}']['fechado'] == "True":
+                            msg_title = f'[color=#2E2E2E]{str(nome.title())}[/color]  [color=#AC0C18]"AUSENTE"![/color]'
+                    except:
+                        pass
+
+
+                    self.ids.title_toobar.title = str(msg_title)
 
                     self.entrada = requisicao_dic_socio[f'{self.dia_atual}']['entrada']
 
@@ -1745,16 +2012,32 @@ class ViewSchedule(Screen):
                     self.space_temp = requisicao_dic_socio[f'{self.dia_atual}']['space_temp']
 
                     try:
-                        # Estes "FOR" é porque esta dando erro as vêzes quer "self.dia_atual" STR ou INT #######################
-                        try:
-                            for id_agenda in requisicao_dic_socio['agenda'][int(self.dia_atual)]:
-                                lista_info.append(requisicao_dic_socio['agenda'][int(self.dia_atual)][id_agenda])
-                        except:
-                            for id_agenda in requisicao_dic_socio['agenda'][str(self.dia_atual)]:
-                                lista_info.append(requisicao_dic_socio['agenda'][str(self.dia_atual)][id_agenda])
-                        return lista_info
+                        if requisicao_dic_socio[f'{self.dia_atual}']['fechado'] == "True":
+                            pass
+                        else:
+                            try:
+                                # Estes "FOR" é porque está dando erro as vêzes quer "self.dia_atual" STR ou INT #######################
+                                try:
+                                    for id_agenda in requisicao_dic_socio['agenda'][int(self.dia_atual)]:
+                                        lista_info.append(requisicao_dic_socio['agenda'][int(self.dia_atual)][id_agenda])
+                                except:
+                                    for id_agenda in requisicao_dic_socio['agenda'][str(self.dia_atual)]:
+                                        lista_info.append(requisicao_dic_socio['agenda'][str(self.dia_atual)][id_agenda])
+                                return lista_info
+                            except:
+                                return lista_info
                     except:
-                        return lista_info
+                        try:
+                            # Estes "FOR" é porque está dando erro as vêzes quer "self.dia_atual" STR ou INT #######################
+                            try:
+                                for id_agenda in requisicao_dic_socio['agenda'][int(self.dia_atual)]:
+                                    lista_info.append(requisicao_dic_socio['agenda'][int(self.dia_atual)][id_agenda])
+                            except:
+                                for id_agenda in requisicao_dic_socio['agenda'][str(self.dia_atual)]:
+                                    lista_info.append(requisicao_dic_socio['agenda'][str(self.dia_atual)][id_agenda])
+                            return lista_info
+                        except:
+                            return lista_info
 
                 elif id_manager["manager"] == 'True':
 
@@ -1763,7 +2046,15 @@ class ViewSchedule(Screen):
                     requisicao_dic = requisicao.json()
 
                     nome = requisicao_dic['nome']
-                    self.ids.title_toobar.title = f'Agenda {str(nome)}'
+                    msg_title = msg_title = f'Agenda [color=#2E2E2E]{str(nome.title())}[/color]'
+
+                    try:
+                        if requisicao_dic[f'{self.dia_atual}']['fechado'] == "True":
+                            msg_title = f'Agenda [color=#2E2E2E]{str(nome.title())}[/color]  [color=#AC0C18]"AUSENTE"![/color]'
+                    except:
+                        pass
+
+                    self.ids.title_toobar.title = str(msg_title)
 
 
                     self.entrada = requisicao_dic[f'{self.dia_atual}']['entrada']
@@ -1772,23 +2063,40 @@ class ViewSchedule(Screen):
 
                     self.space_temp = requisicao_dic[f'{self.dia_atual}']['space_temp']
 
-                    # Here get the ids of schedule client ######################################################################
                     try:
-                        # Estes "FOR" é porque esta dando erro as vêzes quer "self.dia_atual" STR ou INT #######################
-                        try:
-                            for id_agenda in requisicao_dic['agenda'][int(self.dia_atual)]:
-                                lista_info.append(requisicao_dic['agenda'][int(self.dia_atual)][id_agenda])
-                        except:
-                            for id_agenda in requisicao_dic['agenda'][str(self.dia_atual)]:
-                                lista_info.append(requisicao_dic['agenda'][str(self.dia_atual)][id_agenda])
-                        return lista_info
+                        # Here get the ids of schedule client ######################################################################
+                        if requisicao_dic[f'{self.dia_atual}']['fechado'] == "True":
+                            pass
+                        else:
+                            try:
+                                # Estes "FOR" é porque está dando erro as vêzes quer "self.dia_atual" STR ou INT #######################
+                                try:
+                                    for id_agenda in requisicao_dic['agenda'][int(self.dia_atual)]:
+                                        lista_info.append(requisicao_dic['agenda'][int(self.dia_atual)][id_agenda])
+                                except:
+                                    for id_agenda in requisicao_dic['agenda'][str(self.dia_atual)]:
+                                        lista_info.append(requisicao_dic['agenda'][str(self.dia_atual)][id_agenda])
+                                return lista_info
 
+                            except:
+                                return lista_info
                     except:
-                        return lista_info
+                        try:
+                            # Estes "FOR" é porque está dando erro as vêzes quer "self.dia_atual" STR ou INT #######################
+                            try:
+                                for id_agenda in requisicao_dic['agenda'][int(self.dia_atual)]:
+                                    lista_info.append(requisicao_dic['agenda'][int(self.dia_atual)][id_agenda])
+                            except:
+                                for id_agenda in requisicao_dic['agenda'][str(self.dia_atual)]:
+                                    lista_info.append(requisicao_dic['agenda'][str(self.dia_atual)][id_agenda])
+                            return lista_info
+
+                        except:
+                            return lista_info
             except:
                 pass
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
 
     def loop_actualizar(self, *args):
         # Clock.schedule_once(self.actualizar,30)
@@ -1809,8 +2117,6 @@ class ViewSchedule(Screen):
 
             data_hall = self.get_data_hall()
             id_manager = self.get_manager()
-            print(data_hall[id_manager]['time_cancel'])
-
 
             time_c = data_hall[id_manager]['time_cancel']
             # Time Mensage of cancel ot schedule #############################
@@ -1854,6 +2160,12 @@ class ViewSchedule(Screen):
 
                     try:
                         if entrada[:2] == lista_info[num]['id_horas'][:2]:
+
+                            if lista_info[num]['data'] == self.date:
+                                pass
+                            else:
+                                del(lista_info[num])
+
                             for mim in range(ranger_init, ranger_last):
 
                                 entry_future = datetime.strptime(entrada, '%H:%M')
@@ -1895,7 +2207,7 @@ class ViewSchedule(Screen):
                                         # Insert table #####################################################################################
                                         table = TableInfo(str(cont), lista_info[0]['id_user'], entrada,
                                                               f'{soma_horas.strftime("%H:%M")}', lista_info[num]['tempo'], lista_info[num]['nome'], str(email), str(cpf))
-                                        table.msg = f'[color=#6B0A00][b]"Atenção":[/b][/color] Você tem {data_hall[id_manager]["time_cancel"]} minutos para desmarcar apos agendamento!'
+                                        table.msg = f'[color=#6B0A00][b]"Atenção":[/b][/color] Você tem  [color=#6B0A00][b]{data_hall[id_manager]["time_cancel"]}[/b][/color]  h/m para desmarcar após agendamento!'
                                         # print(table)
                                         self.ids.grid_shedule.add_widget(table)
                                         entrada = soma_horas.strftime('%H:%M')
@@ -1910,14 +2222,14 @@ class ViewSchedule(Screen):
                                     else:
                                         table = Table_shedule(str(cont), lista_info[num]['id_user'], entrada,
                                                               f'{soma_horas.strftime("%H:%M")}', lista_info[num]['tempo'], str(time_cancel), lista_info[num]['nome'], str(email), str(cpf))
-                                        table.msg = f'[color=#6B0A00][b]"Atenção":[/b][/color] Você tem {data_hall[id_manager]["time_cancel"]} minutos para desmarcar apos agendamento!'
+                                        table.msg = f'[color=#6B0A00][b]"Atenção":[/b][/color] Você tem  [color=#6B0A00][b]{data_hall[id_manager]["time_cancel"]}[/b][/color]  h/m para desmarcar após agendamento!'
                                         self.ids.grid_shedule.add_widget(table)
                                         list_content.append(entrada)
                                         entrada = soma_horas.strftime('%H:%M')
                                         block = True
                                         permition_to_sum = False
                                         ranger_init = entrada[3:]
-                                        del (lista_info[0])
+                                        del(lista_info[0])
                                         cont += 1
                                         break
 
@@ -1932,7 +2244,7 @@ class ViewSchedule(Screen):
                                     ranger_init = entrada[3:]
                                     cont += 1
                     except:
-                        print('Deu algum erro na função actualizar da class "ViewSchedule"')
+                        print('Deu algum erro na função actualizar da class "ViewSchedule"!')
 
                 # except:
                 #     print('Deu algum erro na função actualizar da class "ViewSchedule"')
@@ -1983,7 +2295,7 @@ class ViewSchedule(Screen):
             with open('list_content.json', 'w') as file:
                 json.dump(list_content, file)
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
         except:
             toast('Nenhuma Horário para hoje!')
 
@@ -2087,7 +2399,7 @@ class ViewSchedule(Screen):
             Clock.schedule_once(self.box_dialog.dismiss, 5)
 
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
 
     def sum_hours_end_time(self,hours, time, *args):
 
@@ -2102,7 +2414,7 @@ class ViewSchedule(Screen):
 
     def wait_blocked_schedule(self,id_button, id_schedule, hours, hours_second, client, *args):
         """
-        Função para chamar a função "blocked_schedule" depois de um  tempo, só para mostrar que a tela esta sendo
+        Função para chamar a função "blocked_schedule" depois de um  tempo, só para mostrar que a tela está sendo
         carregada
         :param id_button:
         :param id_schedule:
@@ -2176,20 +2488,23 @@ class ViewSchedule(Screen):
 
                 # Here getting the hours of marked ###
                 for id_marked in list_id_marked:
-                    list_comparate_hours.append(if_scheduled[id_marked]['id_horas'])
 
-                    time_marked = self.sum_hours_end_time(if_scheduled[id_marked]['id_horas'],
-                                                          if_scheduled[id_marked]['tempo'])
-                    list_second_hours.append(time_marked)
+                    if if_scheduled[id_marked]['data'] == self.date:
 
-                    if if_scheduled[id_marked]['id_horas'] < horas and time_marked > horas:
-                        second_free = True
-                        break
+                        list_comparate_hours.append(if_scheduled[id_marked]['id_horas'])
+
+                        time_marked = self.sum_hours_end_time(if_scheduled[id_marked]['id_horas'],
+                                                              if_scheduled[id_marked]['tempo'])
+                        list_second_hours.append(time_marked)
+
+                        if if_scheduled[id_marked]['id_horas'] < horas and time_marked > horas:
+                            second_free = True
+                            break
                 free = horas in list_comparate_hours
             except TypeError:
                 pass
             except requests.exceptions.ConnectionError:
-                toast('Você não esta conectado a internet!')
+                toast('Você não está conectado a internet!')
             except:
                 pass
             # ######################################################################################
@@ -2202,6 +2517,7 @@ class ViewSchedule(Screen):
             # Creating the schedule Here ##########################################################################
             info = f'{{"id_posicao":"{id_button}",' \
                    f'"id_horas":"{horas}",' \
+                   f'"data":"{self.date}",' \
                    f'"id_user":"{id_log_id_button}",' \
                    f'"tempo":"{self.space_temp}",' \
                    f'"valor":"{valor}",' \
@@ -2263,7 +2579,9 @@ class ViewSchedule(Screen):
             except:
                 pass
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
+        except:
+            toast(' Deu algum erro! contate o desenvolvedor')
 
     def get_hours(self,id_button, id_schedule, hours, hours_second, time, client, *args):
         hours_dic = {}
@@ -2296,11 +2614,6 @@ class ViewSchedule(Screen):
         dic_info['email'] = email
         dic_info['cpf'] = str(cpf)
 
-        print(email)
-        print(cpf)
-
-        print(dic_info)
-
         with open('infoscheduleclient.json', 'w') as file:
             json.dump(dic_info, file, indent=2)
 
@@ -2331,6 +2644,15 @@ class HoursSchedule(Screen):
     def __init__(self,hours='', **kwargs):
         super().__init__(**kwargs)
         # Clock.schedule_once(self.get_works, 2)
+
+        # week day ==================
+        self.day = datetime.today().day
+        self.month = datetime.today().month
+        self.year = datetime.today().year
+        self.date = f'{str(self.day).zfill(2)}/{str(self.month).zfill(2)}/{self.year}'
+
+
+        # week ======================
         self.semana = datetime.today().isoweekday()
         self.hours = hours
         self.id_manager = self.get_manager()
@@ -2352,7 +2674,7 @@ class HoursSchedule(Screen):
 
             self.valid_button_save()
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
 
     def previews(self, windown, key, *args):
         if key == 27:
@@ -2392,7 +2714,9 @@ class HoursSchedule(Screen):
             for id in requisicao_dic:
                 return id
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
+        except:
+            return ''
 
     def get_id_diverse(self):
         if_manager = {}
@@ -2466,7 +2790,7 @@ class HoursSchedule(Screen):
                 except:
                     pass
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
 
     def changer_color(self,eu,servico,*args):
         color = eu.md_bg_color
@@ -2653,7 +2977,10 @@ class HoursSchedule(Screen):
 
             return info_dic['nome']
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
+        except:
+            print('HoursSchedule "get_name()"')
+            pass
 
     def nada(self,*args):
         toast('Selecione o tipo de serviço!')
@@ -2670,7 +2997,6 @@ class HoursSchedule(Screen):
 
         soma = delta + id_hours
 
-        print(soma.strftime('%H:%M'))
         return soma.strftime('%H:%M')
 
     def save_scheduleing(self, *args):
@@ -2721,23 +3047,28 @@ class HoursSchedule(Screen):
 
                 # Geting the id marked on schedule ###
                 for info in if_scheduled:
+
                     list_id_marked.append(info)
 
                 # Here getting the hours of marked ###
                 for id_marked in list_id_marked:
-                    list_comparate_hours.append(if_scheduled[id_marked]['id_horas'])
 
-                    time_marked = self.sum_hours_end_time(if_scheduled[id_marked]['id_horas'],
-                                                          if_scheduled[id_marked]['tempo'])
-                    list_second_hours.append(time_marked)
+                    if if_scheduled[id_marked]['data'] == self.date:
+                        list_comparate_hours.append(if_scheduled[id_marked]['id_horas'])
 
-                    if if_scheduled[id_marked]['id_horas'] < horas and time_marked > horas:
-                        second_free = True
-                        break
+                        time_marked = self.sum_hours_end_time(if_scheduled[id_marked]['id_horas'],
+                                                              if_scheduled[id_marked]['tempo'])
+                        list_second_hours.append(time_marked)
+
+                        if if_scheduled[id_marked]['id_horas'] < horas and time_marked > horas:
+                            second_free = True
+                            break
                 free = horas in list_comparate_hours
             except requests.exceptions.ConnectionError:
-                toast('Você não esta conectado a internet!')
+                toast('Você não está conectado a internet!')
             except TypeError:
+                pass
+            except:
                 pass
             # ######################################################################################
 
@@ -2750,6 +3081,7 @@ class HoursSchedule(Screen):
             # Creating the schedule Here ##########################################################################
             info = f'{{"id_posicao":"{id_pos["id_button"]}",' \
                    f'"id_horas":"{horas}",' \
+                   f'"data":"{self.date}",' \
                    f'"id_user":"{id_user}",' \
                    f'"tempo":"{tempo}",' \
                    f'"valor":"{valor}",' \
@@ -2797,7 +3129,7 @@ class HoursSchedule(Screen):
                 json.dump([], file)
             MDApp.get_running_app().root.current = 'viewshedule'
         except requests.exceptions.ConnectionError:
-            toast('Você não esta conectado a internet!')
+            toast('Você não está conectado a internet!')
 
 
 class InfoScheduleClient(Screen):
@@ -2833,9 +3165,12 @@ class InfoScheduleClient(Screen):
         requisicao = requests.get(link_work)
         requisicao_dic = requisicao.json()
 
-        for id in requisicao_dic:
-            manager = id
-        return manager
+        try:
+            for id in requisicao_dic:
+                manager = id
+            return manager
+        except:
+            return ''
 
     def inf_schedule_client(self):
         dic_inf = {}
