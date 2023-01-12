@@ -1098,8 +1098,11 @@ class ViewSchedule(Screen):
 
                 msg_title = f'Agenda [color=#2E2E2E]{str(nome)}[/color]'
 
-                if requisicao_dic[f'{self.dia_atual}']['fechado'] == "True":
-                    msg_title = f'[color=#2E2E2E]{str(nome)}[/color]  [color=#AC0C18]"AUSENTE"![/color]'
+                try:
+                    if requisicao_dic[f'{self.dia_atual}']['fechado'] == "True":
+                        msg_title = f'[color=#2E2E2E]{str(nome)}[/color]  [color=#AC0C18]"AUSENTE"![/color]'
+                except:
+                    pass
 
                 self.ids.title_toobar.title = str(msg_title)
 
@@ -1140,8 +1143,11 @@ class ViewSchedule(Screen):
                 nome = requisicao_dic['nome']
                 msg_title = f'Agenda [color=#2E2E2E]{str(nome)}[/color]'
 
-                if requisicao_dic[f'{self.dia_atual}']['fechado'] == "True":
-                    msg_title = f'[color=#2E2E2E]{str(nome)}[/color]  [color=#AC0C18]"AUSENTE"![/color]'
+                try:
+                    if requisicao_dic[f'{self.dia_atual}']['fechado'] == "True":
+                        msg_title = f'[color=#2E2E2E]{str(nome)}[/color]  [color=#AC0C18]"AUSENTE"![/color]'
+                except:
+                    pass
 
                 self.ids.title_toobar.title = str(msg_title)
 
@@ -1394,6 +1400,7 @@ class ViewSchedule(Screen):
             toast('Você não esta conectado a internet!')
         except:
             toast('Nenhuma agenda para hoje!')
+            
 
         # # inserting the label opening ou closeup #################################
         # mdbox = MDBoxLayout(size_hint_y=(None), height='100dp')
