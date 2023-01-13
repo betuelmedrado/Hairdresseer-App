@@ -69,15 +69,11 @@ class HomePage(Screen):
         Clock.schedule_once(self.get_local, 1)
 
     def call_back(self,windown, key, *args):
-
         if key == 27:
-            try:
-                MDApp().stop()
-            except:
-                raise
-
+           self.dialog_exit_app()
         else:
             pass
+        return True
 
     # function to exit the app ###
     def exit_app(self, *args):
@@ -165,6 +161,8 @@ class HomePage(Screen):
 
         return True
 
+    def on_leave(self, *args):
+        Window.unbind(on_keyboard=self.call_back)
 
     # def get_client_data(self, *args):
     #     try:
@@ -1400,7 +1398,7 @@ class ViewSchedule(Screen):
             toast('Você não esta conectado a internet!')
         except:
             toast('Nenhuma agenda para hoje!')
-            
+
 
         # # inserting the label opening ou closeup #################################
         # mdbox = MDBoxLayout(size_hint_y=(None), height='100dp')
