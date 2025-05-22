@@ -3,15 +3,15 @@
 import requests
 
 # ============ Link to manager of app ==============
-APP_MANAGER = 'https://shedule-vitor-default-rtdb.firebaseio.com/msg_to_app/msg_manager.json'
+APP_MANAGER = link_salao
 
 # ============ Link to the clients =================
-APP_CLIENT = 'https://shedule-vitor-default-rtdb.firebaseio.com/msg_to_app/msg_client.json'
+APP_CLIENT = link_salao
 
 
 # ========== MSF to upgrade of app =====================
 # msg_client = ('Por favor faça a atualização do App!')
-# link_app = 'https://play.google.com/store/apps/details?id=org.barbershopcliente.barbershopcliente&pli=1'
+# link_app = link_salao
 
 
 # ====== To manutation of app =========================
