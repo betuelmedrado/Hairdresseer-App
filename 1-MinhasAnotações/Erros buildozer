@@ -1,4 +1,0 @@
-ERROS:
-
-ModuleNotFoundError:No module named 'docutils':
-    # Tive que definir o modulo 'docutils' no requerimento do arquivo .spec
