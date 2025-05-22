@@ -64,8 +64,8 @@ class Manager(ScreenManager):
 
 
 class LoginManager(Screen):
-    API_KEY = 'AIzaSyAue2_eYU5S5TsUc692vHNlyxIHrlBVZjk'
-    LINK_ID_MANAGER = 'https://shedule-vitor-default-rtdb.firebaseio.com/salao'
+    API_KEY = ''
+    LINK_ID_MANAGER = ''
 
     def on_pre_enter(self, *args):
         # Clock.schedule_once(self.spiner,1)
@@ -102,7 +102,7 @@ class LoginManager(Screen):
 
             # Geting ids of socios #########################################################################################
 
-            LINK_SOCIOS = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{ID_MANAGER}/socios.json'
+            LINK_SOCIOS = Link_here
             requisicao_socio = requests.get(LINK_SOCIOS)
             requisicao_socio_dic = requisicao_socio.json()
 
@@ -208,8 +208,7 @@ class LoginManager(Screen):
             user_id = requisicao_dic["user_id"]
 
             if requisicao.ok:
-                # LINK_DATA_MANAGER = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{user_id}.json'
-                LINK_DATA_MANAGER = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{user_id}.json'
+                LINK_DATA_MANAGER = link_salao
 
                 requisicao_data_manager = requests.get(LINK_DATA_MANAGER)
                 requisicao_data_manager_dic = requisicao_data_manager.json()
@@ -279,10 +278,10 @@ class LoginManager(Screen):
 
 class CreatProfile(Screen):
 
-    API_KEY = 'AIzaSyAue2_eYU5S5TsUc692vHNlyxIHrlBVZjk'
+    API_KEY = api_key
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
-        self.LINK_DATABASE_SALAO = 'https://shedule-vitor-default-rtdb.firebaseio.com/salao'
+        self.LINK_DATABASE_SALAO = link_salao
 
         Clock.schedule_once(self.call_init,1)
 
@@ -353,7 +352,7 @@ class CreatProfile(Screen):
     #  Here I will change to change the id
     def creat_profile(self,id_token, localid, refreshtoken, *args):
         try:
-            LINK_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{localid}.json'
+            LINK_SALAO = link_salao
 
             nome = self.ids.nome.text
 
@@ -372,7 +371,7 @@ class CreatProfile(Screen):
 
     def creat_socio(self, id_token, localid, refreshtoken, *args):
         try:
-            LINK_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{localid}.json'
+            LINK_SALAO = link_salao
 
             nome = self.ids.nome.text
 
@@ -399,7 +398,7 @@ class CreatProfile(Screen):
         try:
             if self.valid_field():
                 try:
-                    LINK = f"https://identitytoolkit.googleapis.com/v1/accounts:signUp?key={self.API_KEY}"
+                    LINK = link_salao
 
                     email = self.ids.email.text
                     senha = self.ids.senha.text
@@ -489,7 +488,7 @@ class CreatProfile(Screen):
 
 
 class RedefinitionSenha(Screen):
-    API_KEY = 'AIzaSyAue2_eYU5S5TsUc692vHNlyxIHrlBVZjk'
+    API_KEY = api_key
 
     def send_email(self, *args):
         """
@@ -498,7 +497,7 @@ class RedefinitionSenha(Screen):
         :return:
         """
         try:
-            LINK_FOR_API = f'https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key={self.API_KEY}'
+            LINK_FOR_API = link_google_api
 
             email = self.ids.email.text
 
@@ -528,7 +527,7 @@ class RedefinitionSenha(Screen):
 
 
 class HomePage(Screen):
-    LINK_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao'
+    LINK_SALAO = link_salao
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -650,7 +649,7 @@ class HomePage(Screen):
 
 class ClientBlocked(Screen):
 
-    LINK_DATA = 'https://shedule-vitor-default-rtdb.firebaseio.com'
+    LINK_DATA = link_salao
 
     # In use in function "search_client_blocked" first
      # List to geting the clients e filter the blockeds
@@ -739,8 +738,8 @@ class ClientBlocked(Screen):
 
 
 class ManagerProfile(Screen):
-    API_KEY = 'AIzaSyAue2_eYU5S5TsUc692vHNlyxIHrlBVZjk'
-    LINK_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao'
+    API_KEY = api_key
+    LINK_SALAO = link_salao
     list_day = []
 
     def __init__(self,*args,**kwargs):
@@ -1097,7 +1096,7 @@ class ManagerProfile(Screen):
             refresh_token = json.load(arquivo)
 
         try:
-            LINK_CHANGE_REFRESH = f'https://securetoken.googleapis.com/v1/token?key={self.API_KEY}'
+            LINK_CHANGE_REFRESH = link-refresh
 
             info = {"grant_type": "refresh_token",
                     "refresh_token": refresh_token}
@@ -1116,7 +1115,7 @@ class ManagerProfile(Screen):
         try:
             self.user_id = self.get_id_whith_refreshtoken()
             try:
-                LINK_BASE_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.user_id}.json'
+                LINK_BASE_SALAO = link_salao
 
                 requisicao_base_salao = requests.get(LINK_BASE_SALAO)
                 requisicao_salao_dic = requisicao_base_salao.json()
@@ -1130,7 +1129,7 @@ class ManagerProfile(Screen):
 
             except TypeError:
 
-                LINK_BASE_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{self.user_id}.json'
+                LINK_BASE_SALAO = link_salao
 
                 requisicao_base_salao = requests.get(LINK_BASE_SALAO)
                 requisicao_salao_dic = requisicao_base_salao.json()
@@ -1243,7 +1242,7 @@ class ManagerProfile(Screen):
             if if_manager == 'socio':
 
                 for day in self.list_day:
-                    LINK_BASE_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{self.user_id}/{day}.json'
+                    LINK_BASE_SALAO = link_salao
 
                     self.entrada = self.ids.entry.text
                     self.saida = self.ids.exit.text
@@ -1271,7 +1270,7 @@ class ManagerProfile(Screen):
             elif if_manager == 'manager':
 
                 for day in self.list_day:
-                    LINK_BASE_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.user_id}/{day}.json'
+                    LINK_BASE_SALAO = link_salao
 
 
                     self.entrada = self.ids.entry.text
@@ -1286,7 +1285,7 @@ class ManagerProfile(Screen):
 
 
                 time_cancel = self.ids.time_cancel.text
-                LINK_BASE_TIME_CANCEL = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.user_id}.json'
+                LINK_BASE_TIME_CANCEL = link_salao
                 info_cancel = f'{{"time_cancel":"{time_cancel}"}}'
                 requisica = requests.patch(LINK_BASE_TIME_CANCEL, info_cancel)
 
@@ -1316,7 +1315,7 @@ class ManagerProfile(Screen):
             if nome_servico != '' and tempo != '' and valor != '':
 
                 if is_manager == 'socio':
-                    LINK_BASE_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{self.user_id}/servicos.json'
+                    LINK_BASE_SALAO = link_salao
 
                     info = f'{{"nome_servico":"{nome_servico}",' \
                            f'"tempo":"{tempo}",' \
@@ -1335,7 +1334,7 @@ class ManagerProfile(Screen):
                     self.ids.valor.text = ''
 
                 elif is_manager == 'manager':
-                    LINK_BASE_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.user_id}/servicos.json'
+                    LINK_BASE_SALAO = link_salao
 
                     info = f'{{"nome_servico":"{nome_servico}",' \
                            f'"tempo":"{tempo}",' \
@@ -1366,11 +1365,11 @@ class ManagerProfile(Screen):
         try:
             # Para saber si quem está acessando é o socio ou o gerente #####################################################
             if is_manager == 'socio':
-                LINK_CATEGORIA = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{self.user_id}/servicos.json'
+                LINK_CATEGORIA = link_salao
                 requisicao_get = requests.get(LINK_CATEGORIA)
                 socio_ou_gerente = True
             elif is_manager == 'manager':
-                LINK_CATEGORIA = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.user_id}/servicos.json'
+                LINK_CATEGORIA = link_salao
                 requisicao_get = requests.get(LINK_CATEGORIA)
                 socio_ou_gerente = False
 
@@ -1383,9 +1382,9 @@ class ManagerProfile(Screen):
                 # Aqui eu também estou recebendo o id de trabalho
                 for id in requisicao_get_dic:
                     if socio_ou_gerente:
-                        LINK_ID = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{self.user_id}/servicos/{id}.json'
+                        LINK_ID = link_salao
                     else:
-                        LINK_ID = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.user_id}/servicos/{id}.json'
+                        LINK_ID = link_salao
 
                     requisicao_get_categoria = requests.get(LINK_ID)
                     requisicao_get_categoria_dic = requisicao_get_categoria.json()
@@ -1405,14 +1404,14 @@ class ManagerProfile(Screen):
 
     def save_socio(self,*args):
         try:
-            LINK_ETRADA_SAIDA =f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.user_id}.json'
+            LINK_ETRADA_SAIDA  = link_salao
             requisicao_entrada_saida = requests.get(LINK_ETRADA_SAIDA)
             entrada_saida = requisicao_entrada_saida.json()
 
             entrada = entrada_saida['entrada']
             saida = entrada_saida['saida']
 
-            LINK_SOCIO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.user_id}/socios.json'
+            LINK_SOCIO = link_salao
 
 
             nome_socio = self.ids.text_socio.text
@@ -1443,7 +1442,7 @@ class ManagerProfile(Screen):
         lista = []
 
         try:
-            LINK_SOCIO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.user_id}/socios.json'
+            LINK_SOCIO = link_salao
             socio = requests.get(LINK_SOCIO)
             socio_dic = socio.json()
 
@@ -1550,11 +1549,11 @@ class Popup_widgets(MDBoxLayout):
             try:
                 # Para saber si quem está acessando é o socio ou o gerente #####################################################
                 if is_manager == 'socio':
-                    LINK_CATEGORIA = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{self.user_id}/servicos{id_work}.json'
+                    LINK_CATEGORIA = link_salao
                     requisicao_get = requests.patch(LINK_CATEGORIA, data=info)
 
                 elif is_manager == 'manager':
-                    LINK_CATEGORIA = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.user_id}/servicos/{id_work}.json'
+                    LINK_CATEGORIA = link_salao
                     requisicao_get = requests.patch(LINK_CATEGORIA, data=info)
 
                 toast('Alterações feita com sucesso!')
@@ -1577,11 +1576,11 @@ class Popup_widgets(MDBoxLayout):
         try:
             # Para saber si quem está acessando é o socio ou o gerente #####################################################
             if is_manager == 'socio':
-                LINK_CATEGORIA = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{self.user_id}/servicos{id_work}.json'
+                LINK_CATEGORIA = link_salao
                 requisicao_get = requests.delete(LINK_CATEGORIA)
 
             elif is_manager == 'manager':
-                LINK_CATEGORIA = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.user_id}/servicos/{id_work}.json'
+                LINK_CATEGORIA = link_salao
                 requisicao_get = requests.delete(LINK_CATEGORIA)
 
             toast('Serviço excluido!')
@@ -1691,7 +1690,7 @@ class MyBoxCategorieLabel(MDCard):
 class MyBoxSocio(MDCard):
 
     API_KEY = 'AIzaSyAue2_eYU5S5TsUc692vHNlyxIHrlBVZjk'
-    LINK_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao'
+    LINK_SALAO = link_salao
 
     def __init__(self,name, id_socio, id_manager, **kwargs):
         super().__init__(**kwargs)
@@ -1796,7 +1795,7 @@ class CardButtonProficional(MDCard):
 
 
 class ScreenChoiceSchedule(Screen):
-    LINK_DATABASE_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao'
+    LINK_DATABASE_SALAO = link_salao
 
     # permition read the class "call_init()" only when app the open
     read_get_info = True
@@ -1878,7 +1877,7 @@ class ScreenChoiceSchedule(Screen):
 
 
 class ViewSchedule(Screen):
-    API_KEY = "AIzaSyAue2_eYU5S5TsUc692vHNlyxIHrlBVZjk"
+    API_KEY = api_key
     x = NumericProperty(0)
     y = NumericProperty(0)
 
@@ -1893,9 +1892,9 @@ class ViewSchedule(Screen):
 
         self.dia_atual = datetime.today().isoweekday()
 
-        # self.LINK = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao.json'
+        # self.LINK = link_salao
 
-        self.LINK_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao'
+        self.LINK_SALAO = link_salao
 
         try:
             # Getting the id of manager ####################################################################################
@@ -1955,7 +1954,7 @@ class ViewSchedule(Screen):
 
     def log_aut(self,*args):
         try:
-            LINK = f'https://securetoken.googleapis.com/v1/token?key={self.API_KEY}'
+            LINK = google_link
             try:
                 with open('refreshtoken.json', 'r') as arquivo:
                     refresh = json.load(arquivo)
@@ -1989,7 +1988,7 @@ class ViewSchedule(Screen):
                 # information socio ############################################################################################
                 if id_manager["manager"] == 'False':
                     # Here if not manager then get the socio #########################################################################
-                    LINK_SALAO = f'https://shedule-vitor-default-rtdb.firebaseio.com/salao/{self.id_manager}/socios/{id_manager["id_user"]}.json'
+                    LINK_SALAO = link_salao
                     requisicao = requests.get(LINK_SALAO)
                     requisicao_dic_socio = requisicao.json()
 
@@ -2553,7 +2552,7 @@ class ViewSchedule(Screen):
 
             if if_manager['manager'] == "False":
                 # getting ids that are already scheduled ###########################################################################
-                link_cliente = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_user}/ids_agendado.json'
+                link_cliente = link_salao
                 requisicao_client_get = requests.get(link_cliente)
                 requisicao_client_get_dic = requisicao_client_get.json()
 
@@ -2565,7 +2564,7 @@ class ViewSchedule(Screen):
                 list_ids_schedule.append(if_manager['id_user'])
 
                 # Insert ids of schedule in user ###################################################################################
-                link_cliente = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_user}/ids_agendado.json'
+                link_cliente = link_salao
 
                 info = f'{{"ids_agendado":"{list_ids_schedule}" }}'
 
@@ -2640,7 +2639,7 @@ class ViewSchedule(Screen):
 
 class HoursSchedule(Screen):
 
-    LINK_SALAO = 'https://shedule-vitor-default-rtdb.firebaseio.com/salao'
+    LINK_SALAO = link_salao
     def __init__(self,hours='', **kwargs):
         super().__init__(**kwargs)
         # Clock.schedule_once(self.get_works, 2)
@@ -2953,7 +2952,6 @@ class HoursSchedule(Screen):
         pass
 
     def get_name_user(self, info_user, *args):
-        # LINK_DATA_NAME = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_user}.json'
         # name = requests.get(LINK_DATA_NAME)
         # name_dic = name.json()
 
@@ -3104,7 +3102,7 @@ class HoursSchedule(Screen):
 
             if if_manager['manager'] == "False":
                 # getting ids that are already scheduled ###########################################################################
-                    link_cliente = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_user}/ids_agendado.json'
+                    link_cliente = link_salao
                     requisicao_client_get = requests.get(link_cliente)
                     requisicao_client_get_dic = requisicao_client_get.json()
 
@@ -3116,7 +3114,7 @@ class HoursSchedule(Screen):
                     list_ids_schedule.append(if_manager['id_user'])
 
                 # Insert ids of schedule in user ###################################################################################
-                    link_cliente = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_user}/ids_agendado.json'
+                    link_cliente = link_salao
 
                     info = f'{{"ids_agendado":"{list_ids_schedule}" }}'
 
@@ -3134,7 +3132,7 @@ class HoursSchedule(Screen):
 
 class InfoScheduleClient(Screen):
 
-    LINK_DATA_BASE = 'https://shedule-vitor-default-rtdb.firebaseio.com/salao'
+    LINK_DATA_BASE = link_salao
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -3192,7 +3190,7 @@ class InfoScheduleClient(Screen):
 
     def info_cliente_and_cancel(self,id_client,*args):
 
-        link = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_client}.json'
+        link = link_salao
         requisicao = requests.get(link)
         requisicao_dic = requisicao.json()
 
@@ -3233,7 +3231,7 @@ class InfoScheduleClient(Screen):
             id_client = info_schedule['id_schedule']
 
 
-            link = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_client}.json'
+            link = link_salao
 
             info = f'{{"quant_cancelado":"{cancelada}"}}'
             requisicao = requests.patch(link, data=info)
@@ -3257,7 +3255,7 @@ class InfoScheduleClient(Screen):
             id_client = info_schedule['id_schedule']
 
 
-            link = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_client}.json'
+            link = link_salao
 
             info = f'{{"quant_cancelado":"{cancelada}"}}'
             requisicao = requests.patch(link, data=info)
@@ -3282,7 +3280,7 @@ class InfoScheduleClient(Screen):
         id_client = info_schedule['id_schedule']
 
 
-        link = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_client}.json'
+        link = link_salao
 
         info = f'{{"bloqueado":"True"}}'
         requisicao = requests.patch(link, data=info)
@@ -3322,7 +3320,7 @@ class InfoScheduleClient(Screen):
             info_schedule = json.load(file)
         id_client = info_schedule['id_schedule']
 
-        link = f'https://shedule-vitor-default-rtdb.firebaseio.com/client/{id_client}.json'
+        link = link_salao
 
         info = f'{{"bloqueado":"False"}}'
         requisicao = requests.patch(link, data=info)
