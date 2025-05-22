@@ -124,7 +124,7 @@ class LoginManager(Screen):
 
             dic_login = {}
 
-            LINK_API = f'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={self.API_KEY}'
+            LINK_API = goole_api
 
             email = self.ids.email.text
             senha = self.ids.senha.text
@@ -193,7 +193,7 @@ class LoginManager(Screen):
     def load_refresh(self, *args):
         try:
             # pegando o locaoid
-            LINK_GET_ID = f'https://securetoken.googleapis.com/v1/token?key={self.API_KEY}'
+            LINK_GET_ID = goolge_key
 
             with open('refreshtoken.json', 'r') as arquivo:
                 refresh = json.load(arquivo)
